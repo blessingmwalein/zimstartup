@@ -11,6 +11,10 @@ import {
 import {
   AddCombinedShareholderRequest,
   AddDirectorDetailsRequest,
+  AddDirectorPositionRequest,
+  AddEducationalQualificationsRequest,
+  AddEmploymentHistoryRequest,
+  AddPublicInformationRequest,
   CheckCompanyNameResponse,
   CompanyCombinedResponse,
   CompanyListBySectorResponse,
@@ -25,7 +29,9 @@ import {
   CreateCompanyUpdatesRequest,
   CreateUserEmploymentHistoryRequest,
   RegisterCompanyRequest,
+  UploadCompanyLogoRequest,
 } from "../models/company";
+import { CompanyDocumentsResponse } from "../models/documents";
 
 // Global Axios instance with the default config (including token if required)
 const api = createAxiosInstance();
@@ -129,14 +135,16 @@ export const createNewDirectorDetails = async (data: any): Promise<any> => {
 };
 
 //{{URL}}create-new-director-position
-export const createNewDirectorPosition = async (data: any): Promise<any> => {
+export const createNewDirectorPosition = async (
+  data: AddDirectorPositionRequest,
+): Promise<any> => {
   const response = await api.post<any>(`create-new-director-position`, data);
   return response.data;
 };
 
 //{{URL}}create-educational-qualifications
 export const createEducationalQualifications = async (
-  data: any,
+  data: AddEducationalQualificationsRequest,
 ): Promise<any> => {
   const response = await api.post<any>(
     `create-educational-qualifications`,
@@ -144,14 +152,19 @@ export const createEducationalQualifications = async (
   );
   return response.data;
 };
+
 //{{URL}}{create-new-employment-history
-export const createNewEmploymentHistory = async (data: any): Promise<any> => {
+export const createNewEmploymentHistory = async (
+  data: AddEmploymentHistoryRequest,
+): Promise<any> => {
   const response = await api.post<any>(`create-new-employment-history`, data);
   return response.data;
 };
 
 //{{URL}}{create-new-public-information
-export const createNewPublicInformation = async (data: any): Promise<any> => {
+export const createNewPublicInformation = async (
+  data: AddPublicInformationRequest,
+): Promise<any> => {
   const response = await api.post<any>(`create-new-public-information`, data);
   return response.data;
 };
@@ -243,7 +256,57 @@ export const addCombinedCompanyShareholder = async (
 };
 
 //add drector details
-export const addDirectorDetails = async (data: AddDirectorDetailsRequest): Promise<any> => {
+export const addDirectorDetails = async (
+  data: AddDirectorDetailsRequest,
+): Promise<any> => {
   const response = await api.post<any>(`create-new-director-details`, data);
+  return response.data;
+};
+
+//upload company logo
+export const uploadCompanyLogo = async (
+  data: UploadCompanyLogoRequest,
+): Promise<any> => {
+  // Create a FormData instance
+  const formData = new FormData();
+  formData.append("company_id", data.companyId);
+  formData.append("file", data.file);
+
+  // Send the POST request with multipart/form-data
+  const response = await api.post<any>("upload-company-logo", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data", // Set the content type explicitly
+    },
+  });
+
+  return response.data;
+};
+
+//upload company document
+export const uploadCompanyDocument = async (
+  data: UploadCompanyLogoRequest,
+): Promise<any> => {
+  // Create a FormData instance
+  const formData = new FormData();
+  formData.append("company_id", data.companyId);
+  formData.append("file", data.file);
+
+  // Send the POST request with multipart/form-data
+  const response = await api.post<any>("upload-company-documents", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data", // Set the content type explicitly
+    },
+  });
+
+  return response.data;
+};
+
+//get company_documents/102
+export const getCompanyDocuments = async (
+  companyId: number,
+): Promise<CompanyDocumentsResponse> => {
+  const response = await api.get<CompanyDocumentsResponse>(
+    `company_documents/${companyId}`,
+  );
   return response.data;
 };

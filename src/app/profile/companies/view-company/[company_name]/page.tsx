@@ -11,6 +11,7 @@ import { fetchCompanyDataCombined } from "../../../../../../state/slices/company
 import ViewCompanyDetails from "@/components/Companies/ViewPages/ViewCompanyDetails";
 import ViewStockMarketDetails from "@/components/Companies/ViewPages/ViewStockMarketDetails";
 import ViewPreviousFundsDetails from "@/components/Companies/ViewPages/ViewPreviousFunds";
+import ViewCompanyDocuments from "@/components/Companies/ViewPages/ViewCompanyDocuments";
 
 const ViewCompany: React.FC = ({ params }: any) => {
   const dispatch = useDispatch<AppDispatch>();
@@ -134,7 +135,7 @@ const ViewCompany: React.FC = ({ params }: any) => {
     },
     {
       name: "Documents",
-      tab: <h2 />,
+      tab: <ViewCompanyDocuments />,
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"

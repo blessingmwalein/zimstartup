@@ -26,6 +26,8 @@ import {
   getCompanyDataCombined,
   addCombinedCompanyShareholder,
   addDirectorDetails,
+  uploadCompanyDocument,
+  getCompanyDocuments,
 } from "../services/company";
 import {
   CheckCompanyNameResponse,
@@ -36,13 +38,21 @@ import {
   CompanyCombinedResponse,
   AddCombinedShareholderRequest,
   AddDirectorDetailsRequest,
+  AddDirectorPositionRequest,
+  AddEducationalQualificationsRequest,
+  AddEmploymentHistoryRequest,
+  AddPublicInformationRequest,
+  AddAwardRequest,
+  UploadCompanyLogoRequest,
 } from "../models/company";
+import { CompanyDocument } from "../models/documents";
 
 interface CompanyState {
   companyList: CompanyListResponse | null;
   combinedCompanyData: CompanyCombinedResponse | null;
   companyBySectorList: CompanyListBySectorResponse | null;
   companyUpdates: any[];
+  companyDocuments: CompanyDocument[];
   status: "idle" | "loading" | "failed";
   error: string | null;
 }
@@ -52,6 +62,7 @@ const initialState: CompanyState = {
   combinedCompanyData: null,
   companyBySectorList: null,
   companyUpdates: [],
+  companyDocuments: [],
   status: "idle",
   error: null,
 };
@@ -223,6 +234,231 @@ export const createDirectorDetails = createAsyncThunk(
   },
 );
 
+//createNewDirectorPosition
+export const addNewDirectorPosition = createAsyncThunk(
+  "company/createNewDirectorPosition",
+  async (data: AddDirectorPositionRequest, { rejectWithValue }) => {
+    try {
+      // Attempt to create a new director position
+      return await createNewDirectorPosition(data);
+    } catch (error: any) {
+      console.error("Failed to add company director position:", error.message);
+      // Handle cases where error response exists
+      if (error.response) {
+        const { status, data } = error.response;
+        // Handle 422 validation error
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+
+        // For other errors, return the message from the response
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      // Return a generic error message for any other case
+      return rejectWithValue("Failed to add company director position");
+    }
+  },
+);
+
+//createEducationalQualifications
+export const addEducationalQualifications = createAsyncThunk(
+  "company/createEducationalQualifications",
+  async (data: AddEducationalQualificationsRequest, { rejectWithValue }) => {
+    try {
+      return await createEducationalQualifications(data);
+    } catch (error: any) {
+      console.error("Failed to add educational qualifications:", error.message);
+      if (error.response) {
+        const { status, data } = error.response;
+        // Handle 422 validation error
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+
+        // For other errors, return the message from the response
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      // Return a generic error message for any other case
+      return rejectWithValue("Failed to add educational qualifications");
+    }
+  },
+);
+
+//createNewEmploymentHistory
+export const addEmploymentHistory = createAsyncThunk(
+  "company/createNewEmploymentHistory",
+  async (data: AddEmploymentHistoryRequest, { rejectWithValue }) => {
+    try {
+      return await createNewEmploymentHistory(data);
+    } catch (error: any) {
+      console.error("Failed to add employment history:", error.message);
+      if (error.response) {
+        const { status, data } = error.response;
+        // Handle 422 validation error
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+
+        // For other errors, return the message from the response
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      // Return a generic error message for any other case
+      return rejectWithValue("Failed to add employment history");
+    }
+  },
+);
+
+//createNewPublicInformation
+export const addPublicInformation = createAsyncThunk(
+  "company/createNewPublicInformation",
+  async (data: AddPublicInformationRequest, { rejectWithValue }) => {
+    try {
+      return await createNewPublicInformation(data);
+    } catch (error: any) {
+      console.error("Failed to add public information:", error.message);
+      if (error.response) {
+        const { status, data } = error.response;
+        // Handle 422 validation error
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+
+        // For other errors, return the message from the response
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      // Return a generic error message for any other case
+      return rejectWithValue("Failed to add public information");
+    }
+  },
+);
+
+//createNewAward
+export const addNewAward = createAsyncThunk(
+  "company/createNewAward",
+  async (data: AddAwardRequest, { rejectWithValue }) => {
+    try {
+      return await createNewAward(data);
+    } catch (error: any) {
+      console.error("Failed to add award:", error.message);
+      if (error.response) {
+        const { status, data } = error.response;
+        // Handle 422 validation error
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+
+        // For other errors, return the message from the response
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      // Return a generic error message for any other case
+      return rejectWithValue("Failed to add award");
+    }
+  },
+);
+
+//uploadCompanyLogo
+export const uploadCompanyLogo = createAsyncThunk(
+  "company/uploadCompanyLogo",
+  async (data: any, { rejectWithValue }) => {
+    try {
+      return await registerCompanyRequest(data);
+    } catch (error: any) {
+      console.error("Failed to upload company logo:", error.message);
+      if (error.response) {
+        const { status, data } = error.response;
+        // Handle 422 validation error
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+
+        // For other errors, return the message from the response
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      // Return a generic error message for any other case
+      return rejectWithValue("Failed to upload company logo");
+    }
+  },
+);
+
+//upload company documents
+export const addCompanyDocument = createAsyncThunk(
+  "company/uploadCompanyDocument",
+  async (data: UploadCompanyLogoRequest, { rejectWithValue }) => {
+    try {
+      return await uploadCompanyDocument(data);
+    } catch (error: any) {
+      console.error("Failed to upload company document:", error.message);
+      if (error.response) {
+        const { status, data } = error.response;
+        // Handle 422 validation error
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+
+        // For other errors, return the message from the response
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      // Return a generic error message for any other case
+      return rejectWithValue("Failed to upload company document");
+    }
+  },
+);
+
+//get company documents
+export const fetchCompanyDocuments = createAsyncThunk(
+  "company/fetchCompanyDocuments",
+  async (companyId: number, { rejectWithValue }) => {
+    try {
+      return await getCompanyDocuments(companyId);
+    } catch (error: any) {
+      console.error("Failed to fetch company documents:", error.message);
+      return rejectWithValue("Failed to fetch company documents");
+    }
+  },
+);
+
 const companySlice = createSlice({
   name: "company",
   initialState,
@@ -344,6 +580,94 @@ const companySlice = createSlice({
       })
       .addCase(createDirectorDetails.pending, (state) => {
         state.status = "loading";
+      })
+      .addCase(createDirectorDetails.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(createDirectorDetails.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(addNewDirectorPosition.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addNewDirectorPosition.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addNewDirectorPosition.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(addEducationalQualifications.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addEducationalQualifications.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addEducationalQualifications.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(addEmploymentHistory.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addEmploymentHistory.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addEmploymentHistory.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(addPublicInformation.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addPublicInformation.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addPublicInformation.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(addNewAward.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addNewAward.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addNewAward.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(uploadCompanyLogo.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(uploadCompanyLogo.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(uploadCompanyLogo.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(addCompanyDocument.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addCompanyDocument.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addCompanyDocument.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(fetchCompanyDocuments.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchCompanyDocuments.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.companyDocuments = action.payload.documents;
+      })
+      .addCase(fetchCompanyDocuments.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
       });
   },
 });

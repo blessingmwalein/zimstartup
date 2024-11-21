@@ -307,9 +307,9 @@ const ViewCompanyDetails: React.FC = () => {
           <section>
             <header className="flex items-center justify-between">
               <h3 className="text-lg font-bold">Shareholders</h3>
-              <button className="rounded-md bg-primary px-4 py-2 text-white">
+              <Link href={`${companyData.company_name}/add-shareholder`} className="rounded-md bg-primary px-4 py-2 text-white">
                 + Add Shareholder
-              </button>
+              </Link>
             </header>
             <table className="mt-4 w-full rounded-lg border border-gray-200 text-sm">
               <thead>

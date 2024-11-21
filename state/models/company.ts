@@ -328,3 +328,48 @@ export interface AddDirectorDetailsRequest {
   email: string;
   nationality: string;
 }
+
+export interface AddDirectorPositionRequest {
+  employee_id: number;
+  overall_position: string;
+  position: string;
+  start_date: Date;
+  end_date: Date;
+  is_current: boolean;
+}
+
+export interface AddEducationalQualificationsRequest {
+  employee_id: number;
+  institution: string;
+  education_type: string;
+  field_of_study: string;
+  year_obtained: number;
+}
+
+export interface AddEmploymentHistoryRequest {
+  employee_id: number;
+  company_name: string;
+  position: string;
+  start_date: Date;
+  end_date: Date;
+  achievements: string;
+  reason_for_leaving: string;
+}
+
+export interface AddPublicInformationRequest {
+  employee_id: number;
+  public_profile: string;
+}
+
+export interface AddAwardRequest {
+  employee_id: number;
+  award: string;
+  year: number;
+  description: string;
+}
+
+
+export interface UploadCompanyLogoRequest {
+  companyId: string;
+  file: File; // Use Blob or File for binary data
+}
