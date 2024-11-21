@@ -5,12 +5,13 @@ import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import CustomAlert from "@/components/common/notification/Alert";
-import { AppDispatch } from "../../../../../../../state/store";
+import { AppDispatch } from "../../../../../../../../state/store";
 import Stepper from "@/components/common/Stepper";
-import { createCompanyContact } from "../../../../../../../state/slices/companySlice";
+import { createCompanyContact } from "../../../../../../../../state/slices/companySlice";
+import { toast } from "react-toastify";
 
 // Yup validation schema
 const schema = Yup.object({
@@ -23,19 +24,18 @@ const schema = Yup.object({
   work_email: Yup.string()
     .email("Invalid email address")
     .required("Work email is required"),
-  phone1: Yup.string()
-    .matches(/^[0-9]{10}$/, "Phone number must be exactly 10 digits")
+  phone1: Yup.number()
     .required("Phone number 1 is required"),
-  phone2: Yup.string()
+  phone2: Yup.number()
 
     .nullable(),
 
-  phone3: Yup.string()
+  phone3: Yup.number()
 
     .nullable(),
   address: Yup.string().required("Address is required"),
   address_city: Yup.string().required("City is required"),
-  state_code: Yup.string().required("State code is required"),
+  state_code: Yup.number().required("State code is required"),
   region: Yup.string().required("Region is required"),
   country: Yup.string().required("Country is required"),
 }).required();
@@ -49,6 +49,17 @@ const AddCompanyContactDetails: React.FC = ({ params }: any) => {
   const [error, setError] = useState<string | null>(null);
 
   const { user } = useSelector((state: any) => state.auth);
+
+  const [companyName, setCompanyName] = useState("");
+
+  useEffect(() => {
+    const companyName = params.company_name;
+    if (companyName) {
+      const decodedCompanyName = decodeURIComponent(companyName); // Decode the encoded string
+      setCompanyName(decodedCompanyName); // Set the decoded value in the form
+    }
+  }, [params.company_name, setCompanyName]);
+
 
   const {
     register,
@@ -78,7 +89,16 @@ const AddCompanyContactDetails: React.FC = ({ params }: any) => {
       ).unwrap();
 
       // Redirect to the next step using the company_id from the response
-      router.push(`/profile/companies/add-company/${company_id}/step-3`);
+      if (response.data) {
+        toast.success("Company contact details added successful", {
+          position: "bottom-center",
+        });
+        router.push(`/profile/companies/add-company/step-3/${company_id}/${params.company_name}`);
+      } else {
+        toast.error("Something went wrong", {
+          position: "bottom-center",
+        });
+      }
     } catch (err: any) {
       setError(err || "Failed to submit company contact details");
     }
@@ -94,11 +114,17 @@ const AddCompanyContactDetails: React.FC = ({ params }: any) => {
 
   return (
     <DefaultLayout>
-      <div className="mx-auto max-w-270">
+      <div className="mx-auto mt-4 max-w-270">
         <Breadcrumb pageName="Add Company Contact Details" />
         <div className="grid gap-8">
           <div className="col-span-5 xl:col-span-3">
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+              {/* company name */}
+              <div className="px-7 py-4 border-b border-stroke dark:border-strokedark">
+                <h2 className="text-xl font-semibold text-black ">
+                  {companyName}
+                </h2>
+              </div>
               <div className="border-b border-stroke px-7 py-4 dark:border-strokedark">
                 <Stepper currentStep={currentStep} headings={headings} />
               </div>

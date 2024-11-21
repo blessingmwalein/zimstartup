@@ -5,34 +5,34 @@ import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import CustomAlert from "@/components/common/notification/Alert";
-import { AppDispatch } from "../../../../../../../state/store";
+import { AppDispatch } from "../../../../../../../../state/store";
 import Stepper from "@/components/common/Stepper";
-import {
-  createCompanyContact,
-  createStockMarketDetails,
-} from "../../../../../../../state/slices/companySlice";
+import { createCompanyPreviousFunds } from "../../../../../../../../state/slices/companySlice";
+import { toast } from "react-toastify";
+import { format } from "date-fns";
 
 // Yup validation schema
 const schema = Yup.object({
-  type_of_market: Yup.string().required("Type of Market is required"),
-  listed_date: Yup.date().required("Listed Date is required"),
-  listing_capital: Yup.number().required("Listing Capital is required"),
-  listing_currency: Yup.string().required("Listing Currency is required"),
-  delisted_date: Yup.date().required("Delisted Date is required"),
-  current_market_cap: Yup.number().required(
-    "Current Market Capital is required",
+  investor_type: Yup.string().required("Investor Type is required"),
+  investor_information: Yup.string().required(
+    "Investor Information is required",
   ),
-  financial_year_end: Yup.date().required("Financial Year End is required"),
-  transfer_secretary: Yup.string().required("Transfer Secretary is required"),
-  reporting_currency: Yup.string().required("Reporting Currency is required"),
-  ISIN: Yup.string().required("ISIN is required"),
+  investment_type: Yup.string().required("Investment Type is required"),
+  date_of_funds: Yup.date().required("Date of Funds is required"),
+  investment_amount: Yup.number().required("Investment Amount is required"),
+  investment_currency: Yup.string().required("Investment Currency is required"),
+  company_valuation: Yup.number().required("Company Valuation is required"),
+  company_valuation_currency: Yup.string().required(
+    "Company Valuation Currency is required",
+  ),
+  valuation_date: Yup.date().required("Valuation Date is required"),
 }).required();
 
 // Main Component
-const AddCompanyStockMarketDetails: React.FC = ({ params }: any) => {
+const AddCompanyFundsDetails: React.FC = ({ params }: any) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -40,6 +40,24 @@ const AddCompanyStockMarketDetails: React.FC = ({ params }: any) => {
   const [error, setError] = useState<string | null>(null);
 
   const { user } = useSelector((state: any) => state.auth);
+
+  const [companyName, setCompanyName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const companyName = params.company_name;
+    if (companyName) {
+      const decodedCompanyName = decodeURIComponent(companyName); // Decode the encoded string
+      setCompanyName(decodedCompanyName); // Set the decoded value in the form
+    }
+  }, [params.company_name, setCompanyName]);
+
+
+  const {
+    industryList,
+    businessStatesList,
+    stockExchangeList,
+    marketTypesList,
+  } = useSelector((state: any) => state.companyConfig);
 
   const {
     register,
@@ -56,22 +74,32 @@ const AddCompanyStockMarketDetails: React.FC = ({ params }: any) => {
 
     const contactDetailsPayload = {
       ...data,
-      stock_id: "None",
       company_id,
+      valuation_date: format(new Date(data.valuation_date), "yyyy-MM-dd"),
+      date_of_funds: format(new Date(data.date_of_funds), "yyyy-MM-dd"),
     };
 
     try {
       const response = await dispatch(
-        createStockMarketDetails(contactDetailsPayload),
+        createCompanyPreviousFunds(contactDetailsPayload),
       ).unwrap();
 
-      router.push(`/profile/companies/add-company/${company_id}/step-3`);
+      if (response.data) {
+        toast.success("Company stock details added successful", {
+          position: "bottom-center",
+        });
+        router.push(`/profile/companies/view-company/${params.company_name}`);
+      } else {
+        toast.error("Something went wrong", {
+          position: "bottom-center",
+        });
+      }
     } catch (err: any) {
       setError(err || "Failed to submit company contact details");
     }
   };
 
-  const currentStep = 2;
+  const currentStep = 3;
   const headings = [
     "Step 1: General Details",
     "Step 2: Contact Details",
@@ -79,13 +107,20 @@ const AddCompanyStockMarketDetails: React.FC = ({ params }: any) => {
     "Step 4: Funds Details",
   ];
 
+  const investorTypes = ["Individual", "Governement", "Organization"];
+
   return (
     <DefaultLayout>
-      <div className="mx-auto max-w-270">
+      <div className="mx-auto mt-4 max-w-280">
         <Breadcrumb pageName="Add Company Stock Details" />
         <div className="grid gap-8">
           <div className="col-span-5 xl:col-span-3">
             <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
+              <div className="border-b border-stroke px-7 py-4 dark:border-strokedark">
+                <h2 className="text-xl font-semibold text-black ">
+                  {companyName}
+                </h2>
+              </div>
               <div className="border-b border-stroke px-7 py-4 dark:border-strokedark">
                 <Stepper currentStep={currentStep} headings={headings} />
               </div>
@@ -101,68 +136,75 @@ const AddCompanyStockMarketDetails: React.FC = ({ params }: any) => {
                 <form onSubmit={handleSubmit(onSubmit)}>
                   {/* Row 1 */}
                   <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {/* Type of Market */}
+                    {/* Investor Type */}
                     <div>
                       <label
                         className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="type_of_market"
+                        htmlFor="investor_type"
                       >
-                        Type of Market
+                        Investor Type
+                      </label>
+
+                      <select
+                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
+                        {...register("investor_type")}
+                        id="investor_type"
+                      >
+                        <option value="">Select Investor Type</option>
+                        {investorTypes?.map((type: string, index: number) => (
+                          <option key={index} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.investor_type && (
+                        <span className="text-xs text-red-500">
+                          {errors.investor_type.message}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Investor Information */}
+                    <div>
+                      <label
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
+                        htmlFor="investor_information"
+                      >
+                        Investor Information
                       </label>
                       <input
                         className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
                         type="text"
-                        {...register("type_of_market")}
-                        id="type_of_market"
-                        placeholder="Type of Market"
+                        {...register("investor_information")}
+                        id="investor_information"
+                        placeholder="Investor Information"
                       />
-                      {errors.type_of_market && (
+                      {errors.investor_information && (
                         <span className="text-xs text-red-500">
-                          {errors.type_of_market.message}
+                          {errors.investor_information.message}
                         </span>
                       )}
                     </div>
 
-                    {/* Listed Date */}
+                    {/* Investment Type */}
                     <div>
                       <label
                         className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="listed_date"
+                        htmlFor="investment_type"
                       >
-                        Listed Date
+                        Investment Type
                       </label>
                       <input
                         className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="date"
-                        {...register("listed_date")}
-                        id="listed_date"
-                        placeholder="Listed Date"
+                        type="text"
+                        {...register("investment_type")}
+                        id="investment_type"
+                        placeholder="Investment Type"
                       />
-                      {errors.listed_date && (
-                        <span className="text-xs text-red-500">
-                          {errors.listed_date.message}
-                        </span>
-                      )}
-                    </div>
 
-                    {/* Listing Capital */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="listing_capital"
-                      >
-                        Listing Capital
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="number"
-                        {...register("listing_capital")}
-                        id="listing_capital"
-                        placeholder="Listing Capital"
-                      />
-                      {errors.listing_capital && (
+                      {errors.investment_type && (
                         <span className="text-xs text-red-500">
-                          {errors.listing_capital.message}
+                          {errors.investment_type.message}
                         </span>
                       )}
                     </div>
@@ -170,68 +212,68 @@ const AddCompanyStockMarketDetails: React.FC = ({ params }: any) => {
 
                   {/* Row 2 */}
                   <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {/* Listing Currency */}
+                    {/* Date of Funds */}
                     <div>
                       <label
                         className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="listing_currency"
+                        htmlFor="date_of_funds"
                       >
-                        Listing Currency
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="text"
-                        {...register("listing_currency")}
-                        id="listing_currency"
-                        placeholder="Listing Currency"
-                      />
-                      {errors.listing_currency && (
-                        <span className="text-xs text-red-500">
-                          {errors.listing_currency.message}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Delisted Date */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="delisted_date"
-                      >
-                        Delisted Date
+                        Date of Funds
                       </label>
                       <input
                         className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
                         type="date"
-                        {...register("delisted_date")}
-                        id="delisted_date"
-                        placeholder="Delisted Date"
+                        {...register("date_of_funds")}
+                        id="date_of_funds"
+                        placeholder="Date of Funds"
                       />
-                      {errors.delisted_date && (
+                      {errors.date_of_funds && (
                         <span className="text-xs text-red-500">
-                          {errors.delisted_date.message}
+                          {errors.date_of_funds.message}
                         </span>
                       )}
                     </div>
 
-                    {/* Current Market Capital */}
+                    {/* Investment Amount */}
                     <div>
                       <label
                         className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="current_market_cap"
+                        htmlFor="investment_amount"
                       >
-                        Current Market Capital
+                        Investment Amount
                       </label>
                       <input
                         className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
                         type="number"
-                        {...register("current_market_cap")}
-                        id="current_market_cap"
-                        placeholder="Current Market Capital"
+                        {...register("investment_amount")}
+                        id="investment_amount"
+                        placeholder="Investment Amount"
                       />
-                      {errors.current_market_cap && (
+                      {errors.investment_amount && (
                         <span className="text-xs text-red-500">
-                          {errors.current_market_cap.message}
+                          {errors.investment_amount.message}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Investment Currency */}
+                    <div>
+                      <label
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
+                        htmlFor="investment_currency"
+                      >
+                        Investment Currency
+                      </label>
+                      <input
+                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
+                        type="text"
+                        {...register("investment_currency")}
+                        id="investment_currency"
+                        placeholder="Investment Currency"
+                      />
+                      {errors.investment_currency && (
+                        <span className="text-xs text-red-500">
+                          {errors.investment_currency.message}
                         </span>
                       )}
                     </div>
@@ -239,93 +281,68 @@ const AddCompanyStockMarketDetails: React.FC = ({ params }: any) => {
 
                   {/* Row 3 */}
                   <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {/* Financial Year End */}
+                    {/* Company Valuation */}
                     <div>
                       <label
                         className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="financial_year_end"
+                        htmlFor="company_valuation"
                       >
-                        Financial Year End
+                        Company Valuation
+                      </label>
+                      <input
+                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
+                        type="number"
+                        {...register("company_valuation")}
+                        id="company_valuation"
+                        placeholder="Company Valuation"
+                      />
+                      {errors.company_valuation && (
+                        <span className="text-xs text-red-500">
+                          {errors.company_valuation.message}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Company Valuation Currency */}
+                    <div>
+                      <label
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
+                        htmlFor="company_valuation_currency"
+                      >
+                        Company Valuation Currency
+                      </label>
+                      <input
+                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
+                        type="text"
+                        {...register("company_valuation_currency")}
+                        id="company_valuation_currency"
+                        placeholder="Company Valuation Currency"
+                      />
+                      {errors.company_valuation_currency && (
+                        <span className="text-xs text-red-500">
+                          {errors.company_valuation_currency.message}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Valuation Date */}
+                    <div>
+                      <label
+                        className="mb-3 block text-sm font-medium text-black dark:text-white"
+                        htmlFor="valuation_date"
+                      >
+                        Valuation Date
                       </label>
                       <input
                         className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
                         type="date"
-                        {...register("financial_year_end")}
-                        id="financial_year_end"
-                        placeholder="Financial Year End"
+                        {...register("valuation_date")}
+                        id="valuation_date"
+                        placeholder="Valuation Date"
                       />
-                      {errors.financial_year_end && (
+                      {errors.valuation_date && (
                         <span className="text-xs text-red-500">
-                          {errors.financial_year_end.message}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Transfer Secretary */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="transfer_secretary"
-                      >
-                        Transfer Secretary
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="text"
-                        {...register("transfer_secretary")}
-                        id="transfer_secretary"
-                        placeholder="Transfer Secretary"
-                      />
-                      {errors.transfer_secretary && (
-                        <span className="text-xs text-red-500">
-                          {errors.transfer_secretary.message}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Reporting Currency */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="reporting_currency"
-                      >
-                        Reporting Currency
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="text"
-                        {...register("reporting_currency")}
-                        id="reporting_currency"
-                        placeholder="Reporting Currency"
-                      />
-                      {errors.reporting_currency && (
-                        <span className="text-xs text-red-500">
-                          {errors.reporting_currency.message}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Row 4 */}
-                  <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {/* ISIN */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="ISIN"
-                      >
-                        ISIN
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="text"
-                        {...register("ISIN")}
-                        id="ISIN"
-                        placeholder="ISIN"
-                      />
-                      {errors.ISIN && (
-                        <span className="text-xs text-red-500">
-                          {errors.ISIN.message}
+                          {errors.valuation_date.message}
                         </span>
                       )}
                     </div>
@@ -337,7 +354,9 @@ const AddCompanyStockMarketDetails: React.FC = ({ params }: any) => {
                       className="mr-3 rounded-md bg-warning px-3 py-3 text-white"
                       type="button"
                       onClick={() =>
-                        router.push(`/profile/companies/${params.company_id}`)
+                        router.push(
+                          `/profile/companies/view-company/${params.company_id}`,
+                        )
                       }
                     >
                       Add Details Later
@@ -359,4 +378,4 @@ const AddCompanyStockMarketDetails: React.FC = ({ params }: any) => {
   );
 };
 
-export default AddCompanyStockMarketDetails;
+export default AddCompanyFundsDetails;

@@ -23,15 +23,24 @@ import {
   getAllCompanyDataCombined,
   getAllCompanyDataCombinedByLocation,
   companyWithMultipleSearchesOr,
+  getCompanyDataCombined,
+  addCombinedCompanyShareholder,
+  addDirectorDetails,
 } from "../services/company";
 import {
   CheckCompanyNameResponse,
   CompanyListResponse,
   CompanyListBySectorResponse,
+  CreateCompanyRequest,
+  CreateCompanyStockMarketRequest,
+  CompanyCombinedResponse,
+  AddCombinedShareholderRequest,
+  AddDirectorDetailsRequest,
 } from "../models/company";
 
 interface CompanyState {
   companyList: CompanyListResponse | null;
+  combinedCompanyData: CompanyCombinedResponse | null;
   companyBySectorList: CompanyListBySectorResponse | null;
   companyUpdates: any[];
   status: "idle" | "loading" | "failed";
@@ -40,6 +49,7 @@ interface CompanyState {
 
 const initialState: CompanyState = {
   companyList: null,
+  combinedCompanyData: null,
   companyBySectorList: null,
   companyUpdates: [],
   status: "idle",
@@ -66,7 +76,7 @@ export const checkIfCompanyExists = createAsyncThunk(
 // Async thunk to create a new company
 export const createNewCompany = createAsyncThunk(
   "company/createNewCompany",
-  async (data: any, { rejectWithValue }) => {
+  async (data: CreateCompanyRequest, { rejectWithValue }) => {
     try {
       return await createCompany(data);
     } catch (error: any) {
@@ -98,7 +108,7 @@ export const createCompanyContact = createAsyncThunk(
 //createNewStockMarketDetails
 export const createStockMarketDetails = createAsyncThunk(
   "company/createStockMarketDetails",
-  async (data: any, { rejectWithValue }) => {
+  async (data: CreateCompanyStockMarketRequest, { rejectWithValue }) => {
     try {
       return await createNewStockMarketDetails(data);
     } catch (error: any) {
@@ -166,6 +176,53 @@ export const fetchCompaniesBySector = createAsyncThunk(
   },
 );
 
+//fetch company data combined
+export const fetchCompanyDataCombined = createAsyncThunk(
+  "company/fetchCompanyDataCombined",
+  async (companyName: any, { rejectWithValue }) => {
+    try {
+      return await getCompanyDataCombined(companyName);
+    } catch (error: any) {
+      console.error("Failed to fetch company data combined:", error.message);
+      return rejectWithValue("Failed to fetch company data combined");
+    }
+  },
+);
+
+//addCombinedCompanyShareholder
+export const createCombinedCompanyShareholder = createAsyncThunk(
+  "company/createCombinedCompanyShareholder",
+  async (data: AddCombinedShareholderRequest, { rejectWithValue }) => {
+    try {
+      return await addCombinedCompanyShareholder(data);
+    } catch (error: any) {
+      console.error("Failed to add company shareholder:", error.message);
+      if (error.response) {
+        return rejectWithValue(error?.response?.data?.detail);
+      } else {
+        return rejectWithValue("Failed to add company shareholder");
+      }
+    }
+  },
+);
+
+//create addDirectorDetails
+export const createDirectorDetails = createAsyncThunk(
+  "company/createDirectorDetails",
+  async (data: AddDirectorDetailsRequest, { rejectWithValue }) => {
+    try {
+      return await addDirectorDetails(data);
+    } catch (error: any) {
+      console.error("Failed to add company director details:", error.message);
+      if (error.response) {
+        return rejectWithValue(error?.response?.data?.detail);
+      } else {
+        return rejectWithValue("Failed to add company director details");
+      }
+    }
+  },
+);
+
 const companySlice = createSlice({
   name: "company",
   initialState,
@@ -214,7 +271,7 @@ const companySlice = createSlice({
       })
       .addCase(createStockMarketDetails.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message as string
+        state.error = action.error.message as string;
       })
       .addCase(createCompanyPreviousFunds.pending, (state) => {
         state.status = "loading";
@@ -251,7 +308,6 @@ const companySlice = createSlice({
         state.status = "failed";
         state.error = action.error.message as string;
       })
-
       // Handle fetchCompaniesBySector action
       .addCase(fetchCompaniesBySector.pending, (state) => {
         state.status = "loading";
@@ -263,6 +319,31 @@ const companySlice = createSlice({
       .addCase(fetchCompaniesBySector.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message as string;
+      })
+      // Handle fetchCompanyDataCombined action
+      .addCase(fetchCompanyDataCombined.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchCompanyDataCombined.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.combinedCompanyData = action.payload;
+      })
+      .addCase(fetchCompanyDataCombined.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(createCombinedCompanyShareholder.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(createCombinedCompanyShareholder.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(createCombinedCompanyShareholder.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(createDirectorDetails.pending, (state) => {
+        state.status = "loading";
       });
   },
 });

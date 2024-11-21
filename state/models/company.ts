@@ -1,3 +1,5 @@
+import { PreviousFunds, StockMarketDetails } from "./stock";
+
 export interface CreateCompanyRequest {
   company_abbreviations: string;
   company_name: string;
@@ -8,7 +10,7 @@ export interface CreateCompanyRequest {
   location: string;
   website: string;
   employees: number;
-  business_state: string;
+  business_state_id: string;
 }
 
 export interface CreateCompanyContactRequest {
@@ -29,7 +31,7 @@ export interface CreateCompanyContactRequest {
 }
 
 export interface CreateCompanyStockMarketRequest {
-  type_of_market: string;
+  market_type_id: string;
   stock_id: string;
   company_id: number;
   listed_date: Date;
@@ -194,19 +196,14 @@ export interface Company {
   company_abbreviations: string;
   company_name: string;
   business_state: string;
-  sector: Sector;
+  sector: string;
   location: string;
   name: string;
+  company_id: number;
 }
 
 export enum CompanyStatus {
   PendingCheck = "PENDING CHECK",
-}
-
-export enum Sector {
-  Banking = "Banking",
-  Health = "Health",
-  Technology = "Technology",
 }
 
 export interface CreateCompanyResponse {
@@ -230,4 +227,104 @@ export interface CompanyData {
   website: string;
   employees: number;
   company_logo: null;
+}
+
+export interface CompanyCombinedResponse {
+  company_data: CompanyData;
+  company_contact_details: CompanyContactDetails;
+  stock_market_details: StockMarketDetails;
+  previous_funds: PreviousFunds;
+  company_review: CompanyReview;
+}
+
+export interface CompanyContactDetails {
+  email: string;
+  work_email: string;
+  phone1: number;
+  phone2: number;
+  phone3: number;
+  address: string;
+  address_city: string;
+  state_code: number;
+  region: string;
+  country: string;
+}
+
+// export interface CompanyData {
+//   company_id:                number;
+//   status:                    string;
+//   business_state:            number;
+//   company_abbreviations:     string;
+//   company_name:              string;
+//   company_start_date:        Date;
+//   sector:                    string;
+//   company_short_description: string;
+//   location:                  string;
+//   website:                   string;
+//   employees:                 number;
+// }
+
+export interface CompanyReview {
+  approver_status: null;
+  company_comment: null;
+  chip_type: null;
+  updated_by: null;
+}
+
+export interface AddCombinedShareholderRequest {
+  position: Position;
+  qualifications: Qualification[];
+  employment_history: EmploymentHistory[];
+  public_info: PublicInfo;
+  awards: Award[];
+}
+
+export interface Award {
+  employee_id: number;
+  award: string;
+  year: number;
+  description: string;
+}
+
+export interface EmploymentHistory {
+  employee_id: number;
+  company_name: string;
+  position: string;
+  start_date: Date;
+  end_date: Date;
+  achievements: string;
+  reason_for_leaving: string;
+}
+
+export interface Position {
+  employee_id: number;
+  overall_position: string;
+  position: string;
+  start_date: Date;
+  end_date: Date;
+  is_current: boolean;
+}
+
+export interface PublicInfo {
+  employee_id: number;
+  public_profile: string;
+}
+
+export interface Qualification {
+  employee_id: number;
+  institution: string;
+  education_type: string;
+  field_of_study: string;
+  year_obtained: number;
+}
+
+export interface AddDirectorDetailsRequest {
+  company_id: number;
+  first_name: string;
+  last_name: string;
+  title: string;
+  dob: Date;
+  marital_status: string;
+  email: string;
+  nationality: string;
 }

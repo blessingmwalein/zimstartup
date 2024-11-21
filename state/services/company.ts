@@ -9,7 +9,10 @@ import {
   UpdateContactInfoRequest,
 } from "../models/employement";
 import {
+  AddCombinedShareholderRequest,
+  AddDirectorDetailsRequest,
   CheckCompanyNameResponse,
+  CompanyCombinedResponse,
   CompanyListBySectorResponse,
   CompanyListResponse,
   CompanyUpdate,
@@ -41,7 +44,7 @@ export const checkCompanyExists = async (
 export const createCompany = async (
   data: CreateCompanyRequest,
 ): Promise<any> => {
-  const response = await api.post<any>(`create-new-company`, data);
+  const response = await api.post<any>(`create-new-company-details`, data);
   return response.data;
 };
 
@@ -49,7 +52,10 @@ export const createCompany = async (
 export const createCompanyContactDetails = async (
   data: CreateCompanyContactRequest,
 ): Promise<any> => {
-  const response = await api.post<any>(`create-new-company-contact-details`, data);
+  const response = await api.post<any>(
+    `create-new-company-contact-details`,
+    data,
+  );
   return response.data;
 };
 
@@ -78,9 +84,7 @@ export const createNewCompanyUpdate = async (
 };
 
 //get-company-updates
-export const getCompanyUpdates = async (
-  companyId: any,
-): Promise<any> => {
+export const getCompanyUpdates = async (companyId: any): Promise<any> => {
   const response = await api.get<>(`get-company-updates/${companyId}`);
   return response.data;
 };
@@ -119,17 +123,13 @@ export const registerCompanyRequest = async (
 };
 
 //{{URL}}create-new-director-details
-export const createNewDirectorDetails = async (
-  data: any,
-): Promise<any> => {
+export const createNewDirectorDetails = async (data: any): Promise<any> => {
   const response = await api.post<any>(`create-new-director-details`, data);
   return response.data;
 };
 
 //{{URL}}create-new-director-position
-export const createNewDirectorPosition = async (
-  data: any,
-): Promise<any> => {
+export const createNewDirectorPosition = async (data: any): Promise<any> => {
   const response = await api.post<any>(`create-new-director-position`, data);
   return response.data;
 };
@@ -138,29 +138,26 @@ export const createNewDirectorPosition = async (
 export const createEducationalQualifications = async (
   data: any,
 ): Promise<any> => {
-  const response = await api.post<any>(`create-educational-qualifications`, data);
+  const response = await api.post<any>(
+    `create-educational-qualifications`,
+    data,
+  );
   return response.data;
 };
 //{{URL}}{create-new-employment-history
-export const createNewEmploymentHistory = async (
-  data: any,
-): Promise<any> => {
+export const createNewEmploymentHistory = async (data: any): Promise<any> => {
   const response = await api.post<any>(`create-new-employment-history`, data);
   return response.data;
 };
 
 //{{URL}}{create-new-public-information
-export const createNewPublicInformation = async (
-  data: any,
-): Promise<any> => {
+export const createNewPublicInformation = async (data: any): Promise<any> => {
   const response = await api.post<any>(`create-new-public-information`, data);
   return response.data;
 };
 
 //{{URL}}create-new-award
-export const createNewAward = async (
-  data: any,
-): Promise<any> => {
+export const createNewAward = async (data: any): Promise<any> => {
   const response = await api.post<any>(`create-new-award`, data);
   return response.data;
 };
@@ -169,10 +166,12 @@ export const createNewAward = async (
 export const createNewDirectorProfileCombined = async (
   data: any,
 ): Promise<any> => {
-  const response = await api.post<any>(`create-new-director-profile-combined`, data);
+  const response = await api.post<any>(
+    `create-new-director-profile-combined`,
+    data,
+  );
   return response.data;
 };
-
 
 ///show-companies-list
 export const showCompaniesList = async (): Promise<any> => {
@@ -181,25 +180,70 @@ export const showCompaniesList = async (): Promise<any> => {
 };
 
 //get-companies-list-by/Technology
-export const showCompaniesListBySector = async (sector: string): Promise<any> => {
-  const response = await api.get<CompanyListBySectorResponse>(`get-companies-list-by/${sector}`);
+export const showCompaniesListBySector = async (
+  sector: string,
+): Promise<any> => {
+  const response = await api.get<CompanyListBySectorResponse>(
+    `get-companies-list-by/${sector}`,
+  );
   return response.data;
 };
 
 //https://zimstartup-861d8915d228.herokuapp.com/get-all-company-data-combined/Nyika
-export const getAllCompanyDataCombined = async (sector: string): Promise<any> => {
-  const response = await api.get<any>(`get-all-company-data-combined/${sector}`);
+export const getAllCompanyDataCombined = async (
+  sector: string,
+): Promise<any> => {
+  const response = await api.get<any>(
+    `get-all-company-data-combined/${sector}`,
+  );
   return response.data;
 };
 
 //https://zimstartup-861d8915d228.herokuapp.com/get-all-company-data-combined-by/harare
-export const getAllCompanyDataCombinedByLocation = async (location: string): Promise<any> => {
-  const response = await api.get<any>(`get-all-company-data-combined-by/${location}`);
+export const getAllCompanyDataCombinedByLocation = async (
+  location: string,
+): Promise<any> => {
+  const response = await api.get<any>(
+    `get-all-company-data-combined-by/${location}`,
+  );
   return response.data;
 };
 
 //{{URL}}company-with-multiple-searches-or?company_name=X&industrial_id&location
-export const companyWithMultipleSearchesOr = async (company_name: string, industrial_id: string, location: string): Promise<any> => {
-  const response = await api.get<any>(`company-with-multiple-searches-or?company_name=${company_name}&industrial_id=${industrial_id}&location=${location}`);
+export const companyWithMultipleSearchesOr = async (
+  company_name: string,
+  industrial_id: string,
+  location: string,
+): Promise<any> => {
+  const response = await api.get<any>(
+    `company-with-multiple-searches-or?company_name=${company_name}&industrial_id=${industrial_id}&location=${location}`,
+  );
+  return response.data;
+};
+
+//get-all-company-data-combined/Stitchit%20Inc
+export const getCompanyDataCombined = async (
+  companyName: string,
+): Promise<CompanyCombinedResponse> => {
+  const response = await api.get<CompanyCombinedResponse>(
+    `get-all-company-data-combined/${companyName}`,
+  );
+  return response.data;
+};
+
+//add combined company shareholder
+export const addCombinedCompanyShareholder = async (
+  data: AddCombinedShareholderRequest,
+): Promise<any> => {
+  const response = await api.post<any>(
+    `create-new-director-profile-combined`,
+    data,
+  );
+  return response.data;
+};
+
+//add drector details
+export const addDirectorDetails = async (data: AddDirectorDetailsRequest): Promise<any> => {
+  const response = await api.post<any>(`create-new-director-details`, data);
   return response.data;
 };

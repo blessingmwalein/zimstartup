@@ -29,7 +29,7 @@ const Companies: React.FC = () => {
   useEffect(() => {
     // Fetch companies only on component mount
 
-    fetchCompanyList();
+    // fetchCompanyList();
   }, []); // Empty dependency array ensures this runs only once
 
   return (
@@ -37,10 +37,8 @@ const Companies: React.FC = () => {
       <div className="mx-auto max-w-full">
         {/* Search Section */}
         <section
-          className="relative mt-8 bg-cover bg-center px-8 py-16"
-          style={{
-            backgroundImage: "url('/backgrounds/company_back.jpg')",
-          }}
+          className="relative bg-center px-8 py-16"
+          
         >
           <div className="absolute inset-0 bg-black opacity-50"></div>
           <div className="relative z-10 flex flex-col items-center space-y-6  text-white">

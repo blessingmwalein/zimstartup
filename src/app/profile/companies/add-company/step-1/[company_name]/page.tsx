@@ -5,13 +5,20 @@ import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import CustomAlert from "@/components/common/notification/Alert";
-import { AppDispatch } from "../../../../../../state/store";
-import { createNewCompany } from "../../../../../../state/slices/companySlice";
+import { AppDispatch } from "../../../../../../../state/store";
+import { createNewCompany } from "../../../../../../../state/slices/companySlice";
 import Stepper from "@/components/common/Stepper";
 import { format } from "date-fns";
+import { toast, ToastContainer } from "react-toastify";
+import { fetchAllConfigs } from "../../../../../../../state/slices/configSlice";
+import {
+  BusinessState,
+  CompanyIndustry,
+  StockExchangeEntity,
+} from "../../../../../../../state/models/config";
 // Yup validation schema
 const schema = Yup.object({
   company_abbreviations: Yup.string().required(
@@ -23,25 +30,30 @@ const schema = Yup.object({
     "Company short description is required",
   ),
   industry_id: Yup.string().required("Industry is required"),
+  stock_id: Yup.string().required("Stock Market is required"),
   location: Yup.string().required("Location is required"),
   website: Yup.string().url("Invalid URL").required("Website is required"),
   employees: Yup.number()
     .positive("Employees must be a positive number")
     .required("Number of employees is required"),
-  business_state: Yup.string().required("Business state is required"),
+  business_state_id: Yup.string().required("Business state is required"),
 }).required();
 
 // Main Component
-const AddCompanyGeneralDetails: React.FC = () => {
+const AddCompanyGeneralDetails: React.FC = ({ params }) => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const [error, setError] = useState<string | null>(null);
 
   const { user } = useSelector((state: any) => state.auth);
+  const { industryList, businessStatesList, stockExchangeList } = useSelector(
+    (state: any) => state.companyConfig,
+  );
 
   const {
     register,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -52,7 +64,6 @@ const AddCompanyGeneralDetails: React.FC = () => {
 
     const updatePayload = {
       ...data,
-      stock_id: "None",
       company_start_date: format(
         new Date(data.company_start_date),
         "yyyy-MM-dd",
@@ -62,14 +73,32 @@ const AddCompanyGeneralDetails: React.FC = () => {
     try {
       const response = await dispatch(createNewCompany(updatePayload)).unwrap();
 
-      console.log(response);
-      router.push(
-        `/profile/companies/add-company/step-2/${response.data.company_id}`,
-      );
+      if (response.data) {
+        toast.success("Company details added successful", {
+          position: "bottom-center",
+        });
+        router.push(
+          `/profile/companies/add-company/step-2/${response.data?.company_id}/${response.data?.company_name}`,
+        );
+      } else {
+        toast.error("Something went wrong", {
+          position: "bottom-center",
+        });
+      }
     } catch (err: any) {
       setError(err || "Failed to update company details");
+      toast.error(err || "Failed to update company details", {
+        position: "bottom-center",
+      });
     }
   };
+  useEffect(() => {
+    const companyName = params.company_name;
+    if (companyName) {
+      const decodedCompanyName = decodeURIComponent(companyName); // Decode the encoded string
+      setValue("company_name", decodedCompanyName); // Set the decoded value in the form
+    }
+  }, [params.company_name, setValue]);
 
   const currentStep = 0; // Assuming this is step 1, change dynamically as needed
   const headings = [
@@ -79,19 +108,18 @@ const AddCompanyGeneralDetails: React.FC = () => {
     "Step 4: Funds Details",
   ];
 
-  //business states  'New Business Idea', 'Patent', 'Established Business', 'Nonprofit', 'Franchise', 'Partnership'
-  const businessStates = [
-    "New Business Idea",
-    "Patent",
-    "Established Business",
-    "Nonprofit",
-    "Franchise",
-    "Partnership",
-  ];
+  const isFetched = useRef(false);
+
+  useEffect(() => {
+    if (!isFetched.current) {
+      dispatch(fetchAllConfigs());
+      isFetched.current = true;
+    }
+  }, [dispatch]);
 
   return (
     <DefaultLayout>
-      <div className="mx-auto max-w-270">
+      <div className="mx-auto mt-4 max-w-270">
         <Breadcrumb pageName="Add Company" />
         <div className="grid gap-8">
           <div className="col-span-5 xl:col-span-3">
@@ -224,14 +252,14 @@ const AddCompanyGeneralDetails: React.FC = () => {
                           id="industry_id"
                         >
                           <option value="">Select Industry</option>
-                          {/* Replace with actual industry options */}
-                          <option value="Technology">Technology</option>
-                          <option value="Health">Health</option>
-                          <option value="Banking">Banking</option>
-                          <option value="Pharmaceticules">
-                            Pharmaceticules
-                          </option>
-                          <option value="Retail">Retail</option>
+                          {industryList?.map((industry: CompanyIndustry) => (
+                            <option
+                              key={industry.sector}
+                              value={industry.sector}
+                            >
+                              {industry.sector}
+                            </option>
+                          ))}
                         </select>
                         {errors.industry_id && (
                           <span className="text-xs text-red-500">
@@ -240,26 +268,33 @@ const AddCompanyGeneralDetails: React.FC = () => {
                         )}
                       </div>
 
-                      {/* <div>
+                      <div>
                         <label
                           className="mb-3 block text-sm font-medium text-black dark:text-white"
                           htmlFor="stock_id"
                         >
-                          Stock ID
+                          Stock Market
                         </label>
-                        <input
+                        <select
                           className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          type="text"
                           {...register("stock_id")}
                           id="stock_id"
-                          placeholder="Stock ID"
-                        />
+                        >
+                          <option value="">Select Stock Market</option>
+                          {stockExchangeList?.map(
+                            (stock: StockExchangeEntity) => (
+                              <option key={stock.name} value={stock.name}>
+                                {stock.name}
+                              </option>
+                            ),
+                          )}
+                        </select>
                         {errors.stock_id && (
                           <span className="text-xs text-red-500">
                             {errors.stock_id.message}
                           </span>
                         )}
-                      </div> */}
+                      </div>
                     </div>
                   </div>
 
@@ -337,37 +372,38 @@ const AddCompanyGeneralDetails: React.FC = () => {
                       <div>
                         <label
                           className="mb-3 block text-sm font-medium text-black dark:text-white"
-                          htmlFor="business_state"
+                          htmlFor="business_state_id"
                         >
                           Business State
                         </label>
                         <select
                           className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          {...register("business_state")}
-                          id="business_state"
+                          {...register("business_state_id")}
+                          id="business_state_id"
                         >
                           <option value="">Select Business State</option>
-                          {businessStates.map((state) => (
-                            <option key={state} value={state}>
-                              {state}
+                          {businessStatesList?.map((state: BusinessState) => (
+                            <option key={state.id} value={state.state_name}>
+                              {state.state_name}
                             </option>
                           ))}
                         </select>
-                        {errors.business_state && (
+                        {errors.business_state_id && (
                           <span className="text-xs text-red-500">
-                            {errors.business_state.message}
+                            {errors.business_state_id.message}
                           </span>
                         )}
+
                         {/* <input
                           className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
                           type="text"
-                          {...register("business_state")}
-                          id="business_state"
+                          {...register("business_state_id")}
+                          id="business_state_id"
                           placeholder="Business State"
                         />
-                        {errors.business_state && (
+                        {errors.business_state_id && (
                           <span className="text-xs text-red-500">
-                            {errors.business_state.message}
+                            {errors.business_state_id.message}
                           </span>
                         )} */}
                       </div>
