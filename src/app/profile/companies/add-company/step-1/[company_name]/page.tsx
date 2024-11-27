@@ -39,8 +39,16 @@ const schema = Yup.object({
   business_state_id: Yup.string().required("Business state is required"),
 }).required();
 
-// Main Component
-const AddCompanyGeneralDetails: React.FC = ({ params }) => {
+interface AddCompanyGeneralDetailsProps {
+  params: {
+    company_name?: string;
+  };
+}
+
+// Update the component to use the new props type
+const AddCompanyGeneralDetails: React.FC<AddCompanyGeneralDetailsProps> = ({
+  params,
+}) => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const [error, setError] = useState<string | null>(null);
@@ -74,7 +82,7 @@ const AddCompanyGeneralDetails: React.FC = ({ params }) => {
       const response = await dispatch(createNewCompany(updatePayload)).unwrap();
 
       if (response.data) {
-        toast.success("Company details added successful", {
+        toast.success("Company details added successfully", {
           position: "bottom-center",
         });
         router.push(
@@ -92,6 +100,7 @@ const AddCompanyGeneralDetails: React.FC = ({ params }) => {
       });
     }
   };
+
   useEffect(() => {
     const companyName = params.company_name;
     if (companyName) {

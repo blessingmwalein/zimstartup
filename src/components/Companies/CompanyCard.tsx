@@ -11,7 +11,7 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company }) => {
   const avatarText = `${company.company_abbreviations[0]}${company.company_abbreviations.slice(-1)}`;
 
   return (
-    <Link href={`companies/${company.id}`}>
+    <Link href={`companies/${company.company_id}`}>
       <div className="relative rounded-lg bg-white p-6 shadow-md">
         {/* Love Icon */}
         <div className="absolute right-2 top-2">

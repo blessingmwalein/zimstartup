@@ -18,7 +18,7 @@ const AddCompany: React.FC = () => {
     if (user) {
       getCustomerInfo();
     }
-  }, [user]);
+  }, [user ]);
 
   const getCustomerInfo = async () => {
     try {

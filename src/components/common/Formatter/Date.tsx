@@ -4,7 +4,7 @@ interface DateDisplayProps {
   date: string;
 }
 
-const DateDisplay: React.FC<DateDisplayProps> = ({ date }) => {
+const DateDisplay: React.FC<DateDisplayProps> = ({ date } ) => {
   const formattedDate = new Date(date).toLocaleDateString();
 
   return (

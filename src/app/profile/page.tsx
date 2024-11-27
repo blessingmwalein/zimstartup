@@ -11,10 +11,7 @@ import { UserResponse } from '../../../state/models/user';
 import { getCustomerData } from "../../../state/slices/authSlice";
 import InitialsAvatar from "@/components/Header/Avatar";
 import WalletOverView from "@/components/Wallet/OverViewCard";
-import PersonalInformationCard from "@/components/Profile/PersonalDataCard";
-import TransactionsCard from "@/components/Profile/TransactionsCard";  // New Transaction card
-import SettingsCard from "@/components/Profile/SettingsCard";  // New Settings card
-import NotificationsCard from "@/components/Profile/NotificationsCard";  // New Notifications card
+import PersonalInformationCard from "@/components/Profile/PersonalDataCard";  // New Notifications card
 import ContactInformationCard from "@/components/Profile/ContactInformationCard";
 import WorkInformationCard from "@/components/Profile/WorkInformationCard";
 import BeneficiaryInformationCard from "@/components/Profile/BenerficiaryInformationCard";

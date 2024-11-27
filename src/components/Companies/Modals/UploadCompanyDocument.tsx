@@ -39,19 +39,16 @@ const UploadDocumentDialog: React.FC = ({
           }),
         );
 
-        if (response) {
-          toast.success("Company document added successful", {
-            position: "bottom-center",
-          });
-          
-        } else {
-          toast.error("Something went wrong", {
-            position: "bottom-center",
-          });
-        }
-
+        toast.success("Company document added successful", {
+          position: "bottom-center",
+        });
         //
-      } catch (error) {}
+      } catch (error) {
+        console.log("Error:", error);
+        toast.error("Failed to add company document", {
+          position: "bottom-center",
+        });
+      }
 
       closeDialog();
     }
