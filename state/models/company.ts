@@ -373,3 +373,13 @@ export interface UploadCompanyLogoRequest {
   companyId: string;
   file: File; // Use Blob or File for binary data
 }
+
+
+export interface UserCompaniesResponse {
+  national_id:           string;
+  company_abbreviations: string;
+  company_name:          string;
+  status:                string;
+  location:              string;
+  website:               string;
+}

@@ -1,9 +1,20 @@
 import React, { useState } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch } from "../../../../state/store";
+import { addCompanyDocument } from "../../../../state/slices/companySlice";
+import { toast } from "react-toastify";
 
-const UploadDocumentDialog: React.FC = () => {
+const UploadDocumentDialog: React.FC = ({
+   
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const { combinedCompanyData, status } = useSelector(
+    (state: any) => state.company,
+  );
 
   const openDialog = () => setIsOpen(true);
   const closeDialog = () => setIsOpen(false);
@@ -18,6 +29,30 @@ const UploadDocumentDialog: React.FC = () => {
     if (selectedFile) {
       // Handle file upload logic here
       console.log("Uploading file:", selectedFile);
+      try {
+        // const formData = new FormData();
+        // formData.append("file", selectedFile);
+        const response = dispatch(
+          addCompanyDocument({
+            companyId: combinedCompanyData.company_data.company_id,
+            file: selectedFile,
+          }),
+        );
+
+        if (response) {
+          toast.success("Company document added successful", {
+            position: "bottom-center",
+          });
+          
+        } else {
+          toast.error("Something went wrong", {
+            position: "bottom-center",
+          });
+        }
+
+        //
+      } catch (error) {}
+
       closeDialog();
     }
   };

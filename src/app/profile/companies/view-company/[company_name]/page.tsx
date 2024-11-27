@@ -7,7 +7,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../../../../state/store";
 import { CompanyCombinedResponse } from "../../../../../../state/models/company";
 import { useEffect } from "react";
-import { fetchCompanyDataCombined } from "../../../../../../state/slices/companySlice";
+import {
+  fetchCompanyDataCombined,
+  fetchCompanyDocuments,
+} from "../../../../../../state/slices/companySlice";
 import ViewCompanyDetails from "@/components/Companies/ViewPages/ViewCompanyDetails";
 import ViewStockMarketDetails from "@/components/Companies/ViewPages/ViewStockMarketDetails";
 import ViewPreviousFundsDetails from "@/components/Companies/ViewPages/ViewPreviousFunds";
@@ -31,13 +34,44 @@ const ViewCompany: React.FC = ({ params }: any) => {
     }
   };
 
-  useEffect(() => {
-    const companyName = params.company_name;
-    if (companyName) {
-      const decodedCompanyName = decodeURIComponent(companyName); // Decode the encoded string
-      getCompanyCombinedData(decodedCompanyName);
+  //fetch comapany documents
+  const getCompanyDocuments = async (companyId: number) => {
+    try {
+      await dispatch(fetchCompanyDocuments(companyId)).unwrap();
+    } catch (err: any) {
+      console.log("Error:", err);
     }
-  }, [params.company_name]);
+  };
+
+  useEffect(() => {
+    const fetchCompanyDataAndDocuments = async () => {
+      const companyName = params.company_name;
+      if (companyName) {
+        const decodedCompanyName = decodeURIComponent(companyName);
+        try {
+          // Fetch combined company data and get the response directly
+          const companyData = await dispatch(
+            fetchCompanyDataCombined(decodedCompanyName),
+          ).unwrap();
+
+          // Print company data
+          console.log("Company Data:", companyData);
+
+          // Extract companyId from the fetched data
+          const companyId = companyData?.company_data?.company_id;
+          if (companyId) {
+            await getCompanyDocuments(companyId);
+          } else {
+            console.log("Company ID is not available.");
+          }
+        } catch (err) {
+          console.error("Error during fetching data:", err);
+        }
+      }
+    };
+
+    fetchCompanyDataAndDocuments();
+  }, [params.company_name, dispatch]); // Inc
 
   const pages = [
     {
@@ -72,7 +106,6 @@ const ViewCompany: React.FC = ({ params }: any) => {
       ),
     },
 
-   
     {
       name: "Stock Market",
       tab: <ViewStockMarketDetails />,

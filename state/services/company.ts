@@ -30,8 +30,10 @@ import {
   CreateUserEmploymentHistoryRequest,
   RegisterCompanyRequest,
   UploadCompanyLogoRequest,
+  UserCompaniesResponse,
 } from "../models/company";
 import { CompanyDocumentsResponse } from "../models/documents";
+import { AddWatchListRequest } from "../models/watchlist";
 
 // Global Axios instance with the default config (including token if required)
 const api = createAxiosInstance();
@@ -308,5 +310,22 @@ export const getCompanyDocuments = async (
   const response = await api.get<CompanyDocumentsResponse>(
     `company_documents/${companyId}`,
   );
+  return response.data;
+};
+
+export const getUserCompanies = async (
+  national_id: string,
+): Promise<UserCompaniesResponse[]> => {
+  const response = await api.get<UserCompaniesResponse[]>(
+    `fetch-companies-owned-by-user/${national_id}`,
+  );
+  return response.data;
+};
+
+//company to watchlist
+export const addCompanyToWatchList = async (
+  data: AddWatchListRequest,
+): Promise<any> => {
+  const response = await api.post<any>(`add-to-watchlist`, data);
   return response.data;
 };
