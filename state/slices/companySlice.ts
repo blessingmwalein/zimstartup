@@ -29,6 +29,8 @@ import {
   uploadCompanyDocument,
   getCompanyDocuments,
   getUserCompanies,
+  updateCompanyDetails,
+  updateCompanyContactDetails,
 } from "../services/company";
 import {
   CheckCompanyNameResponse,
@@ -46,10 +48,12 @@ import {
   AddAwardRequest,
   UploadCompanyLogoRequest,
   UserCompaniesResponse,
+  CreateCompanyContactRequest,
 } from "../models/company";
 import { CompanyDocument } from "../models/documents";
 import { addCompanyToWatchList } from "../services/company";
 import { AddWatchListRequest } from "../models/watchlist";
+import { updateContactInformation } from "../services/auth";
 
 interface CompanyState {
   companyList: CompanyListResponse | null;
@@ -106,6 +110,42 @@ export const createNewCompany = createAsyncThunk(
   },
 );
 
+// Async thunk to create a update company details
+export const submitUpdateCompanyDetails = createAsyncThunk(
+  "company/updateCompanyDetails",
+  async (
+    data: { data: CreateCompanyRequest; companyId: number },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await updateCompanyDetails(data.data, data.companyId);
+    } catch (error: any) {
+      if (error.response) {
+        const { status, data } = error.response;
+        // Handle 422 validation error
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+
+        // For other errors, return the message from the response
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+
+        if (data?.detail) {
+          return rejectWithValue(data.detail);
+        }
+      }
+      // Return a generic error message for any other case
+      return rejectWithValue("Failed to update company details");
+    }
+  },
+);
+
 //aync createCompanyContactDetails
 export const createCompanyContact = createAsyncThunk(
   "company/createCompanyContact",
@@ -118,6 +158,42 @@ export const createCompanyContact = createAsyncThunk(
       } else {
         return rejectWithValue("Failed to create company contact");
       }
+    }
+  },
+);
+
+//update contact details
+export const submitUpdateContactDetails = createAsyncThunk(
+  "company/updateContactDetails",
+  async (
+    data: { data: CreateCompanyContactRequest; companyId: number },
+    { rejectWithValue },
+  ) => {
+    try {
+      return await updateCompanyContactDetails(data.data, data.companyId);
+    } catch (error: any) {
+      if (error.response) {
+        const { status, data } = error.response;
+        // Handle 422 validation error
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+
+        // For other errors, return the message from the response
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+
+        if (data?.detail) {
+          return rejectWithValue(data.detail);
+        }
+      }
+      // Return a generic error message for any other case
+      return rejectWithValue("Failed to update company contact details");
     }
   },
 );
@@ -497,13 +573,12 @@ export const addCompanyToWatch = createAsyncThunk(
         }
 
         // For other errors, return the message from the response
-        if (data?.message ) {
+        if (data?.message) {
           return rejectWithValue(data.message);
         }
 
-        if(data?.detail){
+        if (data?.detail) {
           return rejectWithValue(data.detail);
-
         }
       }
       // Return a generic error message for any other case
@@ -741,6 +816,20 @@ const companySlice = createSlice({
         state.userCompanies = action.payload;
       })
       .addCase(addCompanyToWatch.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      }).addCase(submitUpdateCompanyDetails.pending, (state) => {
+        state.status = "loading";
+      }).addCase(submitUpdateCompanyDetails.fulfilled, (state) => {
+        state.status = "idle";
+      }).addCase(submitUpdateCompanyDetails.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      }).addCase(submitUpdateContactDetails.pending, (state) => {
+        state.status = "loading";
+      }).addCase(submitUpdateContactDetails.fulfilled, (state) => {
+        state.status = "idle";
+      }).addCase(submitUpdateContactDetails.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message as string;
       });

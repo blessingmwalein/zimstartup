@@ -125,7 +125,7 @@ const menuGroups = [
           </svg>
         ),
         label: "Companies",
-        route: "companies",
+        route: "/companies",
       },
       {
         icon: (
@@ -149,6 +149,7 @@ const menuGroups = [
         children: [
           { label: "Companies", route: "/profile/companies" },
           { label: "Add Company", route: "/profile/companies/add-company" },
+          { label: "Watch List", route: "/profile/companies/watch-list" },
           // { label: "Employees", route: "/employees" },
           // { label: "Contact Details", route: "/contact-details" },
           // { label: "Stock Market Details", route: "/contact-details" },

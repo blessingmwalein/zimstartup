@@ -61,7 +61,10 @@ const ViewCompanyDetails: React.FC = () => {
             <div className="space-y-1">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold">General</h3>
-                <button className="items-center justify-center  p-2 ">
+                <Link
+                  href={`/profile/companies/view-company/${companyData.company_name}/edit-details`}
+                  className="items-center justify-center  p-2 "
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -76,10 +79,10 @@ const ViewCompanyDetails: React.FC = () => {
                       d="M16.862 4.487a2.25 2.25 0 0 1 3.182 3.182l-9.056 9.056-3.49 1.165a1.125 1.125 0 0 1-1.348-1.348l1.165-3.49 9.056-9.056z"
                     />
                   </svg>
-                </button>
+                </Link>
               </div>
 
-              <p className="flex items-center space-x-2  text-gray-500 py-1">
+              <p className="flex items-center space-x-2  py-1 text-gray-500">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -107,7 +110,7 @@ const ViewCompanyDetails: React.FC = () => {
                   {companyData.sector}
                 </span>
               </p>
-              <p className="flex items-center space-x-2  text-gray-500 py-1">
+              <p className="flex items-center space-x-2  py-1 text-gray-500">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -134,7 +137,7 @@ const ViewCompanyDetails: React.FC = () => {
                   {companyData.location}
                 </span>
               </p>
-              <p className="flex items-center space-x-2  text-gray-500 py-1 ">
+              <p className="flex items-center space-x-2  py-1 text-gray-500 ">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -164,7 +167,10 @@ const ViewCompanyDetails: React.FC = () => {
 
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-semibold">Contact</h3>
-                <button className="items-center  justify-center p-2  ">
+                <Link
+                  href={`/profile/companies/view-company/${companyData.company_name}/edit-contact-details`}
+                  className="items-center  justify-center p-2  "
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -179,10 +185,10 @@ const ViewCompanyDetails: React.FC = () => {
                       d="M16.862 4.487a2.25 2.25 0 0 1 3.182 3.182l-9.056 9.056-3.49 1.165a1.125 1.125 0 0 1-1.348-1.348l1.165-3.49 9.056-9.056z"
                     />
                   </svg>
-                </button>
+                </Link>
               </div>
 
-              <p className="flex items-center space-x-2  text-gray-500 py-1">
+              <p className="flex items-center space-x-2  py-1 text-gray-500">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -205,7 +211,7 @@ const ViewCompanyDetails: React.FC = () => {
                   {contactData.email}
                 </span>
               </p>
-              <p className="flex items-center space-x-2  text-gray-500 py-1">
+              <p className="flex items-center space-x-2  py-1 text-gray-500">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -228,7 +234,7 @@ const ViewCompanyDetails: React.FC = () => {
                   {contactData.work_email}
                 </span>
               </p>
-              <p className="flex items-center space-x-2  text-gray-500 py-1">
+              <p className="flex items-center space-x-2  py-1 text-gray-500">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -251,7 +257,7 @@ const ViewCompanyDetails: React.FC = () => {
                   {contactData.phone1}
                 </span>
               </p>
-              <p className="flex items-center space-x-2  text-gray-500 py-1">
+              <p className="flex items-center space-x-2  py-1 text-gray-500">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -274,7 +280,7 @@ const ViewCompanyDetails: React.FC = () => {
                   {contactData.phone2}
                 </span>
               </p>
-              <p className="flex items-center space-x-2  text-gray-500 py-1">
+              <p className="flex items-center space-x-2  py-1 text-gray-500">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -307,7 +313,10 @@ const ViewCompanyDetails: React.FC = () => {
           <section>
             <header className="flex items-center justify-between">
               <h3 className="text-lg font-bold">Shareholders</h3>
-              <Link href={`${companyData.company_name}/add-shareholder`} className="rounded-md bg-primary px-4 py-2 text-white">
+              <Link
+                href={`${companyData.company_name}/add-shareholder`}
+                className="rounded-md bg-primary px-4 py-2 text-white"
+              >
                 + Add Shareholder
               </Link>
             </header>

@@ -56,12 +56,36 @@ export const createCompany = async (
   return response.data;
 };
 
+//update company details
+export const updateCompanyDetails = async (
+  data: CreateCompanyRequest,
+  companyId: number,
+): Promise<any> => {
+  const response = await api.put<any>(
+    `update-company-details?company_id=${companyId}`,
+    data,
+  );
+  return response.data;
+};
+
 //create comapny contact details
 export const createCompanyContactDetails = async (
   data: CreateCompanyContactRequest,
 ): Promise<any> => {
   const response = await api.post<any>(
     `create-new-company-contact-details`,
+    data,
+  );
+  return response.data;
+};
+
+//update company contact details
+export const updateCompanyContactDetails = async (
+  data: CreateCompanyContactRequest,
+  companyId: number,
+): Promise<any> => {
+  const response = await api.put<any>(
+    `update-company-contact-details/${companyId}`,
     data,
   );
   return response.data;

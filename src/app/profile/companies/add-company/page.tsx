@@ -77,12 +77,12 @@ const AddCompany: React.FC = () => {
           //   backgroundImage: "url('/backgrounds/company_back.jpg')",
           // }}
         >
-          <div className="absolute inset-0 bg-black opacity-50"></div>
+          {/* <div className="absolute inset-0 bg-black opacity-50"></div> */}
           <div className="relative z-10 flex flex-col items-center space-y-6 text-white">
-            <h1 className="text-4xl font-bold">Check if company name exists</h1>
+            <h1 className="text-4xl font-bold text-black">Check if company name exists</h1>
             <form
               onSubmit={handleSubmit(onSubmit)}
-              className="flex w-full max-w-4xl items-center overflow-hidden rounded-full bg-white p-3 shadow-lg"
+              className="flex w-full max-w-4xl items-center overflow-hidden rounded-full bg-white p-3 border-2"
             >
               <div className="pl-4 pr-2 text-gray-500">
                 <svg

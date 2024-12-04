@@ -7,7 +7,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../../../state/store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { updateContactInformationAsync } from "../../../../../state/slices/authSlice";
 import CustomAlert from "@/components/common/notification/Alert";
@@ -70,6 +70,8 @@ const UpdateContactDetails: React.FC = () => {
       setError(err.message || "Failed to update contact information");
     }
   };
+  
+
 
   return (
     <DefaultLayout>
