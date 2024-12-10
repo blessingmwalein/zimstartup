@@ -2,6 +2,7 @@ import Spinner from "@/components/common/Loader/spinner";
 import Link from "next/link";
 import React from "react";
 import { useSelector } from "react-redux";
+import UploadCompanyDialog from "../Modals/UploadCompanyLogo";
 
 const ViewCompanyDetails: React.FC = () => {
   const { combinedCompanyData, status } = useSelector(
@@ -41,8 +42,14 @@ const ViewCompanyDetails: React.FC = () => {
           {/* Company Overview */}
           <div className="space-y-4">
             <div className="flex items-center space-x-4">
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-xl font-bold text-gray-700">
+              <div className="relative flex h-16 w-16 items-center justify-center rounded-full bg-gray-200 text-xl font-bold text-gray-700">
+                {/* Abbreviations */}
                 {companyData.company_abbreviations}
+
+                {/* Camera Icon */}
+                <div className="absolute bottom-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-gray-800 text-white hover:bg-gray-700">
+                  <UploadCompanyDialog />
+                </div>
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-gray-800">

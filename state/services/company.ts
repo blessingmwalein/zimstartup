@@ -10,6 +10,8 @@ import {
 } from "../models/employement";
 import {
   AddCombinedShareholderRequest,
+  AddCompanyRequestDetailRequest,
+  AddCompanyRequestRequest,
   AddDirectorDetailsRequest,
   AddDirectorPositionRequest,
   AddEducationalQualificationsRequest,
@@ -147,13 +149,6 @@ export const createEmployeeHistory = async (
 
 // {{URL}}register-company-request
 
-export const registerCompanyRequest = async (
-  data: RegisterCompanyRequest,
-): Promise<any> => {
-  const response = await api.post<any>(`register-company-request`, data);
-  return response.data;
-};
-
 //{{URL}}create-new-director-details
 export const createNewDirectorDetails = async (data: any): Promise<any> => {
   const response = await api.post<any>(`create-new-director-details`, data);
@@ -289,25 +284,6 @@ export const addDirectorDetails = async (
   return response.data;
 };
 
-//upload company logo
-export const uploadCompanyLogo = async (
-  data: UploadCompanyLogoRequest,
-): Promise<any> => {
-  // Create a FormData instance
-  const formData = new FormData();
-  formData.append("company_id", data.companyId);
-  formData.append("file", data.file);
-
-  // Send the POST request with multipart/form-data
-  const response = await api.post<any>("upload-company-logo", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data", // Set the content type explicitly
-    },
-  });
-
-  return response.data;
-};
-
 //upload company document
 export const uploadCompanyDocument = async (
   data: UploadCompanyLogoRequest,
@@ -323,6 +299,29 @@ export const uploadCompanyDocument = async (
       "Content-Type": "multipart/form-data", // Set the content type explicitly
     },
   });
+
+  return response.data;
+};
+
+//upload_company_logo
+export const uploadCompanyLogo = async (
+  data: UploadCompanyLogoRequest,
+): Promise<any> => {
+  // Create a FormData instance
+  const formData = new FormData();
+  formData.append("company_id", data.companyId);
+  formData.append("file", data.file);
+
+  // Send the POST request with multipart/form-data
+  const response = await api.post<any>(
+    `upload_company_logo?company_id=${data.companyId}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data", // Set the content type explicitly
+      },
+    },
+  );
 
   return response.data;
 };
@@ -351,5 +350,35 @@ export const addCompanyToWatchList = async (
   data: AddWatchListRequest,
 ): Promise<any> => {
   const response = await api.post<any>(`add-to-watchlist`, data);
+  return response.data;
+};
+
+//add company request register-company-request
+export const registerCompanyRequest = async (
+  data: AddCompanyRequestRequest,
+): Promise<any> => {
+  const response = await api.post<any>(`register-company-request`, data);
+  return response.data;
+};
+
+//add company request details register-company-request-detail
+export const registerCompanyRequestDetails = async (
+  data: AddCompanyRequestDetailRequest,
+): Promise<any> => {
+  const response = await api.post<any>(`register-company-request-detail`, data);
+  return response.data;
+};
+
+//get watchlist
+export const getWatchList = async (national_id: string): Promise<any> => {
+  const response = await api.get<any>(`watchlist/${national_id}`);
+  return response.data;
+};
+
+// get-all-sectors
+
+//search companies search-query
+export const searchCompanies = async (searchQuery: string): Promise<any> => {
+  const response = await api.get<any>(`search-query?${searchQuery}`);
   return response.data;
 };

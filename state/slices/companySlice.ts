@@ -31,6 +31,10 @@ import {
   getUserCompanies,
   updateCompanyDetails,
   updateCompanyContactDetails,
+  uploadCompanyLogo,
+  registerCompanyRequestDetails,
+  getWatchList,
+  searchCompanies,
 } from "../services/company";
 import {
   CheckCompanyNameResponse,
@@ -49,10 +53,16 @@ import {
   UploadCompanyLogoRequest,
   UserCompaniesResponse,
   CreateCompanyContactRequest,
+  AddCompanyRequestDetailRequest,
+  AddCompanyRequestRequest,
 } from "../models/company";
 import { CompanyDocument } from "../models/documents";
 import { addCompanyToWatchList } from "../services/company";
-import { AddWatchListRequest } from "../models/watchlist";
+import {
+  AddWatchListRequest,
+  WatchlistDetail,
+  WatchListDetail,
+} from "../models/watchlist";
 import { updateContactInformation } from "../services/auth";
 
 interface CompanyState {
@@ -62,6 +72,7 @@ interface CompanyState {
   companyUpdates: any[];
   companyDocuments: CompanyDocument[];
   userCompanies: UserCompaniesResponse[];
+  watchlist_details: WatchlistDetail[];
   status: "idle" | "loading" | "failed";
   error: string | null;
 }
@@ -70,6 +81,7 @@ const initialState: CompanyState = {
   companyList: null,
   combinedCompanyData: null,
   companyBySectorList: null,
+  watchlist_details: [],
   companyUpdates: [],
   companyDocuments: [],
   userCompanies: [],
@@ -469,11 +481,11 @@ export const addNewAward = createAsyncThunk(
 );
 
 //uploadCompanyLogo
-export const uploadCompanyLogo = createAsyncThunk(
+export const submitUploadCompanyLogo = createAsyncThunk(
   "company/uploadCompanyLogo",
   async (data: any, { rejectWithValue }) => {
     try {
-      return await registerCompanyRequest(data);
+      return await uploadCompanyLogo(data);
     } catch (error: any) {
       console.error("Failed to upload company logo:", error.message);
       if (error.response) {
@@ -524,6 +536,65 @@ export const addCompanyDocument = createAsyncThunk(
       }
       // Return a generic error message for any other case
       return rejectWithValue("Failed to upload company document");
+    }
+  },
+);
+
+//addCompanyRequest handle errors like above
+export const addCompanyRequest = createAsyncThunk(
+  "company/addCompanyRequest",
+  async (data: AddCompanyRequestRequest, { rejectWithValue }) => {
+    try {
+      return await registerCompanyRequest(data);
+    } catch (error: any) {
+      console.error("Failed to add company request:", error.message);
+      if (error.response) {
+        const { status, data } = error.response;
+        // Handle 422 validation error
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+
+        // For other errors, return the message from the response
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      // Return a generic error message for any other case
+      return rejectWithValue("Failed to add company request");
+    }
+  },
+);
+
+//add company request details
+export const addCompanyRequestDetail = createAsyncThunk(
+  "company/addCompanyRequestDetail",
+  async (data: AddCompanyRequestDetailRequest, { rejectWithValue }) => {
+    try {
+      return await registerCompanyRequestDetails(data);
+    } catch (error: any) {
+      if (error.response) {
+        const { status, data } = error.response;
+        // Handle 422 validation error
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+
+        // For other errors, return the message from the response
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      // Return a generic error message for any other case
+      return rejectWithValue("Failed to add company request details");
     }
   },
 );
@@ -583,6 +654,32 @@ export const addCompanyToWatch = createAsyncThunk(
       }
       // Return a generic error message for any other case
       return rejectWithValue("Failed to add award");
+    }
+  },
+);
+
+//get user watchlist
+export const fetchUserWatchList = createAsyncThunk(
+  "company/fetchUserWatchList",
+  async (nationalId: string, { rejectWithValue }) => {
+    try {
+      return await getWatchList(nationalId);
+    } catch (error: any) {
+      console.error("Failed to fetch user watchlist:", error.message);
+      return rejectWithValue("Failed to fetch user watchlist");
+    }
+  },
+);
+
+//search companies
+export const fetchCompanySearch = createAsyncThunk(
+  "company/searchCompanies",
+  async (searchQuery: any, { rejectWithValue }) => {
+    try {
+      return await searchCompanies(searchQuery);
+    } catch (error: any) {
+      console.error("Failed to search companies:", error.message);
+      return rejectWithValue("Failed to search companies");
     }
   },
 );
@@ -766,13 +863,13 @@ const companySlice = createSlice({
         state.status = "failed";
         state.error = action.error.message as string;
       })
-      .addCase(uploadCompanyLogo.pending, (state) => {
+      .addCase(submitUploadCompanyLogo.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(uploadCompanyLogo.fulfilled, (state) => {
+      .addCase(submitUploadCompanyLogo.fulfilled, (state) => {
         state.status = "idle";
       })
-      .addCase(uploadCompanyLogo.rejected, (state, action) => {
+      .addCase(submitUploadCompanyLogo.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message as string;
       })
@@ -818,21 +915,69 @@ const companySlice = createSlice({
       .addCase(addCompanyToWatch.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message as string;
-      }).addCase(submitUpdateCompanyDetails.pending, (state) => {
+      })
+      .addCase(submitUpdateCompanyDetails.pending, (state) => {
         state.status = "loading";
-      }).addCase(submitUpdateCompanyDetails.fulfilled, (state) => {
+      })
+      .addCase(submitUpdateCompanyDetails.fulfilled, (state) => {
         state.status = "idle";
-      }).addCase(submitUpdateCompanyDetails.rejected, (state, action) => {
+      })
+      .addCase(submitUpdateCompanyDetails.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message as string;
-      }).addCase(submitUpdateContactDetails.pending, (state) => {
+      })
+      .addCase(submitUpdateContactDetails.pending, (state) => {
         state.status = "loading";
-      }).addCase(submitUpdateContactDetails.fulfilled, (state) => {
+      })
+      .addCase(submitUpdateContactDetails.fulfilled, (state) => {
         state.status = "idle";
-      }).addCase(submitUpdateContactDetails.rejected, (state, action) => {
+      })
+      .addCase(submitUpdateContactDetails.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message as string;
-      });
+      })
+      .addCase(addCompanyRequest.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addCompanyRequest.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addCompanyRequest.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(addCompanyRequestDetail.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(addCompanyRequestDetail.fulfilled, (state) => {
+        state.status = "idle";
+      })
+      .addCase(addCompanyRequestDetail.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(fetchUserWatchList.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchUserWatchList.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.watchlist_details = action.payload.watchlist_details;
+      })
+      .addCase(fetchUserWatchList.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      .addCase(fetchCompanySearch.pending, (state) => {
+        state.status = "loading";
+      }
+      ).addCase(fetchCompanySearch.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.companyList = action.payload;
+      }).addCase(fetchCompanySearch.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      })
+      ;
   },
 });
 

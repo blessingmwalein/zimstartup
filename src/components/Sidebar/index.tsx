@@ -104,7 +104,7 @@ const menuGroups = [
           { label: "Buy Stock", route: "/buy-stock" },
           { label: "Sell Stock", route: "/sell-stock" },
           { label: "Transactions", route: "/transactions" },
-          { label: "Watch List", route: "watch-list" },
+          { label: "Exchange Cash", route: "/exchange-cash" },
         ],
       },
       {

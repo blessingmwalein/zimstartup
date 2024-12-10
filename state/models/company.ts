@@ -383,3 +383,18 @@ export interface UserCompaniesResponse {
   location:              string;
   website:               string;
 }
+
+
+export interface AddCompanyRequestRequest {
+  company_id:   number;
+  request_type: string;
+  status:       string;
+}
+
+export interface AddCompanyRequestDetailRequest {
+  request_id:       number;
+  total_shares:     number;
+  share_price:      number;
+  currency:         string;
+  amount_requested: number;
+}

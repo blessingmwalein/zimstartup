@@ -11,7 +11,7 @@ const api = createAxiosInstance();
 
 export const getIndustries = async (): Promise<CompanyIndustryResponse> => {
   const response = await api.get<CompanyIndustryResponse>(
-    `get-all-industries-data-in-the-database`,
+    `get-all-sectors`,
   );
   return response.data;
 };
