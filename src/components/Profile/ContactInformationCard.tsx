@@ -16,7 +16,7 @@ const ContactInformationCard: React.FC<ContactInformationCardProps> = ({ contact
   const missingFields = fields.filter(field => !contactDetails[field as keyof ContactDetails]);
 
   return (
-    <div className="max-w-4xl mx-auto rounded-lg border border-gray-300 p-5 bg-white dark:bg-[#37404F] dark:border-strokedark mb-4 relative">
+    <div className="mx-auto rounded-lg border border-gray-300 p-5 bg-white dark:bg-[#37404F] dark:border-strokedark mb-4 relative">
       {/* Edit button aligned to the top right */}
       <Link
         href="/profile/contact/update"

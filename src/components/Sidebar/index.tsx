@@ -100,11 +100,11 @@ const menuGroups = [
         label: "Wallet",
         route: "#",
         children: [
-          { label: "Dashboard", route: "/wallet" },
-          { label: "Buy Stock", route: "/buy-stock" },
-          { label: "Sell Stock", route: "/sell-stock" },
-          { label: "Transactions", route: "/transactions" },
-          { label: "Exchange Cash", route: "/exchange-cash" },
+          { label: "Dashboard", route: "/wallet/dashboard" },
+          { label: "Buy Stock", route: "wallet//buy-stock" },
+          { label: "Sell Stock", route: "/wallet/sell-stock" },
+          { label: "Transactions", route: "/wallet/transactions" },
+          { label: "Exchange Cash", route: "/wallet/exchange-cash" },
         ],
       },
       {

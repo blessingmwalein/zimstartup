@@ -18,7 +18,7 @@ const BeneficiaryInformationCard: React.FC<BeneficiaryInformationCardProps> = ({
   const missingFields = fields.filter(field => !beneficiaryDetails[field as keyof BeneficiaryDetails]);
 
   return (
-    <div className="max-w-4xl mx-auto rounded-lg border border-gray-300 p-5 bg-white dark:bg-[#37404F] dark:border-strokedark mb-4">
+    <div className="mx-auto rounded-lg border border-gray-300 p-5 bg-white dark:bg-[#37404F] dark:border-strokedark mb-4">
       <h2 className="text-1xl font-normal text-gray-700 dark:text-white mb-4">Beneficiary Information</h2>
       
       {/* Show alert if all fields are missing */}
