@@ -21,6 +21,7 @@ import {
   CompanyCombinedResponse,
   CompanyListBySectorResponse,
   CompanyListResponse,
+  CompanyQuestionRequestion,
   CompanyUpdate,
   CreateCompanyContactRequest,
   CreateCompanyPreviousFundRequest,
@@ -30,6 +31,7 @@ import {
   CreateCompanyStockMarketRequest,
   CreateCompanyUpdatesRequest,
   CreateUserEmploymentHistoryRequest,
+  InvestorQuestionRequest,
   RegisterCompanyRequest,
   UploadCompanyLogoRequest,
   UserCompaniesResponse,
@@ -379,6 +381,27 @@ export const getWatchList = async (national_id: string): Promise<any> => {
 
 //search companies search-query
 export const searchCompanies = async (searchQuery: string): Promise<any> => {
-  const response = await api.get<any>(`search-query?${searchQuery}`);
+  const response = await api.get<any>(`company-search-query?${searchQuery}`);
   return response.data;
 };
+
+
+//add company ivestor question question register-investor-question
+
+export const addInvestorQuestion = async (
+  data: InvestorQuestionRequest,
+): Promise<any> => {
+  const response = await api.post<any>(`register-investor-question`, data);
+  return response.data;
+}
+
+
+//add company request question
+export const addCompanyRequestQuestion = async (
+  data: CompanyQuestionRequestion,
+): Promise<any> => {
+  const response = await api.post<any>(`register-company-request-question`, data);
+  return response.data;
+}
+
+

@@ -382,6 +382,7 @@ export interface UserCompaniesResponse {
   status:                string;
   location:              string;
   website:               string;
+  state_name:            string;
 }
 
 
@@ -397,4 +398,16 @@ export interface AddCompanyRequestDetailRequest {
   share_price:      number;
   currency:         string;
   amount_requested: number;
+}
+
+
+export interface InvestorQuestionRequest {
+  question_text: string;
+}
+
+
+export interface CompanyQuestionRequestion {
+  request_id:  number;
+  question_id: number;
+  answer:      string;
 }

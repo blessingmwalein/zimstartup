@@ -35,6 +35,7 @@ import {
   registerCompanyRequestDetails,
   getWatchList,
   searchCompanies,
+  addInvestorQuestion,
 } from "../services/company";
 import {
   CheckCompanyNameResponse,
@@ -55,6 +56,7 @@ import {
   CreateCompanyContactRequest,
   AddCompanyRequestDetailRequest,
   AddCompanyRequestRequest,
+  InvestorQuestionRequest,
 } from "../models/company";
 import { CompanyDocument } from "../models/documents";
 import { addCompanyToWatchList } from "../services/company";
@@ -632,28 +634,25 @@ export const addCompanyToWatch = createAsyncThunk(
       return await addCompanyToWatchList(data);
     } catch (error: any) {
       console.error("Failed to add company watchlist:", error);
-      if (error.response) {
-        const { status, data } = error.response;
-        // Handle 422 validation error
-        if (status === 422 && data?.detail) {
-          const validationErrors = data.detail
-            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
-            .join("\n");
+      const { status, data } = error.response;
+      // Handle 422 validation error
+      if (status === 422 && data?.detail) {
+        const validationErrors = data.detail
+          .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+          .join("\n");
 
-          return rejectWithValue(`Validation Error:\n${validationErrors}`);
-        }
-
-        // For other errors, return the message from the response
-        if (data?.message) {
-          return rejectWithValue(data.message);
-        }
-
-        if (data?.detail) {
-          return rejectWithValue(data.detail);
-        }
+        return rejectWithValue(`Validation Error:\n${validationErrors}`);
       }
-      // Return a generic error message for any other case
-      return rejectWithValue("Failed to add award");
+
+      // For other errors, return the message from the response
+      if (data?.message || data?.detail) {
+        return rejectWithValue(data.message ?? data.detail);
+      }
+
+      if (data?.detail) {
+        return rejectWithValue(data.detail);
+      }
+      return rejectWithValue("Failed to add company to watchlist");
     }
   },
 );
@@ -680,6 +679,36 @@ export const fetchCompanySearch = createAsyncThunk(
     } catch (error: any) {
       console.error("Failed to search companies:", error.message);
       return rejectWithValue("Failed to search companies");
+    }
+  },
+);
+
+//add investor questions
+export const addInvestorQuestions = createAsyncThunk(
+  "company/addInvestorQuestions",
+  async (data: InvestorQuestionRequest, { rejectWithValue }) => {
+    try {
+      return await addInvestorQuestion(data);
+    } catch (error: any) {
+      const { status, data } = error.response;
+
+      if (status === 422 && data?.detail) {
+        const validationErrors = data.detail
+          .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+          .join("\n");
+
+        return rejectWithValue(`Validation Error:\n${validationErrors}`);
+      }
+
+      // For other errors, return the message from the response
+      if (data?.message || data?.detail) {
+        return rejectWithValue(data.message ?? data.detail);
+      }
+
+      if (data?.detail) {
+        return rejectWithValue(data.detail);
+      }
+      return rejectWithValue("Failed to add company to watchlist");
     }
   },
 );
@@ -974,6 +1003,13 @@ const companySlice = createSlice({
         state.status = "idle";
         state.companyList = action.payload;
       }).addCase(fetchCompanySearch.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message as string;
+      }).addCase(addInvestorQuestions.pending, (state) => {
+        state.status = "loading";
+      }).addCase(addInvestorQuestions.fulfilled, (state) => {
+        state.status = "idle";
+      }).addCase(addInvestorQuestions.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message as string;
       })

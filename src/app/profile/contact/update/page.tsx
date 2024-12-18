@@ -75,7 +75,7 @@ const UpdateContactDetails: React.FC = () => {
 
   return (
     <DefaultLayout>
-      <div className="mx-auto max-w-270">
+      <div className="mx-auto p-6">
         <Breadcrumb pageName="Update Contact Details" />
         <div className="grid gap-8">
           <div className="col-span-5 xl:col-span-3">
@@ -83,6 +83,7 @@ const UpdateContactDetails: React.FC = () => {
               <div className="border-b border-stroke px-7 py-4 dark:border-strokedark">
                 <h3 className="font-medium text-black dark:text-white">
                   Contact Information
+                  
                 </h3>
               </div>
               <div className="p-7">

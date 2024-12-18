@@ -144,9 +144,9 @@ const Companies: React.FC = () => {
               <div className="flex items-center justify-center">
                 <Loader />
               </div>
-            ) : companyList?.data && companyList.data.length > 0 ? (
+            ) : companyList && companyList.length > 0 ? (
               <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {companyList.data.map((company: any) => (
+                {companyList.map((company: any) => (
                   <CompanyCard key={company.id} company={company} />
                 ))}
               </div>

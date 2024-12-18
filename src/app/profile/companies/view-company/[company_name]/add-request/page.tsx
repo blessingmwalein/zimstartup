@@ -124,13 +124,17 @@ const AddCompanyRequest: React.FC<EditCompanyGeneralDetailsProps> = ({
 
   return (
     <DefaultLayout>
-      <div className="mx-auto mt-4 max-w-270">
+      <div className="mx-auto mt-4 p-6">
         <Breadcrumb pageName="Add Company Request" />
 
         <div className="grid gap-8">
           <div className="col-span-5 xl:col-span-3">
             <div className="rounded-sm border border-stroke bg-white shadow-default">
               <div className="p-7">
+                {/* comapany name deatils */}
+                <h2 className="mb-6 text-2xl font-semibold text-black dark:text-white">
+                  {companyData.company_name}
+                </h2>
                 {error && (
                   <CustomAlert
                     title="Oops, something went wrong"

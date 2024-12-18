@@ -47,23 +47,23 @@ const ProfileBeneficiary: React.FC = () => {
 
   return (
     <DefaultLayout>
-      <div className="mx-auto max-w-full px-4"> {/* Ensure full width */}
+      <div className="mx-auto max-w-full p-4"> {/* Ensure full width */}
         <Breadcrumb pageName="Beneficiaries" />
-        
+        {customerData ? (
           <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="p-4 pb-6 text-left lg:pb-8 xl:pb-11.5">
               <div className="flex flex-row w-full">
                 {/* Avatar and ProfileBeneficiary Header */}
                 <div className="w-full">
-                  
+
                   <div className="w-full mt-6">
                     <BeneficiaryInformationCard beneficiaryDetails={customerData.beneficiary} />
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-      
+          </div>) : null}
+
       </div>
     </DefaultLayout>
   );

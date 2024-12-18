@@ -250,7 +250,7 @@ const AddCompanyShareholder: React.FC = ({ params }: any) => {
   }, [getCompanyCombinedData, params.company_name]);
   return (
     <DefaultLayout>
-      <div className="mx-auto mt-4 max-w-270">
+      <div className="mx-auto p-6">
         <Breadcrumb pageName="Add Shareholder" />
         <div className="grid gap-8">
           <div className="col-span-5 xl:col-span-3">

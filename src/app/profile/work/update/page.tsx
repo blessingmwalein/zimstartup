@@ -117,7 +117,7 @@ const CreateEmployementDetails: React.FC = () => {
 
   return (
     <DefaultLayout>
-      <div className="mx-auto max-w-270">
+      <div className="mx-auto p-6">
         <Breadcrumb pageName="Update Employment Details" />
         <div className="grid gap-8">
           <div className="col-span-5 xl:col-span-3">

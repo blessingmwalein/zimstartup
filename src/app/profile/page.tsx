@@ -50,7 +50,9 @@ const Profile: React.FC = () => {
   return (
     <DefaultLayout>
       <div className="mx-auto max-w-full px-4"> {/* Ensure full width */}
-        <Breadcrumb pageName="Profile" />
+        <div className="p-6">
+          <Breadcrumb pageName="Profile" />
+        </div>
         {customerData ? (
           <div className="overflow-hidden rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
             <div className="p-4 pb-6 text-left lg:pb-8 xl:pb-11.5">
@@ -58,9 +60,7 @@ const Profile: React.FC = () => {
                 {/* Avatar and Profile Header */}
                 <div className="w-full">
                   {/* Full width component */}
-                  <div className="w-full mt-6">
-                    <WalletOverView /> {/* Wallet Overview Card */}
-                  </div>
+
                   <div className="w-full mt-6">
                     <PersonalInformationCard customerData={customerData.customer_data} onEdit={() => { /* edit handler */ }} />
                   </div>

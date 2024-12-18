@@ -1,18 +1,25 @@
 "use client";
-import React from "react";
+
+import React, { useEffect, useRef } from "react";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import WalletOverView from "@/components/Wallet/OverViewCard";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { AppDispatch } from "../../../../state/store";
+import { buyStock } from "../../../../state/services/wallet";
+import { submitBuyStock } from "../../../../state/slices/walletSlice";
+import { StockExchangeEntity } from "../../../../state/models/config";
+import { fetchAllConfigs } from "../../../../state/slices/configSlice";
 
 // Define Yup schema for form validation
 const schema = yup.object().shape({
   national_id: yup
     .string()
-    .required("National ID is required")
-    .matches(/^\d+$/, "National ID must be numeric"),
+    .required("National ID is required"),
   stock_id: yup
     .number()
     .typeError("Stock ID must be a number")
@@ -31,20 +38,57 @@ interface BuyStockForm {
 }
 
 const BuyStock: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { status, error: stockError } = useSelector((state: any) => state.wallet);
+
+  const [alertMessage, setAlertMessage] = React.useState<string | null>(null);
+  const [alertType, setAlertType] = React.useState<"success" | "error" | null>(null);
+  const { industryList, businessStatesList, stockExchangeList } = useSelector(
+    (state: any) => state.companyConfig,
+  );
+
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<BuyStockForm>({
     resolver: yupResolver(schema), // Connect Yup schema with react-hook-form
+    defaultValues: {
+      national_id: "632095320E63"
+    },
   });
 
-  const onSubmit = (data: BuyStockForm) => {
-    console.log("Form Data Submitted:", data);
+  const onSubmit = async (data: BuyStockForm) => {
+    console.log("Submitting Buy Stock form:", data);
 
-    // Perform API request or dispatch Redux action to process stock purchase
-    // Example: dispatch(buyStock(data));
+    try {
+      const response = await dispatch(submitBuyStock(data)).unwrap();
+      if (response.success) {
+        toast.success(response.message || "Stock purchased successfully!", {
+          position: "bottom-center",
+        });
+        setAlertMessage(response.message || "Stock purchased successfully!");
+        setAlertType("success");
+      } else {
+        throw new Error(response.message || "Failed to purchase stock");
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to purchase stock", {
+        position: "bottom-center",
+      });
+      setAlertMessage(err.message || "Failed to purchase stock");
+      setAlertType("error");
+    }
   };
+
+  const isFetched = useRef(false);
+
+  useEffect(() => {
+    if (!isFetched.current) {
+      dispatch(fetchAllConfigs());
+      isFetched.current = true;
+    }
+  }, [dispatch]);
 
   return (
     <DefaultLayout>
@@ -59,41 +103,56 @@ const BuyStock: React.FC = () => {
               </div>
             </div>
 
-            {/* Buy Stock Form */}
             <div className="mt-8">
               <h2 className="mb-6 text-lg font-semibold text-black dark:text-white">
                 Buy Stock
               </h2>
+              {/* Alert Messages */}
+              {alertMessage && (
+                <div
+                  className={`mb-4 rounded p-4 text-base ${alertType === "success"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
+                    }`}
+                >
+                  {alertMessage}
+                </div>
+              )}
               <form
                 onSubmit={handleSubmit(onSubmit)}
-                className="space-y-6 rounded-lg bg-gray-50 p-6 shadow-lg dark:bg-gray-800"
+                className="space-y-6 rounded-lg bg-gray-50  shadow-lg dark:bg-gray-800"
               >
                 {/* National ID Field */}
                 <div>
                   <label
-                    htmlFor="national_id"
-                    className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    className="mb-3 block text-sm font-medium text-black dark:text-white"
+                    htmlFor="stock_id"
                   >
-                    National ID
+                    Stock Market
                   </label>
-                  <input
-                    type="text"
-                    id="national_id"
-                    {...register("national_id")}
-                    placeholder="Enter your national ID"
-                    className={`w-full rounded border px-4 py-2 text-gray-700 focus:border-blue-500 focus:outline-none focus:ring dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
-                      errors.national_id ? "border-red-500" : "border-gray-300"
-                    }`}
-                  />
-                  {errors.national_id && (
-                    <p className="mt-2 text-sm text-red-500">
-                      {errors.national_id.message}
-                    </p>
+                  <select
+                    className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
+                    {...register("stock_id")}
+                    id="stock_id"
+                  >
+                    <option value="">Select Stock Market</option>
+                    {stockExchangeList?.map(
+                      (stock: StockExchangeEntity) => (
+                        <option key={stock.name} value={stock.stock_id}>
+                          {stock.name}
+                        </option>
+                      ),
+                    )}
+                  </select>
+                  {errors.stock_id && (
+                    <span className="text-xs text-red-500">
+                      {errors.stock_id.message}
+                    </span>
                   )}
                 </div>
 
                 {/* Stock ID Field */}
-                <div>
+                {/* <div>
                   <label
                     htmlFor="stock_id"
                     className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
@@ -105,16 +164,15 @@ const BuyStock: React.FC = () => {
                     id="stock_id"
                     {...register("stock_id")}
                     placeholder="Enter stock ID"
-                    className={`w-full rounded border px-4 py-2 text-gray-700 focus:border-blue-500 focus:outline-none focus:ring dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
-                      errors.stock_id ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full rounded border px-4 py-2 text-gray-700 focus:border-blue-500 focus:outline-none focus:ring dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${errors.stock_id ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                   {errors.stock_id && (
                     <p className="mt-2 text-sm text-red-500">
                       {errors.stock_id.message}
                     </p>
                   )}
-                </div>
+                </div> */}
 
                 {/* Quantity Field */}
                 <div>
@@ -129,9 +187,8 @@ const BuyStock: React.FC = () => {
                     id="quantity"
                     {...register("quantity")}
                     placeholder="Enter quantity"
-                    className={`w-full rounded border px-4 py-2 text-gray-700 focus:border-blue-500 focus:outline-none focus:ring dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${
-                      errors.quantity ? "border-red-500" : "border-gray-300"
-                    }`}
+                    className={`w-full rounded border px-4 py-2 text-gray-700 focus:border-blue-500 focus:outline-none focus:ring dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 ${errors.quantity ? "border-red-500" : "border-gray-300"
+                      }`}
                   />
                   {errors.quantity && (
                     <p className="mt-2 text-sm text-red-500">
@@ -143,9 +200,13 @@ const BuyStock: React.FC = () => {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full rounded bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 focus:outline-none"
+                  disabled={status === "loading"}
+                  className={`w-full rounded px-4 py-2 text-white ${status === "loading"
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-500 hover:bg-blue-600"
+                    } focus:outline-none`}
                 >
-                  Buy Stock
+                  {status === "loading" ? "Processing..." : "Buy Stock"}
                 </button>
               </form>
             </div>
