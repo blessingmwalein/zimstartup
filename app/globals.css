@@ -1,0 +1,122 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background: #f5f5f5;
+}
+
+input,
+textarea {
+  outline: none !important;
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #e0e0e0;
+  }
+  50% {
+    background-color: #c0c0c0;
+  }
+  100% {
+    background-color: #e0e0e0;
+  }
+}
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+p {
+  @apply text-[15px] md:text-[17px] font-normal;
+}
+
+h1 {
+  @apply text-[26px] lg:text-[40px] text-black font-black;
+}
+
+h2 {
+  @apply text-[24px] lg:text-[30px] text-black font-black;
+}
+
+h3 {
+  @apply text-[18px] lg:text-[24px] text-black font-black;
+}
+
+h4 {
+  @apply text-[16px] lg:text-[20px] text-black font-black;
+}
+
+h5 {
+  @apply text-[13.28px] lg:text-[16px] text-black font-black;
+}
+
+h6 {
+  @apply text-[10.7px] lg:text-[14px] text-black font-bold;
+}
+
+.label {
+  @apply text-[16px] ml-2 mb-1 text-[#606160];
+}
+
+.social-login-btn {
+  background: #fff;
+  border: 1px solid #c6c6c6;
+  color: #000;
+  width: 40px;
+  height: 40px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fit-height {
+  height: calc(100dvh - 135px);
+}
+
+.fit-height-no-footer {
+  height: calc(100dvh - 85px);
+}
+
+/* TEL INPUT */
+
+.react-tel-input .form-control {
+  width: 100%;
+  font-size: 19px;
+  border-radius: 0.5rem;
+  padding: 12px;
+  padding-left: 48px;
+  height: auto;
+  background-color: inherit;
+}
+
+.react-tel-input .form-control:hover,
+.react-tel-input .form-control:focus {
+  border-color: #052941;
+}
+.react-tel-input .flag-dropdown {
+  background-color: inherit;
+  padding: 0px 3px;
+  border-radius: 0.5rem 0 0 0.5rem;
+}
+
+.react-tel-input .flag-dropdown.open .selected-flag {
+  background: inherit;
+  border-radius: 0.5rem 0 0 0;
+}
+
+.react-tel-input .selected-flag:hover,
+.react-tel-input .selected-flag:focus {
+  background-color: inherit;
+}
+
+.react-tel-input .country-list {
+  max-height: 300px;
+  margin-bottom: 5px;
+}
+
+/* TEL INPUT */
