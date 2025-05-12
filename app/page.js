@@ -40,12 +40,12 @@ const Home = async () => {
                   your portfolio all in one place.
                 </p>
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <button className="bg-black text-white rounded-full px-8 py-3 font-medium hover:bg-gray-800 transition-colors flex items-center justify-center">
+                  <Link href={'/login'} className="bg-black text-white rounded-full px-8 py-3 font-medium hover:bg-gray-800 transition-colors flex items-center justify-center">
                     Start Investing <ArrowRight className="ml-2 w-5 h-5" />
-                  </button>
-                  <button className="bg-white text-black border border-gray-200 rounded-full px-8 py-3 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center">
+                  </Link>
+                  <Link href={'/login'} className="bg-white text-black border border-gray-200 rounded-full px-8 py-3 font-medium hover:bg-gray-50 transition-colors flex items-center justify-center">
                     Explore Startups
-                  </button>
+                  </Link>
                 </div>
                 <div className="mt-12 flex items-center space-x-6">
                   <div className="flex -space-x-4">
@@ -358,9 +358,9 @@ const Home = async () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">{startup.return}</span>
-                      <button className="bg-black text-white rounded-full px-4 py-1.5 text-sm font-medium hover:bg-gray-800 transition-colors flex items-center">
+                      <Link href={'/login'} className="bg-black text-white rounded-full px-4 py-1.5 text-sm font-medium hover:bg-gray-800 transition-colors flex items-center">
                         Invest Now <ArrowUpRight className="ml-1 w-3 h-3" />
-                      </button>
+                      </Link>
                     </div>
                   </div>
                 </div>
