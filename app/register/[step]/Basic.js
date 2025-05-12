@@ -10,13 +10,14 @@ import { _registrationSubmit } from "@/clientServices/auth";
 import FormAlert from "@/components/material/FormAlert";
 import nationalities from "@/utils/nationalities";
 import queryString from "querystring";
+
 import moment from "moment";
 
 const titles = ["Mr", "Ms", "Mrs", "Miss", "Dr", "Prof", "Ps"];
 
 const Basic = ({ initData }) => {
   const [loading, setLoading] = useState(false);
-  const [error_message, setErrorMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [errors, setErrors] = useState({});
   const [data, setData] = useState({
     step: "basic",
@@ -35,57 +36,42 @@ const Basic = ({ initData }) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!data.national_id) {
-      setData((prevState) => {
-        return { ...prevState, national_id: initData.national_id };
-      });
+    if (initData?.national_id && !data.national_id) {
+      setData((prev) => ({
+        ...prev,
+        national_id: initData.national_id,
+      }));
     }
   }, [initData]);
 
-  function _onChange(event) {
-    const name = event.target.name;
-    const value = event.target.value;
+  const _onChange = (event) => {
+    const { name, value } = event.target;
+    setData((prev) => ({ ...prev, [name]: value }));
+  };
 
-    setData((prevState) => {
-      return { ...prevState, [name]: value };
-    });
-  }
-
-  async function _onSubmit(event) {
+  const _onSubmit = async (event) => {
     event.preventDefault();
     setLoading(true);
     setErrors({});
     setErrorMessage("");
 
-    if (!data.title) {
-      setErrors((prevState) => {
-        return { ...prevState, title: "Title is required" };
-      });
+    // Client-side required field checks
+    if (!data.title || !data.gender || !data.marital_status) {
+      const newErrors = {};
+      if (!data.title) newErrors.title = "Title is required";
+      if (!data.gender) newErrors.gender = "Gender is required";
+      if (!data.marital_status) newErrors.marital_status = "Marital status is required";
+      setErrors(newErrors);
       setLoading(false);
       return;
     }
 
-    if (!data.gender) {
-      setErrors((prevState) => {
-        return { ...prevState, gender: "Gender is required" };
-      });
-      setLoading(false);
-      return;
-    }
+    const payload = {
+      ...data,
+      dob: data.dob ? moment(data.dob).format("YYYY-MM-DD") : "",
+    };
 
-    if (!data.marital_status) {
-      setErrors((prevState) => {
-        return { ...prevState, marital_status: "Marital status is required" };
-      });
-      setLoading(false);
-      return;
-    }
-
-    if (data.dob) {
-      data.dob = moment(data.dob).format("YYYY-MM-DD");
-    }
-
-    const res = await _registrationSubmit(data);
+    const res = await _registrationSubmit(payload);
 
     if (res.success) {
       router.push(
@@ -97,49 +83,44 @@ const Basic = ({ initData }) => {
       );
     } else {
       setErrors(res.errors || {});
+      setErrorMessage(res.message || "An error occurred");
       setLoading(false);
-      setErrorMessage(res.message);
     }
-  }
+  };
 
   return (
-    <form onSubmit={_onSubmit} className="relative w-full   ">
-      <div className="">
-        <h1 className="">
+    <form onSubmit={_onSubmit} className="relative w-full">
+      <div>
+        <h1>
           Welcome to <span className="text-secondary">StartUp</span>
         </h1>
         <p className="text-left">To get started complete the following</p>
       </div>
 
-      <div className="my-7 max-w-lg mx-auto">
-        <FormAlert error={Boolean(error_message)} message={error_message} />
-      </div>
+      {errorMessage && (
+        <div className="my-7 max-w-lg mx-auto">
+          <FormAlert error={true} message={errorMessage} />
+        </div>
+      )}
 
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-7 ">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-7">
         <Select
           placeholder="Title *"
-          options={titles.map((title) => {
-            return { label: title, value: title };
-          })}
+          options={titles.map((title) => ({ label: title, value: title }))}
           value={data.title}
-          onChange={(value) =>
-            setData((prevState) => {
-              return { ...prevState, title: value };
-            })
-          }
+          onChange={(value) => setData((prev) => ({ ...prev, title: value }))}
           error={errors.title}
         />
       </div>
 
       <div className="grid md:grid-cols-2 gap-7 mt-4">
         <TextField
-          required={true}
+          required
           name="first_name"
           placeholder="First name *"
           value={data.first_name}
           onChange={_onChange}
         />
-
         <TextField
           name="middle_name"
           placeholder="Middle name"
@@ -150,7 +131,7 @@ const Basic = ({ initData }) => {
 
       <div className="grid md:grid-cols-2 gap-7 mt-2">
         <TextField
-          required={true}
+          required
           name="last_name"
           placeholder="Last name *"
           value={data.last_name}
@@ -166,19 +147,19 @@ const Basic = ({ initData }) => {
 
       <div className="grid md:grid-cols-2 gap-7 mt-5">
         <Datepicker
-          placeholder={"YYYY-MM-DD*"}
+          placeholder="YYYY-MM-DD*"
           value={{ startDate: data.dob, endDate: data.dob }}
-          onChange={(value) => {
-            setData((prevState) => ({ ...prevState, dob: value.startDate }));
-          }}
-          asSingle={true}
-          required={true}
+          onChange={(value) =>
+            setData((prev) => ({ ...prev, dob: value?.startDate || "" }))
+          }
+          asSingle
+          required
           popoverDirection="down"
           useRange={false}
-          displayFormat={"YYYY-MM-DD"}
+          displayFormat="YYYY-MM-DD"
           maxDate={new Date()}
           containerClassName="relative w-full flex h-[63px] mb-5"
-          inputClassName="w-full  bg-[inherit] px-4 py-1  text-[19px] font-[400]  border border-gray rounded-lg hover:border-primary focus:border-primary "
+          inputClassName="w-full bg-inherit px-4 py-1 text-[19px] font-[400] border border-gray rounded-lg hover:border-primary focus:border-primary"
         />
 
         <div className="grid md:grid-cols-5 gap-5">
@@ -190,11 +171,7 @@ const Basic = ({ initData }) => {
                 { label: "Female", value: "Female" },
               ]}
               value={data.gender}
-              onChange={(value) =>
-                setData((prevState) => {
-                  return { ...prevState, gender: value };
-                })
-              }
+              onChange={(value) => setData((prev) => ({ ...prev, gender: value }))}
               error={errors.gender}
             />
           </div>
@@ -208,9 +185,7 @@ const Basic = ({ initData }) => {
               ]}
               value={data.marital_status}
               onChange={(value) =>
-                setData((prevState) => {
-                  return { ...prevState, marital_status: value };
-                })
+                setData((prev) => ({ ...prev, marital_status: value }))
               }
               error={errors.marital_status}
             />
@@ -221,19 +196,15 @@ const Basic = ({ initData }) => {
       <div className="grid md:grid-cols-2 gap-7 mt-3">
         <Select
           placeholder="Nationality *"
-          options={nationalities.map((item) => {
-            return { label: item, value: item };
-          })}
+          options={nationalities.map((item) => ({ label: item, value: item }))}
           value={data.nationality}
           onChange={(value) =>
-            setData((prevState) => {
-              return { ...prevState, nationality: value };
-            })
+            setData((prev) => ({ ...prev, nationality: value }))
           }
           error={errors.nationality}
         />
         <TextField
-          required={true}
+          required
           name="national_id"
           value={data.national_id}
           placeholder="National ID *"
@@ -241,23 +212,21 @@ const Basic = ({ initData }) => {
         />
       </div>
 
-      <div className="grid grid-cols-2  gap-5 md:gap-7 mt-7">
-        <div className="grid md:grid-cols-2 gap-7 mt-2">
-          <div className="col-span-1">
-            <Link
-              href="/"
-              className="block w-full py-4 border-2 border-primary text-center  font-[600]  text-[16px] text-primary rounded-lg ring-primary hover:ring-1 hover:opacity-80">
-              Cancel
-            </Link>
-          </div>
-          <div className="col-span-1">
-            <button
-              type="submit"
-              disabled={loading}
-              className=" w-full py-4 bg-primary font-[600] text-[16px] text-white rounded-lg hover:opacity-80">
-              {loading ? "loading..." : "Continue"}
-            </button>
-          </div>
+      <div className="grid grid-cols-2 gap-5 md:gap-7 mt-7">
+        <div className="grid md:grid-cols-2 gap-7">
+          <Link
+            href="/"
+            className="block w-full py-4 border-2 border-primary text-center font-semibold text-[16px] text-primary rounded-lg ring-primary hover:ring-1 hover:opacity-80"
+          >
+            Cancel
+          </Link>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full py-4 bg-primary font-semibold text-[16px] text-white rounded-lg hover:opacity-80"
+          >
+            {loading ? "Loading..." : "Continue"}
+          </button>
         </div>
       </div>
     </form>

@@ -29,7 +29,7 @@ const Home = async () => {
             <div className="flex flex-col md:flex-row items-center">
               <div className="md:w-1/2 mb-12 md:mb-0">
                 <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                  Invest in Africa's
+                  Invest in Africas
                   <span className="relative inline-block text-green-500 ml-3">
                     Future
                     <div className="absolute -bottom-2 left-0 w-full h-1 bg-green-400"></div>
@@ -415,7 +415,10 @@ const Home = async () => {
                         />
                       ))}
                   </div>
-                  <p className="text-gray-600 mb-6 italic">"{testimonial.quote}"</p>
+                  <p className="text-gray-600 mb-6 italic">
+  &ldquo;{testimonial.quote}&rdquo;
+</p>
+
                   <div className="flex items-center">
                     <div className="w-12 h-12 rounded-full bg-gray-200 mr-4 flex items-center justify-center">
                       {testimonial.name.charAt(0)}
@@ -436,7 +439,7 @@ const Home = async () => {
           <div className="container mx-auto max-w-5xl text-center">
             <h2 className="text-3xl md:text-5xl font-bold mb-6">Ready to Start Your Investment Journey?</h2>
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Join thousands of investors who are already discovering and investing in Africa's most promising startups.
+              Join thousands of investors who are already discovering and investing in Africas most promising startups.
             </p>
             <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
               <button className="bg-green-500 text-white rounded-full px-8 py-3 font-medium hover:bg-green-600 transition-colors">

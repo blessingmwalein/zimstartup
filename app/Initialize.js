@@ -1,6 +1,6 @@
 "use client";
 
-import { _getInvestorTypes} from "@/redux/actions/generalActions";
+import { _getInvestorTypes } from "@/redux/actions/generalActions";
 import { _getSectors } from "@/redux/actions/sectorsActions";
 import { _getUserCompanies } from "@/redux/actions/userActions";
 import { resetAuth, saveUser } from "@/redux/slices/userSlice";
@@ -23,8 +23,7 @@ const Initialize = ({ user }) => {
     }
 
     dispatch(_getInvestorTypes());
- 
-  }, [user]);
+  }, [user, dispatch]); // ✅ dispatch added here
 
   return (
     <div>

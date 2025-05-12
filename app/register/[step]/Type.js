@@ -35,7 +35,7 @@ const Type = () => {
       setCompanyReg(false);
       dispatch(_setCompanyReg({ company_reg: false }));
     }
-  }, [data.reason]);
+  }, [data.reason, dispatch]);
 
   function _onChange(event) {
     const name = event.target.name;

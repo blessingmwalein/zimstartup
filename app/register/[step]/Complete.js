@@ -18,7 +18,7 @@ const Complete = ({ initData }) => {
         setSuccess(true);
       }
     });
-  }, []);
+  }, [initData]);
 
   useEffect(() => {
     if (success) {
