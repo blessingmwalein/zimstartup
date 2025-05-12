@@ -36,7 +36,7 @@ export default async function RootLayout({ children }) {
         <ReduxProvider>
           <Suspense fallback={<>Loading...</>}>
             <Initialize user={user} />
-            {/* <NavBar session={session} /> */}
+            <NavBar session={session} />
           </Suspense>
 
           {children}

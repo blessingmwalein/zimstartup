@@ -13,6 +13,16 @@ const NavBar = ({ session }) => {
       href: "/",
       authref: "/dashboard",
     },
+    {
+      name: "Login",
+      href: "/login",
+      authref: "/login",
+    },
+    {
+      name: "Register",
+      href: "/register",
+      authref: "/register",
+    },
 
     {
       name: "HelpDesk",
@@ -55,9 +65,8 @@ const NavBar = ({ session }) => {
   return (
     <nav
       className={`
- sticky top-0 h-[80px] md:h-[85px] w-full px-[15px] md:px-[40px] md:pr-[60px] py-2 z-[901] ${
-   pathname === "/" ? "text-primary bg-white" : "bg-primary text-white"
- }  `}>
+ sticky top-0 h-[80px] md:h-[85px] w-full px-[15px] md:px-[40px] md:pr-[60px] py-2 z-[901] 
+      bg-primary text-white`}>
       <div className="flex h-full w-full items-center space-x-2 md:space-x-7">
         <div className="lg:mr-[100px]">
           <Link
@@ -76,23 +85,30 @@ const NavBar = ({ session }) => {
         <div className="flex-1" />
 
         <div className="hidden lg:flex items-center space-x-7">
-          {!pathname.includes("login") &&
-            !pathname.includes("register") &&
-            links.map((link, index) => (
+          {links
+            .filter((link) => {
+              // Only show Home, Register, and HelpDesk on login/register pages if NOT logged in
+              if ((pathname.includes("login") || pathname.includes("register")) && !session) {
+                return ["Home", "Register", "HelpDesk"].includes(link.name);
+              }
+              // Otherwise, show all links
+              return true;
+            })
+            .map((link, index) => (
               <Link
                 key={index}
                 href={session && link.authref ? link.authref : link.href}
-                className={`font-normal text-[#C6C6C6]  hover:underline `}
+                className="font-normal text-[#C6C6C6] hover:underline"
                 style={{
                   color:
-                    (pathname.includes(link.href) && link.href !== "/") ||
-                    link.href === pathname
+                    (pathname.includes(link.href) && link.href !== "/") || link.href === pathname
                       ? "#9FC031"
                       : "",
                 }}>
                 {link.name}
               </Link>
             ))}
+
         </div>
 
         {/* {!pathname.includes("login") &&

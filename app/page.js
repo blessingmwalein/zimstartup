@@ -20,50 +20,7 @@ const Home = async () => {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Navigation */}
-      <header className="bg-[#052941] border-b border-gray-100 py-6 text-white">
-        <div className="container mx-auto px-4 md:px-8">
-          <div className="flex justify-between items-center">
-            {/* <Link href="/" className="text-2xl font-bold text-white">
-                    Zim<span className="text-green-500">startup</span>
-                </Link> */}
-            <Link className="inline-block" href="/">
-              <Image
-                className="hidden dark:block"
-                src={"/images/logo1.webp"}
-                alt="Logo"
-                width={200}
-                height={50}
-              />
-              <Image
-                className="dark:hidden"
-                src={"/images/logo1.webp"}
-                alt="Logo"
-                width={200}
-                height={80}
-              />
-            </Link>
-            <nav className="hidden md:flex items-center space-x-10">
-              <Link href="/" className="text-white font-medium">Home</Link>
-              <Link href="/about" className="text-white hover:text-white-200 transition-colors">About</Link>
-              <Link href="/helpdesk" className="text-white hover:text-white-200 transition-colors">HelpDesk</Link>
-            </nav>
-            <div className="flex items-center space-x-4">
-              {/* <button className="md:hidden text-white">
-                        <Menu className="w-6 h-6" />
-                    </button> */}
-              <Link href="/login" className="hidden md:block text-white hover:text-white-200 transition-colors">
-                Login
-              </Link>
-              <Link
-                href="/register"
-                className="bg-white text-[#052941] rounded-full px-6 py-2 font-medium hover:bg-gray-200 transition-colors"
-              >
-                Get Started
-              </Link>
-            </div>
-          </div>
-        </div>
-      </header>
+   
 
       <main className="flex-grow">
         {/* Hero Section */}
