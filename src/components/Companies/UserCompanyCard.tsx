@@ -1,187 +1,180 @@
-import Link from "next/link";
-import React, { useState } from "react";
-import { Company, UserCompaniesResponse } from "../../../state/models/company";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../state/store";
-import { addCompanyToWatch } from "../../../state/slices/companySlice";
-import { toast } from "react-toastify";
+"use client"
 
-interface CompanyCardProps {
-  company: UserCompaniesResponse;
+import type React from "react"
+import { useState } from "react"
+import { Menu } from "@headlessui/react"
+import { Edit, Trash2, MoreVertical, Building2, MapPin, Globe, AlertTriangle } from "lucide-react"
+import { Company } from "../../../state/models/company"
+import CustomButton from "../Buttons/CustomButton"
+
+interface CompanyProps {
+  company: Company
 }
 
-const UserCompanyCard: React.FC<CompanyCardProps> = ({ company }) => {
-  // Extract the first and last letters of the abbreviations for avatar
-  const avatarText = `${company.company_abbreviations[0]}${company.company_abbreviations.slice(-1)}`;
+const UserCompanyCard: React.FC<CompanyProps> = ({ company }) => {
+  const [isHovered, setIsHovered] = useState(false)
 
-  const dispatch = useDispatch<AppDispatch>();
-  const [error, setError] = useState<string | null>(null);
-
-  const onSubmit = async (data: any) => {
-    setError(null);
-
-    const updatePayload = {
-      company_id: 102,
-      national_id: "632095320E63",
-      watchlist_status: true,
-    };
-
-    try {
-      const response = await dispatch(
-        addCompanyToWatch(updatePayload),
-      ).unwrap();
-
-      toast.success("Company added to watchlist", {
-        position: "bottom-center",
-      });
-    } catch (err: any) {
-      console.log(err);
-      setError(err || "Failed to add company to watchlist");
-      toast.error(err || "Failed to add company to watchlist", {
-        position: "bottom-center",
-      });
+  // Function to determine status badge color
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "PENDING CHECK":
+        return "bg-yellow-100 text-yellow-800"
+      case "APPROVED":
+        return "bg-green-100 text-green-800"
+      case "REJECTED":
+        return "bg-red-100 text-red-800"
+      default:
+        return "bg-gray-100 text-gray-800"
     }
-  };
+  }
+
+  // Function to determine grade badge color
+  const getGradeColor = (grade: string) => {
+    switch (grade) {
+      case "RISKY":
+        return "bg-red-100 text-red-800"
+      case "MEDIUM":
+        return "bg-yellow-100 text-yellow-800"
+      case "SAFE":
+        return "bg-green-100 text-green-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
+  }
 
   return (
-    <Link href={"#"}>
-      <div className="relative rounded-lg bg-white p-6 shadow-md">
-        {/* Love Icon */}
+    <div
+      className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-md"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* Status Badge - Positioned at the top left */}
+      <div className="absolute left-3 top-3 z-10">
+        <span
+          className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${getStatusColor(company.status)}`}
+        >
+          {company.status}
+        </span>
+      </div>
+
+      {/* Logo Section */}
+      <div className="relative h-40 w-full bg-gradient-to-r from-gray-50 to-gray-100">
+        {company.company_logo ? (
+          <div className="flex h-full w-full items-center justify-center p-4">
+            <img
+              src={company.company_logo || "/placeholder.svg"}
+              alt={`${company.company_name} logo`}
+              className="max-h-full max-w-full object-contain"
+            />
+          </div>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <Building2 className="h-16 w-16 text-gray-300" />
+          </div>
+        )}
+
+        {/* Action Menu */}
         <div className="absolute right-2 top-2">
-          <button
-            onClick={onSubmit}
-            className="rounded-full p-1 text-gray-400 hover:bg-gray-200 hover:text-red-500"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="size-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-              />
-            </svg>
-          </button>
-        </div>
-
-        {/* Card Content */}
-        <div className="flex flex-row items-center">
-          {/* Circle Avatar */}
-          <div className="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 text-lg font-bold text-white">
-            {avatarText}
-          </div>
-
-          {/* Company Details */}
-          <div className="flex flex-col">
-            <p className="mt-2 text-base text-gray-700">
-              {company.company_name}
-            </p>
-            <p className="mt-0.5 flex flex-row text-xs text-gray-500">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="mr-2 h-4 w-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
-                />
-              </svg>
-              {company.location}
-            </p>
-            <div className="mt-2 flex flex-row">
-              {/* Status Badge */}
-              <span
-                className={`rounded px-2.5 py-0.5 text-xs font-medium 
-                  ${
-                    company.status === "PENDING CHECK"
-                      ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300"
-                      : "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
-                  }`}
-              >
-                {company.status}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-3 flex h-full flex-row justify-between">
-          <div className="flex flex-row items-start justify-between">
-            <span className="block text-base font-bold text-gray-700">
-              {company.company_name}
-            </span>
-          </div>
-          <div className="flex justify-end  space-x-2">
-            {/* Website Button */}
-            <a
-              href={company.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block flex flex-row items-center justify-center rounded-full bg-blue-100 px-4 py-2 text-xs font-medium text-blue-700 hover:bg-blue-200"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="mr-2 h-4 w-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418"
-                />
-              </svg>
-              Website
-            </a>
-
-            {/* View Button */}
-            <Link
-              href={`/profile/companies/view-company/${company.company_name}`}
-              className="inline-block flex flex-row items-center justify-center rounded-full bg-blue-500 px-4 py-2 text-xs font-medium text-white hover:bg-blue-600"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="mr-2 h-4 w-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
-                />
-              </svg>
-              View
-            </Link>
-          </div>
+          <Menu as="div" className="relative inline-block text-left">
+            <Menu.Button className="flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-gray-600 shadow-sm hover:bg-white hover:text-gray-900">
+              <MoreVertical className="h-5 w-5" />
+            </Menu.Button>
+            <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    className={`${active ? "bg-gray-100" : ""
+                      } flex w-full items-center px-4 py-2 text-sm text-gray-700`}
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit
+                  </button>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    className={`${active ? "bg-gray-100" : ""} flex w-full items-center px-4 py-2 text-sm text-red-600`}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete
+                  </button>
+                )}
+              </Menu.Item>
+            </Menu.Items>
+          </Menu>
         </div>
       </div>
-    </Link>
-  );
-};
 
-export default UserCompanyCard;
+      {/* Content Section */}
+      <div className="p-6">
+        <div className="mb-4 flex items-start justify-between">
+          <div>
+            <h3 className="text-xl font-bold tracking-tight text-gray-900">{company.company_name}</h3>
+            <p className="text-sm text-gray-500">{company.company_abbreviations}</p>
+          </div>
+          {company.grade === "RISKY" && (
+            <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+              <AlertTriangle className="mr-1 h-3 w-3" />
+              {company.grade}
+            </span>
+          )}
+        </div>
+
+        <div className="mb-4">
+          <div className="mb-1 flex items-center justify-between text-sm">
+            <span className="text-gray-500">Completeness</span>
+            <span className="font-medium">{company.completeness_score}%</span>
+          </div>
+          <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200">
+            <div
+              className={`h-full ${company.completeness_score >= 70
+                ? "bg-green-500"
+                : company.completeness_score >= 40
+                  ? "bg-yellow-500"
+                  : "bg-red-500"
+                }`}
+              style={{ width: `${company.completeness_score}%` }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center text-sm text-gray-500">
+            <MapPin className="mr-2 h-4 w-4" />
+            <span>{company.location}</span>
+          </div>
+
+          {company.website && (
+            <div className="flex items-center text-sm text-gray-500">
+              <Globe className="mr-2 h-4 w-4" />
+              <a
+                href={company.website.startsWith("http") ? company.website : `https://${company.website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+              >
+                {company.website}
+              </a>
+            </div>
+          )}
+
+          {/* <div className="flex items-center text-sm text-gray-500">
+            <span className="mr-2 font-medium">ID:</span>
+            <span>{company.national_id}</span>
+          </div> */}
+        </div>
+      </div>
+
+      {/* Footer Section */}
+      {/* <div className="bg-gray-50 p-4">
+        <CustomButton variant="'outline'">
+          <Edit className="mr-2 h-4 w-4" />
+          Manage Company
+        </CustomButton>
+      </div> */}
+    </div>
+  )
+}
+
+export default UserCompanyCard

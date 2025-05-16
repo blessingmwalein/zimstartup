@@ -190,16 +190,16 @@ export interface CompanyListBySectorResponse {
 }
 
 export interface Company {
-  company_start_date: Date;
-  company_status: CompanyStatus;
-  request_type: null | string;
-  company_abbreviations: string;
-  company_name: string;
-  business_state: string;
-  sector: string;
-  location: string;
-  name: string;
-  company_id: number;
+  company_id: number
+    national_id: string
+    company_abbreviations: string
+    company_name: string
+    status: string
+    location: string
+    website: string
+    company_logo: string
+    completeness_score: number
+    grade: string
 }
 
 export enum CompanyStatus {

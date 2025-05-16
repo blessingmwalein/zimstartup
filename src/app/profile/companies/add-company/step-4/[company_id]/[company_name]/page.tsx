@@ -1,381 +1,272 @@
-"use client";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import * as Yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import CustomAlert from "@/components/common/notification/Alert";
-import { AppDispatch } from "../../../../../../../../state/store";
-import Stepper from "@/components/common/Stepper";
-import { createCompanyPreviousFunds } from "../../../../../../../../state/slices/companySlice";
-import { toast } from "react-toastify";
-import { format } from "date-fns";
+"use client"
+
+import type React from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useDispatch } from "react-redux"
+import { useForm, Controller } from "react-hook-form"
+import * as Yup from "yup"
+import { yupResolver } from "@hookform/resolvers/yup"
+import { format } from "date-fns"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+
+import DefaultLayout from "@/components/Layouts/DefaultLayout"
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb"
+import Stepper from "@/components/common/Stepper"
+import CustomAlert from "@/components/common/notification/Alert"
+
+import type { AppDispatch } from "../../../../../../../../state/store"
+import { createCompanyPreviousFunds } from "../../../../../../../../state/slices/companySlice"
+
+import { DollarSign, Users, Building2 } from "lucide-react"
+import Select from "@/components/FormElements/SelectInput"
+import TextField from "@/components/FormElements/TextField"
+import CustomDatePicker from "@/components/FormElements/DatePicker/CustomDatePicker"
 
 // Yup validation schema
 const schema = Yup.object({
   investor_type: Yup.string().required("Investor Type is required"),
-  investor_information: Yup.string().required(
-    "Investor Information is required",
-  ),
+  investor_information: Yup.string().required("Investor Information is required"),
   investment_type: Yup.string().required("Investment Type is required"),
   date_of_funds: Yup.date().required("Date of Funds is required"),
   investment_amount: Yup.number().required("Investment Amount is required"),
   investment_currency: Yup.string().required("Investment Currency is required"),
   company_valuation: Yup.number().required("Company Valuation is required"),
-  company_valuation_currency: Yup.string().required(
-    "Company Valuation Currency is required",
-  ),
+  company_valuation_currency: Yup.string().required("Company Valuation Currency is required"),
   valuation_date: Yup.date().required("Valuation Date is required"),
-}).required();
+}).required()
 
 // Main Component
 const AddCompanyFundsDetails: React.FC = ({ params }: any) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const dispatch = useDispatch<AppDispatch>();
-  const [error, setError] = useState<string | null>(null);
-
-  const { user } = useSelector((state: any) => state.auth);
-
-  const [companyName, setCompanyName] = useState<string | null>(null);
+  const router = useRouter()
+  const dispatch = useDispatch<AppDispatch>()
+  const [error, setError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [companyName, setCompanyName] = useState<string | null>(null)
 
   useEffect(() => {
-    const companyName = params.company_name;
+    const companyName = params.company_name
     if (companyName) {
-      const decodedCompanyName = decodeURIComponent(companyName); // Decode the encoded string
-      setCompanyName(decodedCompanyName); // Set the decoded value in the form
+      const decodedCompanyName = decodeURIComponent(companyName)
+      setCompanyName(decodedCompanyName)
     }
-  }, [params.company_name, setCompanyName]);
-
-
-  const {
-    industryList,
-    businessStatesList,
-    stockExchangeList,
-    marketTypesList,
-  } = useSelector((state: any) => state.companyConfig);
+  }, [params.company_name])
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
-  });
+  })
 
   const onSubmit = async (data: any) => {
-    const company_id = params.company_id;
+    const company_id = params.company_id
+    setError(null)
+    setIsSubmitting(true)
 
-    setError(null);
-
-    const contactDetailsPayload = {
+    const fundsPayload = {
       ...data,
       company_id,
       valuation_date: format(new Date(data.valuation_date), "yyyy-MM-dd"),
       date_of_funds: format(new Date(data.date_of_funds), "yyyy-MM-dd"),
-    };
+    }
 
     try {
-      const response = await dispatch(
-        createCompanyPreviousFunds(contactDetailsPayload),
-      ).unwrap();
+      const response = await dispatch(createCompanyPreviousFunds(fundsPayload)).unwrap()
 
       if (response.data) {
-        toast.success("Company stock details added successful", {
-          position: "bottom-center",
-        });
-        router.push(`/profile/companies/view-company/${params.company_name}`);
+        toast.success("Company funds details added successfully")
+        router.push(`/profile/companies/view-company/${params.company_id}`)
       } else {
-        toast.error("Something went wrong", {
-          position: "bottom-center",
-        });
+        toast.error("Something went wrong")
       }
     } catch (err: any) {
-      setError(err || "Failed to submit company contact details");
+      setError(err || "Failed to submit company funds details")
+      toast.error(err || "Failed to submit company funds details")
+    } finally {
+      setIsSubmitting(false)
     }
-  };
+  }
 
-  const currentStep = 3;
-  const headings = [
-    "Step 1: General Details",
-    "Step 2: Contact Details",
-    "Step 3: Stock Market Details",
-    "Step 4: Funds Details",
-  ];
+  const currentStep = 3
+  const headings = ["General Details", "Contact Details", "Stock Market", "Funds Details"]
 
-  const investorTypes = ["Individual", "Governement", "Organization"];
+  const investorTypes = [
+    { value: "Individual", label: "Individual" },
+    { value: "Government", label: "Government" },
+    { value: "Organization", label: "Organization" },
+  ]
 
   return (
     <DefaultLayout>
-      <div className="mx-auto mt-4 max-w-280">
-        <Breadcrumb pageName="Add Company Stock Details" />
-        <div className="grid gap-8">
-          <div className="col-span-5 xl:col-span-3">
-            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              <div className="border-b border-stroke px-7 py-4 dark:border-strokedark">
-                <h2 className="text-xl font-semibold text-black ">
-                  {companyName}
-                </h2>
+      <div className="mx-auto max-w-5xl px-4 py-8">
+        <Breadcrumb pageName="Company Funds Details" />
+
+        <div className="mt-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="border-b border-gray-200 px-8 py-6">
+            <h2 className="text-xl font-semibold text-gray-800">{companyName}</h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Add funding information for your company. This is the final step.
+            </p>
+          </div>
+
+          <div className="px-8 py-6">
+            <Stepper currentStep={currentStep} headings={headings} />
+
+            {error && (
+              <div className="mb-6">
+                <CustomAlert title="Oops, something went wrong" subtitle={error} type={"error"} />
               </div>
-              <div className="border-b border-stroke px-7 py-4 dark:border-strokedark">
-                <Stepper currentStep={currentStep} headings={headings} />
-              </div>
-              <div className="p-7">
-                {error && (
-                  <CustomAlert
-                    title="Oops, something went wrong"
-                    subtitle={error}
-                    type={"error"}
+            )}
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+              {/* Investor Information */}
+              <div className="rounded-lg border border-gray-200 bg-white p-6">
+                <h3 className="mb-4 flex items-center text-lg font-medium text-gray-800">
+                  <Users className="mr-2 h-5 w-5 text-blue-600" />
+                  Investor Information
+                </h3>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  <Controller
+                    control={control}
+                    name="investor_type"
+                    render={({ field }) => (
+                      <Select
+                        label="Investor Type"
+                        options={investorTypes}
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select investor type"
+                        error={errors.investor_type?.message}
+                        icon={<Users className="h-5 w-5" />}
+                      />
+                    )}
                   />
-                )}
 
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  {/* Row 1 */}
-                  <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {/* Investor Type */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="investor_type"
-                      >
-                        Investor Type
-                      </label>
+                  <TextField
+                    label="Investor Information"
+                    placeholder="Enter investor information"
+                    {...register("investor_information")}
+                    error={errors.investor_information?.message}
+                    icon={<Users className="h-5 w-5" />}
+                  />
 
-                      <select
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        {...register("investor_type")}
-                        id="investor_type"
-                      >
-                        <option value="">Select Investor Type</option>
-                        {investorTypes?.map((type: string, index: number) => (
-                          <option key={index} value={type}>
-                            {type}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.investor_type && (
-                        <span className="text-xs text-red-500">
-                          {errors.investor_type.message}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Investor Information */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="investor_information"
-                      >
-                        Investor Information
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="text"
-                        {...register("investor_information")}
-                        id="investor_information"
-                        placeholder="Investor Information"
-                      />
-                      {errors.investor_information && (
-                        <span className="text-xs text-red-500">
-                          {errors.investor_information.message}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Investment Type */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="investment_type"
-                      >
-                        Investment Type
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="text"
-                        {...register("investment_type")}
-                        id="investment_type"
-                        placeholder="Investment Type"
-                      />
-
-                      {errors.investment_type && (
-                        <span className="text-xs text-red-500">
-                          {errors.investment_type.message}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Row 2 */}
-                  <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {/* Date of Funds */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="date_of_funds"
-                      >
-                        Date of Funds
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="date"
-                        {...register("date_of_funds")}
-                        id="date_of_funds"
-                        placeholder="Date of Funds"
-                      />
-                      {errors.date_of_funds && (
-                        <span className="text-xs text-red-500">
-                          {errors.date_of_funds.message}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Investment Amount */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="investment_amount"
-                      >
-                        Investment Amount
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="number"
-                        {...register("investment_amount")}
-                        id="investment_amount"
-                        placeholder="Investment Amount"
-                      />
-                      {errors.investment_amount && (
-                        <span className="text-xs text-red-500">
-                          {errors.investment_amount.message}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Investment Currency */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="investment_currency"
-                      >
-                        Investment Currency
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="text"
-                        {...register("investment_currency")}
-                        id="investment_currency"
-                        placeholder="Investment Currency"
-                      />
-                      {errors.investment_currency && (
-                        <span className="text-xs text-red-500">
-                          {errors.investment_currency.message}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Row 3 */}
-                  <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {/* Company Valuation */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="company_valuation"
-                      >
-                        Company Valuation
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="number"
-                        {...register("company_valuation")}
-                        id="company_valuation"
-                        placeholder="Company Valuation"
-                      />
-                      {errors.company_valuation && (
-                        <span className="text-xs text-red-500">
-                          {errors.company_valuation.message}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Company Valuation Currency */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="company_valuation_currency"
-                      >
-                        Company Valuation Currency
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="text"
-                        {...register("company_valuation_currency")}
-                        id="company_valuation_currency"
-                        placeholder="Company Valuation Currency"
-                      />
-                      {errors.company_valuation_currency && (
-                        <span className="text-xs text-red-500">
-                          {errors.company_valuation_currency.message}
-                        </span>
-                      )}
-                    </div>
-
-                    {/* Valuation Date */}
-                    <div>
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="valuation_date"
-                      >
-                        Valuation Date
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="date"
-                        {...register("valuation_date")}
-                        id="valuation_date"
-                        placeholder="Valuation Date"
-                      />
-                      {errors.valuation_date && (
-                        <span className="text-xs text-red-500">
-                          {errors.valuation_date.message}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Submit Buttons */}
-                  <div className="mt-6 flex justify-end">
-                    <button
-                      className="mr-3 rounded-md bg-warning px-3 py-3 text-white"
-                      type="button"
-                      onClick={() =>
-                        router.push(
-                          `/profile/companies/view-company/${params.company_id}`,
-                        )
-                      }
-                    >
-                      Add Details Later
-                    </button>
-                    <button
-                      className="rounded-md bg-primary px-3 py-3 text-white"
-                      type="submit"
-                    >
-                      Save & Continue
-                    </button>
-                  </div>
-                </form>
+                  <TextField
+                    label="Investment Type"
+                    placeholder="Enter investment type"
+                    {...register("investment_type")}
+                    error={errors.investment_type?.message}
+                    icon={<Building2 className="h-5 w-5" />}
+                  />
+                </div>
               </div>
-            </div>
+
+              {/* Investment Details */}
+              <div className="rounded-lg border border-gray-200 bg-white p-6">
+                <h3 className="mb-4 flex items-center text-lg font-medium text-gray-800">
+                  <DollarSign className="mr-2 h-5 w-5 text-blue-600" />
+                  Investment Details
+                </h3>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  <CustomDatePicker
+                    control={control}
+                    name="date_of_funds"
+                    label="Date of Funds"
+                    placeholder="Select date of funds"
+                    error={errors.date_of_funds?.message}
+                  />
+
+                  <TextField
+                    label="Investment Amount"
+                    placeholder="Enter investment amount"
+                    type="number"
+                    {...register("investment_amount")}
+                    error={errors.investment_amount?.message}
+                    icon={<DollarSign className="h-5 w-5" />}
+                  />
+
+                  <TextField
+                    label="Investment Currency"
+                    placeholder="Enter currency (e.g. USD)"
+                    {...register("investment_currency")}
+                    error={errors.investment_currency?.message}
+                    icon={<DollarSign className="h-5 w-5" />}
+                  />
+                </div>
+              </div>
+
+              {/* Valuation Information */}
+              <div className="rounded-lg border border-gray-200 bg-white p-6">
+                <h3 className="mb-4 flex items-center text-lg font-medium text-gray-800">
+                  <Building2 className="mr-2 h-5 w-5 text-blue-600" />
+                  Valuation Information
+                </h3>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  <TextField
+                    label="Company Valuation"
+                    placeholder="Enter company valuation"
+                    type="number"
+                    {...register("company_valuation")}
+                    error={errors.company_valuation?.message}
+                    icon={<DollarSign className="h-5 w-5" />}
+                  />
+
+                  <TextField
+                    label="Valuation Currency"
+                    placeholder="Enter valuation currency"
+                    {...register("company_valuation_currency")}
+                    error={errors.company_valuation_currency?.message}
+                    icon={<DollarSign className="h-5 w-5" />}
+                  />
+
+                  <CustomDatePicker
+                    control={control}
+                    name="valuation_date"
+                    label="Valuation Date"
+                    placeholder="Select valuation date"
+                    error={errors.valuation_date?.message}
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  className="rounded-md border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  onClick={() => router.back()}
+                >
+                  Previous Step
+                </button>
+                <button
+                  type="button"
+                  className="rounded-md border border-gray-300 bg-amber-500 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+                  onClick={() => router.push(`/profile/companies/view-company/${params.company_id}`)}
+                >
+                  Add Details Later
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70"
+                >
+                  {isSubmitting ? "Saving..." : "Complete Registration"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
+
+        <ToastContainer position="bottom-right" />
       </div>
     </DefaultLayout>
-  );
-};
+  )
+}
 
-export default AddCompanyFundsDetails;
+export default AddCompanyFundsDetails

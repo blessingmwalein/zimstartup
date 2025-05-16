@@ -1,467 +1,302 @@
-"use client";
-import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import * as Yup from "yup";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { use, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import CustomAlert from "@/components/common/notification/Alert";
-import { AppDispatch } from "../../../../../../../../state/store";
-import Stepper from "@/components/common/Stepper";
-import { createCompanyContact } from "../../../../../../../../state/slices/companySlice";
-import { toast } from "react-toastify";
+"use client"
+
+import type React from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useDispatch } from "react-redux"
+import { useForm } from "react-hook-form"
+import * as Yup from "yup"
+import { yupResolver } from "@hookform/resolvers/yup"
+import { toast, ToastContainer } from "react-toastify"
+import "react-toastify/dist/ReactToastify.css"
+
+import DefaultLayout from "@/components/Layouts/DefaultLayout"
+import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb"
+import Stepper from "@/components/common/Stepper"
+import CustomAlert from "@/components/common/notification/Alert"
+
+import type { AppDispatch } from "../../../../../../../../state/store"
+import { createCompanyContact } from "../../../../../../../../state/slices/companySlice"
+
+import { Mail, Phone, MapPin, Globe, Instagram, Linkedin, Twitter, Building2 } from "lucide-react"
+import TextField from "@/components/FormElements/TextField"
 
 // Yup validation schema
 const schema = Yup.object({
   instagram: Yup.string().nullable(),
   linkedin: Yup.string().nullable(),
   twitter: Yup.string().nullable(),
-  email: Yup.string()
-    .email("Invalid email address")
-    .required("Email is required"),
-  work_email: Yup.string()
-    .email("Invalid email address")
-    .required("Work email is required"),
-  phone1: Yup.number()
-    .required("Phone number 1 is required"),
-  phone2: Yup.number()
-
-    .nullable(),
-
-  phone3: Yup.number()
-
-    .nullable(),
+  email: Yup.string().email("Invalid email address").required("Email is required"),
+  work_email: Yup.string().email("Invalid email address").required("Work email is required"),
+  phone1: Yup.number().required("Phone number 1 is required"),
+  phone2: Yup.number().nullable(),
+  phone3: Yup.number().nullable(),
   address: Yup.string().required("Address is required"),
   address_city: Yup.string().required("City is required"),
   state_code: Yup.number().required("State code is required"),
   region: Yup.string().required("Region is required"),
   country: Yup.string().required("Country is required"),
-}).required();
+}).required()
 
 // Main Component
 const AddCompanyContactDetails: React.FC = ({ params }: any) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const dispatch = useDispatch<AppDispatch>();
-  const [error, setError] = useState<string | null>(null);
-
-  const { user } = useSelector((state: any) => state.auth);
-
-  const [companyName, setCompanyName] = useState("");
+  const router = useRouter()
+  const dispatch = useDispatch<AppDispatch>()
+  const [error, setError] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [companyName, setCompanyName] = useState("")
 
   useEffect(() => {
-    const companyName = params.company_name;
+    const companyName = params.company_name
     if (companyName) {
-      const decodedCompanyName = decodeURIComponent(companyName); // Decode the encoded string
-      setCompanyName(decodedCompanyName); // Set the decoded value in the form
+      const decodedCompanyName = decodeURIComponent(companyName)
+      setCompanyName(decodedCompanyName)
     }
-  }, [params.company_name, setCompanyName]);
-
+  }, [params.company_name])
 
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
-  });
+  })
 
   const onSubmit = async (data: any) => {
-    const company_id = params.company_id;
-
-    // console.log(params.company_id);
-    // return;
-    setError(null);
+    const company_id = params.company_id
+    setError(null)
+    setIsSubmitting(true)
 
     // Include the company_id in the contactDetailsPayload
     const contactDetailsPayload = {
       ...data,
-      company_id, // Add the company_id to the payload
-    };
+      company_id,
+    }
 
     try {
       // Dispatch the action to create contact details
-      const response = await dispatch(
-        createCompanyContact(contactDetailsPayload),
-      ).unwrap();
+      const response = await dispatch(createCompanyContact(contactDetailsPayload)).unwrap()
 
       // Redirect to the next step using the company_id from the response
       if (response.data) {
-        toast.success("Company contact details added successful", {
-          position: "bottom-center",
-        });
-        router.push(`/profile/companies/add-company/step-3/${company_id}/${params.company_name}`);
+        toast.success("Company contact details added successfully")
+        router.push(`/profile/companies/add-company/step-3/${company_id}/${params.company_name}`)
       } else {
-        toast.error("Something went wrong", {
-          position: "bottom-center",
-        });
+        toast.error("Something went wrong")
       }
     } catch (err: any) {
-      setError(err || "Failed to submit company contact details");
+      setError(err || "Failed to submit company contact details")
+      toast.error(err || "Failed to submit company contact details")
+    } finally {
+      setIsSubmitting(false)
     }
-  };
+  }
 
-  const currentStep = 1; // Assuming this is step 2 for contact details
-  const headings = [
-    "Step 1: General Details",
-    "Step 2: Contact Details",
-    "Step 3: Stock Market Details",
-    "Step 4: Funds Details",
-  ];
+  const currentStep = 1
+  const headings = ["General Details", "Contact Details", "Stock Market", "Funds Details"]
 
   return (
     <DefaultLayout>
-      <div className="mx-auto mt-4 max-w-270">
-        <Breadcrumb pageName="Add Company Contact Details" />
-        <div className="grid gap-8">
-          <div className="col-span-5 xl:col-span-3">
-            <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-              {/* company name */}
-              <div className="px-7 py-4 border-b border-stroke dark:border-strokedark">
-                <h2 className="text-xl font-semibold text-black ">
-                  {companyName}
-                </h2>
+      <div className="mx-auto max-w-5xl px-4 py-8">
+        <Breadcrumb pageName="Company Contact Details" />
+
+        <div className="mt-6 rounded-xl border border-gray-200 bg-white shadow-sm">
+          <div className="border-b border-gray-200 px-8 py-6">
+            <h2 className="text-xl font-semibold text-gray-800">{companyName}</h2>
+            <p className="mt-1 text-sm text-gray-500">Add contact information for your company. This is step 2 of 4.</p>
+          </div>
+
+          <div className="px-8 py-6">
+            <Stepper currentStep={currentStep} headings={headings} />
+
+            {error && (
+              <div className="mb-6">
+                <CustomAlert title="Oops, something went wrong" subtitle={error} type={"error"} />
               </div>
-              <div className="border-b border-stroke px-7 py-4 dark:border-strokedark">
-                <Stepper currentStep={currentStep} headings={headings} />
-              </div>
-              <div className="p-7">
-                {error && (
-                  <CustomAlert
-                    title="Oops, something went wrong"
-                    subtitle={error}
-                    type={"error"}
+            )}
+
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+              {/* Email Information */}
+              <div className="rounded-lg border border-gray-200 bg-white p-6">
+                <h3 className="mb-4 flex items-center text-lg font-medium text-gray-800">
+                  <Mail className="mr-2 h-5 w-5 text-blue-600" />
+                  Email Information
+                </h3>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <TextField
+                    label="Email"
+                    placeholder="company@example.com"
+                    {...register("email")}
+                    error={errors.email?.message}
+                    icon={<Mail className="h-5 w-5" />}
                   />
-                )}
 
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  {/* Email Information (2 in a row) */}
-                  <div className="mb-6">
-                    <h3 className="text-xl font-medium text-gray-700 dark:text-white">
-                      Email Information
-                    </h3>
-                    <div className="mt-4 grid grid-cols-2 gap-4">
-                      <div>
-                        <label
-                          className="mb-3 block text-sm font-medium text-black dark:text-white"
-                          htmlFor="email"
-                        >
-                          Email
-                        </label>
-                        <input
-                          className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          type="email"
-                          {...register("email")}
-                          id="email"
-                          placeholder="Email"
-                        />
-                        {errors.email && (
-                          <span className="text-xs text-red-500">
-                            {errors.email.message}
-                          </span>
-                        )}
-                      </div>
-
-                      <div>
-                        <label
-                          className="mb-3 block text-sm font-medium text-black dark:text-white"
-                          htmlFor="work_email"
-                        >
-                          Work Email
-                        </label>
-                        <input
-                          className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          type="email"
-                          {...register("work_email")}
-                          id="work_email"
-                          placeholder="Work Email"
-                        />
-                        {errors.work_email && (
-                          <span className="text-xs text-red-500">
-                            {errors.work_email.message}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Phone Numbers (3 in a row) */}
-                  <div className="mb-6">
-                    <h3 className="text-xl font-medium text-gray-700 dark:text-white">
-                      Phone Numbers
-                    </h3>
-                    <div className="mt-4 grid grid-cols-3 gap-4">
-                      <div>
-                        <label
-                          className="mb-3 block text-sm font-medium text-black dark:text-white"
-                          htmlFor="phone1"
-                        >
-                          Phone Number 1
-                        </label>
-                        <input
-                          className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          type="text"
-                          {...register("phone1")}
-                          id="phone1"
-                          placeholder="Phone Number 1"
-                        />
-                        {errors.phone1 && (
-                          <span className="text-xs text-red-500">
-                            {errors.phone1.message}
-                          </span>
-                        )}
-                      </div>
-
-                      <div>
-                        <label
-                          className="mb-3 block text-sm font-medium text-black dark:text-white"
-                          htmlFor="phone2"
-                        >
-                          Phone Number 2
-                        </label>
-                        <input
-                          className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          type="text"
-                          {...register("phone2")}
-                          id="phone2"
-                          placeholder="Phone Number 2"
-                        />
-                        {errors.phone2 && (
-                          <span className="text-xs text-red-500">
-                            {errors.phone2.message}
-                          </span>
-                        )}
-                      </div>
-
-                      <div>
-                        <label
-                          className="mb-3 block text-sm font-medium text-black dark:text-white"
-                          htmlFor="phone3"
-                        >
-                          Phone Number 3
-                        </label>
-                        <input
-                          className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          type="text"
-                          {...register("phone3")}
-                          id="phone3"
-                          placeholder="Phone Number 3"
-                        />
-                        {errors.phone3 && (
-                          <span className="text-xs text-red-500">
-                            {errors.phone3.message}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Social Media Information */}
-                  <div className="mb-6">
-                    <h3 className="text-xl font-medium text-gray-700 dark:text-white">
-                      Social Media Information
-                    </h3>
-                    <div className="mt-4 grid grid-cols-3 gap-4">
-                      {/* Instagram */}
-                      <div>
-                        <label
-                          className="mb-3 block text-sm font-medium text-black dark:text-white"
-                          htmlFor="instagram"
-                        >
-                          Instagram
-                        </label>
-                        <input
-                          className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          type="text"
-                          {...register("instagram")}
-                          id="instagram"
-                          placeholder="Instagram Handle"
-                        />
-                        {errors.instagram && (
-                          <span className="text-xs text-red-500">
-                            {errors.instagram.message}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* LinkedIn */}
-                      <div>
-                        <label
-                          className="mb-3 block text-sm font-medium text-black dark:text-white"
-                          htmlFor="linkedin"
-                        >
-                          LinkedIn
-                        </label>
-                        <input
-                          className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          type="text"
-                          {...register("linkedin")}
-                          id="linkedin"
-                          placeholder="LinkedIn Handle"
-                        />
-                        {errors.linkedin && (
-                          <span className="text-xs text-red-500">
-                            {errors.linkedin.message}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Twitter */}
-                      <div>
-                        <label
-                          className="mb-3 block text-sm font-medium text-black dark:text-white"
-                          htmlFor="twitter"
-                        >
-                          Twitter
-                        </label>
-                        <input
-                          className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          type="text"
-                          {...register("twitter")}
-                          id="twitter"
-                          placeholder="Twitter Handle"
-                        />
-                        {errors.twitter && (
-                          <span className="text-xs text-red-500">
-                            {errors.twitter.message}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Address Information */}
-                  <div className="mb-6">
-                    <h3 className="text-xl font-medium text-gray-700 dark:text-white">
-                      Address Information
-                    </h3>
-                    <div className="mt-4">
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="address"
-                      >
-                        Address
-                      </label>
-
-                      <textarea
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        {...register("address")}
-                        id="address"
-                        placeholder="Company address"
-                      />
-                      {errors.address && (
-                        <span className="text-xs text-red-500">
-                          {errors.address.message}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="mt-4 grid grid-cols-3 gap-4">
-                      <div>
-                        <label
-                          className="mb-3 block text-sm font-medium text-black dark:text-white"
-                          htmlFor="address_city"
-                        >
-                          City
-                        </label>
-                        <input
-                          className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          type="text"
-                          {...register("address_city")}
-                          id="address_city"
-                          placeholder="City"
-                        />
-                        {errors.address_city && (
-                          <span className="text-xs text-red-500">
-                            {errors.address_city.message}
-                          </span>
-                        )}
-                      </div>
-
-                      <div>
-                        <label
-                          className="mb-3 block text-sm font-medium text-black dark:text-white"
-                          htmlFor="region"
-                        >
-                          Region
-                        </label>
-                        <input
-                          className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          type="text"
-                          {...register("region")}
-                          id="region"
-                          placeholder="Region"
-                        />
-                        {errors.region && (
-                          <span className="text-xs text-red-500">
-                            {errors.region.message}
-                          </span>
-                        )}
-                      </div>
-                      <div>
-                        <label
-                          className="mb-3 block text-sm font-medium text-black dark:text-white"
-                          htmlFor="state_code"
-                        >
-                          State Code
-                        </label>
-                        <input
-                          className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                          type="text"
-                          {...register("state_code")}
-                          id="state_code"
-                          placeholder="263"
-                        />
-                        {errors.state_code && (
-                          <span className="text-xs text-red-500">
-                            {errors.state_code.message}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="mt-4">
-                      <label
-                        className="mb-3 block text-sm font-medium text-black dark:text-white"
-                        htmlFor="country"
-                      >
-                        Country
-                      </label>
-                      <input
-                        className="w-full rounded border border-stroke bg-gray px-4.5 py-3 text-black focus:border-primary focus-visible:outline-none dark:border-strokedark dark:bg-meta-4 dark:text-white"
-                        type="text"
-                        {...register("country")}
-                        id="country"
-                        placeholder="Country"
-                      />
-                      {errors.country && (
-                        <span className="text-xs text-red-500">
-                          {errors.country.message}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Submit Button */}
-                  <div className="mt-6 flex justify-end">
-                    <button
-                      className="rounded-md bg-primary px-3 py-3 text-white"
-                      type="submit"
-                    >
-                      Save & Continue
-                    </button>
-                  </div>
-                </form>
+                  <TextField
+                    label="Work Email"
+                    placeholder="work@example.com"
+                    {...register("work_email")}
+                    error={errors.work_email?.message}
+                    icon={<Mail className="h-5 w-5" />}
+                  />
+                </div>
               </div>
-            </div>
+
+              {/* Phone Numbers */}
+              <div className="rounded-lg border border-gray-200 bg-white p-6">
+                <h3 className="mb-4 flex items-center text-lg font-medium text-gray-800">
+                  <Phone className="mr-2 h-5 w-5 text-blue-600" />
+                  Phone Numbers
+                </h3>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  <TextField
+                    label="Phone Number 1"
+                    placeholder="Primary phone number"
+                    {...register("phone1")}
+                    error={errors.phone1?.message}
+                    icon={<Phone className="h-5 w-5" />}
+                  />
+
+                  <TextField
+                    label="Phone Number 2 (Optional)"
+                    placeholder="Secondary phone number"
+                    {...register("phone2")}
+                    error={errors.phone2?.message}
+                    icon={<Phone className="h-5 w-5" />}
+                  />
+
+                  <TextField
+                    label="Phone Number 3 (Optional)"
+                    placeholder="Alternative phone number"
+                    {...register("phone3")}
+                    error={errors.phone3?.message}
+                    icon={<Phone className="h-5 w-5" />}
+                  />
+                </div>
+              </div>
+
+              {/* Social Media Information */}
+              <div className="rounded-lg border border-gray-200 bg-white p-6">
+                <h3 className="mb-4 flex items-center text-lg font-medium text-gray-800">
+                  <Globe className="mr-2 h-5 w-5 text-blue-600" />
+                  Social Media Information
+                </h3>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  <TextField
+                    label="Instagram"
+                    placeholder="Instagram handle"
+                    {...register("instagram")}
+                    error={errors.instagram?.message}
+                    icon={<Instagram className="h-5 w-5" />}
+                  />
+
+                  <TextField
+                    label="LinkedIn"
+                    placeholder="LinkedIn profile"
+                    {...register("linkedin")}
+                    error={errors.linkedin?.message}
+                    icon={<Linkedin className="h-5 w-5" />}
+                  />
+
+                  <TextField
+                    label="Twitter"
+                    placeholder="Twitter handle"
+                    {...register("twitter")}
+                    error={errors.twitter?.message}
+                    icon={<Twitter className="h-5 w-5" />}
+                  />
+                </div>
+              </div>
+
+              {/* Address Information */}
+              <div className="rounded-lg border border-gray-200 bg-white p-6">
+                <h3 className="mb-4 flex items-center text-lg font-medium text-gray-800">
+                  <MapPin className="mr-2 h-5 w-5 text-blue-600" />
+                  Address Information
+                </h3>
+
+                <div className="mb-6">
+                  <label className="mb-2 block text-sm font-medium text-gray-700">Address</label>
+                  <div className="relative">
+                    <div className="absolute left-3 top-3 text-gray-500">
+                      <MapPin className="h-5 w-5" />
+                    </div>
+                    <textarea
+                      className={`w-full rounded-md border ${errors.address ? "border-red-500" : "border-gray-300"
+                        } p-3 pl-10 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500`}
+                      rows={3}
+                      placeholder="Company address"
+                      {...register("address")}
+                    />
+                    {errors.address && <p className="mt-1 text-sm text-red-500">{errors.address.message}</p>}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  <TextField
+                    label="City"
+                    placeholder="City"
+                    {...register("address_city")}
+                    error={errors.address_city?.message}
+                    icon={<Building2 className="h-5 w-5" />}
+                  />
+
+                  <TextField
+                    label="Region"
+                    placeholder="Region"
+                    {...register("region")}
+                    error={errors.region?.message}
+                    icon={<MapPin className="h-5 w-5" />}
+                  />
+
+                  <TextField
+                    label="State Code"
+                    placeholder="State code (e.g. 263)"
+                    {...register("state_code")}
+                    error={errors.state_code?.message}
+                    icon={<Building2 className="h-5 w-5" />}
+                  />
+                </div>
+
+                <div className="mt-6">
+                  <TextField
+                    label="Country"
+                    placeholder="Country"
+                    {...register("country")}
+                    error={errors.country?.message}
+                    icon={<Globe className="h-5 w-5" />}
+                  />
+                </div>
+              </div>
+
+              {/* Submit Button */}
+              <div className="flex justify-end space-x-4">
+                <button
+                  type="button"
+                  className="rounded-md border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  onClick={() => router.back()}
+                >
+                  Previous Step
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70"
+                >
+                  {isSubmitting ? "Saving..." : "Continue to Next Step"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
+
+        <ToastContainer position="bottom-right" />
       </div>
     </DefaultLayout>
-  );
-};
+  )
+}
 
-export default AddCompanyContactDetails;
+export default AddCompanyContactDetails

@@ -1,15 +1,16 @@
 import React from "react";
-import clsx from "clsx"; // For conditionally applying classes
+import clsx from "clsx";
 
 interface ButtonProps {
-  type: "button" | "submit" | "reset"; // For form submission buttons
-  variant: "solid" | "outlined"; // Button style type
-  color?: string; // Custom color for button
-  isLoading?: boolean; // Show loading state
-  isDisabled?: boolean; // Disable the button
-  icon?: React.ReactNode; // Icon to display inside the button
-  children: React.ReactNode; // Button label
-  onClick?: () => void; // Button click handler
+  type: "button" | "submit" | "reset";
+  variant: "solid" | "outlined";
+  color?: string;
+  isLoading?: boolean;
+  isDisabled?: boolean;
+  icon?: React.ReactNode;
+  children: React.ReactNode;
+  onClick?: () => void;
+  borderRadius?: string; // 👈 New prop for custom border radius
 }
 
 const CustomButton: React.FC<ButtonProps> = ({
@@ -21,15 +22,21 @@ const CustomButton: React.FC<ButtonProps> = ({
   icon,
   children,
   onClick,
+  borderRadius = "rounded-md", // 👈 Default to rounded-md
 }) => {
-  const baseStyles = "flex-1 py-3 rounded-md flex justify-center items-center gap-2";
+  const baseStyles = clsx(
+    "flex-1 py-3 flex justify-center items-center gap-2 px-3",
+    borderRadius // 👈 Apply custom border radius
+  );
+
   const solidStyles = clsx(
     "text-white bg-[#001f3f]",
     isDisabled && "bg-gray-400 cursor-not-allowed",
     isLoading && "bg-opacity-50"
   );
+
   const outlinedStyles = clsx(
-    `border border-[${color}] text-[${color}]`,
+    `border text-[${color}]`,
     isDisabled && "border-gray-400 text-gray-400 cursor-not-allowed",
     isLoading && "opacity-50"
   );
@@ -44,9 +51,7 @@ const CustomButton: React.FC<ButtonProps> = ({
       disabled={isDisabled || isLoading}
     >
       {isLoading ? (
-        <span className="loader">
-            Loading...
-        </span> // Add a spinner here for loading
+        <span className="loader">Loading...</span>
       ) : (
         <>
           {icon && <span>{icon}</span>}

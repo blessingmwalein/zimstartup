@@ -1,44 +1,77 @@
-import flatpickr from "flatpickr";
-import { useEffect } from "react";
-import { Controller } from "react-hook-form";
+"use client"
 
+import { useEffect, useRef } from "react"
+import { Controller } from "react-hook-form"
+import flatpickr from "flatpickr"
+import "flatpickr/dist/flatpickr.min.css"
+import { Calendar } from "lucide-react"
 
-const CustomDatePicker = ({ control, name, rules }: any) => {
-  useEffect(() => {
-    flatpickr(`#${name}`, {
-      mode: "single",
-      static: true,
-      monthSelectorType: "static",
-      dateFormat: "M j, Y",
-      prevArrow: '<svg className="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M5.4 10.8l1.4-1.4-4-4 4-4L5.4 0 0 5.4z" /></svg>',
-      nextArrow: '<svg className="fill-current" width="7" height="11" viewBox="0 0 7 11"><path d="M1.4 10.8L0 9.4l4-4-4-4L1.4 0l5.4 5.4z" /></svg>',
-    });
-  }, [name]);
+interface CustomDatePickerProps {
+  control: any
+  name: string
+  rules?: any
+  label: string
+  placeholder?: string
+  error?: string
+}
+
+const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
+  control,
+  name,
+  rules,
+  label,
+  placeholder,
+  error,
+}) => {
+  const inputRef = useRef<HTMLInputElement>(null)
 
   return (
-    <Controller
-      control={control}
-      name={name}
-      rules={rules}
-      render={({ field: { onChange, value } }) => (
-        <div>
-          <label className="mb-3 block text-sm font-medium text-black dark:text-white">
-            Date Picker
-          </label>
-          <div className="relative">
-            <input
-              id={name}
-              className="form-datepicker w-full rounded border-[1.5px] border-stroke bg-transparent px-5 py-3 font-normal outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-input dark:focus:border-primary"
-              value={value || ""}
-              onChange={(e) => onChange(e.target.value)} // Update form state on change
-              placeholder="mm/dd/yyyy"
-              data-class="flatpickr-right"
-            />
-          </div>
-        </div>
-      )}
-    />
-  );
-};
+    <div className="w-full">
+      <label className="mb-2 block text-sm font-medium text-gray-700">{label}</label>
+      <Controller
+        name={name}
+        control={control}
+        rules={rules}
+        render={({ field: { onChange, value, ref } }) => {
+          useEffect(() => {
+            if (inputRef.current) {
+              flatpickr(inputRef.current, {
+                defaultDate: value,
+                dateFormat: "M j, Y",
+                onChange: (selectedDates) => {
+                  if (selectedDates.length > 0) {
+                    onChange(selectedDates[0])
+                  }
+                },
+              })
+            }
+          }, [inputRef])
 
-export default CustomDatePicker;
+          return (
+            <div className="relative">
+              <div className="absolute inset-y-0 left-3 flex items-center text-gray-500">
+                <Calendar className="h-5 w-5" />
+              </div>
+              <input
+                id={name}
+                ref={(el) => {
+                  inputRef.current = el
+                  ref(el)
+                }}
+                className={`w-full rounded-[10px] border py-4 ${
+                  error ? "border-red-500" : "border-gray-300"
+                } bg-white p-3 pl-10 font-normal outline-none transition focus:border-blue-500 focus:ring-1 focus:ring-blue-500`}
+                defaultValue={value}
+                placeholder={placeholder || "Select date..."}
+                readOnly // prevents keyboard editing
+              />
+              {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+            </div>
+          )
+        }}
+      />
+    </div>
+  )
+}
+
+export default CustomDatePicker
