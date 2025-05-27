@@ -56,7 +56,7 @@ export default function MainLayout({
                         {
                             isAuthenticated ? (
                                 <nav className="hidden md:flex items-center space-x-10">
-                                    <Link href="/" className="text-white font-medium">Home</Link>
+                                    <Link href="/dashboard/client" className="text-white font-medium">Companies</Link>
                                     <Link href="/competitions" className="text-white font-medium">Competitions</Link>
                                     <Link href="/about" className="text-white hover:text-white-200 transition-colors">About</Link>
                                     <Link href="/helpdesk" className="text-white hover:text-white-200 transition-colors">HelpDesk</Link>

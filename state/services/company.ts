@@ -7,6 +7,7 @@ import {
   CreateEmployementDetailsRequest,
   CreateNextOfKeenRequest,
   UpdateContactInfoRequest,
+  UpdateContactInforRequest,
 } from "../models/employement";
 import {
   AddCombinedShareholderRequest,
@@ -259,10 +260,10 @@ export const companyWithMultipleSearchesOr = async (
 
 //get-all-company-data-combined/Stitchit%20Inc
 export const getCompanyDataCombined = async (
-  companyName: string,
+  companyId: string,
 ): Promise<CompanyCombinedResponse> => {
   const response = await api.get<CompanyCombinedResponse>(
-    `get-all-company-data-combined/${companyName}`,
+    `get-all-company-data-combined/${companyId}`,
   );
   return response.data;
 };
@@ -405,3 +406,125 @@ export const addCompanyRequestQuestion = async (
 }
 
 
+
+// Director APIs
+export const createDirectorDetails = async (data: any) => {
+  const response = await api.post("/create-new-director-details", data)
+  return response.data
+}
+
+export const createDirectorPosition = async (data: any) => {
+  const response = await api.post("/create-new-director-position", data)
+  return response.data
+}
+
+
+
+export const createEmploymentHistory = async (data: any) => {
+  const response = await api.post("/create-new-employment-history", data)
+  return response.data
+}
+
+export const createPublicInformation = async (data: any) => {
+  const response = await api.post("/create-new-public-information", data)
+  return response.data
+}
+
+export const createAward = async (data: any) => {
+  const response = await api.post("/create-new-award", data)
+  return response.data
+}
+
+export const getCompanyDirectors = async (companyId: number) => {
+  const response = await api.get(`/company-directors/${companyId}`)
+  return response.data
+}
+
+// Company APIs
+export const getCompanyData = async (companyId: number) => {
+  const response = await api.get(`/get-all-company-data-combined/${companyId}`)
+  return response.data
+}
+
+
+
+
+
+export const createStockMarketDetails = async (data: UpdateContactInforRequest) => {
+  const response = await api.post("/create-new-stockmarket-details", data)
+  return response.data
+}
+
+export const createCompanyUpdate = async (data: any) => {
+  const response = await api.post("/create-new-company-update", data)
+  return response.data
+}
+
+
+//get emplye combined data 
+export const getEmployeeCombinedData = async (employeeId: number) => {
+  const response = await api.get(`/get-employee-details/${employeeId}`)
+  return response.data
+}
+
+export const getPreviousFunds = async (companyId: number) => {
+  const response = await api.get(`/get-previous-funds/${companyId}`)
+  return response.data
+}
+
+// Get financial metrics
+export const getFinancialMetrics = async (companyId: number) => {
+  const response = await api.get(`/get-financial-metrics/${companyId}`)
+  return response.data
+}
+
+// Add financial metrics
+export const addFinancialMetrics = async (data: any) => {
+  const response = await api.post("/add-financial-metrics", data)
+  return response.data
+}
+
+// Update financial metrics
+export const updateFinancialMetrics = async (data: any) => {
+  const response = await api.put("/update-financial-metrics", data)
+  return response.data
+}
+
+// Delete company document
+export const deleteCompanyDocument = async (documentId: number) => {
+  const response = await api.delete(`/delete-company-document/${documentId}`)
+  return response.data
+}
+
+// Delete previous funds
+export const deletePreviousFunds = async (fundId: number) => {
+  const response = await api.delete(`/delete-previous-funds/${fundId}`)
+  return response.data
+}
+
+// Upload company document (updated to match your pattern)
+// export const uploadCompanyDocument = async (companyId: number, file: File) => {
+//   const formData = new FormData()
+//   formData.append("company_id", companyId.toString())
+//   formData.append("file", file)
+
+//   const response = await api.post("upload-company-documents", formData, {
+//     headers: {
+//       "Content-Type": "multipart/form-data",
+//     },
+//   })
+//   return response.data
+// }
+
+// Upload company logo (updated to match your pattern)
+// export const uploadCompanyLogo = async (companyId: number, file: File) => {
+//   const formData = new FormData()
+//   formData.append("file", file)
+
+//   const response = await api.post(`upload_company_logo?company_id=${companyId}`, formData, {
+//     headers: {
+//       "Content-Type": "multipart/form-data",
+//     },
+//   })
+//   return response.data
+// }

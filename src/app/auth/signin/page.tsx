@@ -101,12 +101,18 @@ const SignIn: React.FC = () => {
               </div>
 
               <div className="flex space-x-4">
-                <CustomButton type="submit" variant="solid" isLoading={status === "loading"} disabled={status === "loading"}>
-                  Login
-                </CustomButton>
-                <CustomButton type="button" variant="outlined" isLoading={status === "loading"}>
-                  Register
-                </CustomButton>
+           
+                  <CustomButton
+                  fullWidth
+                  type="submit" variant="solid" isLoading={status === "loading"} disabled={status === "loading"}>
+                    Login
+                  </CustomButton>
+         
+                  <CustomButton
+                  fullWidth type="button" variant="outlined" isLoading={status === "loading"}>
+                    Register
+                  </CustomButton>
+                
               </div>
 
               <div className="flex items-center gap-2 my-4">

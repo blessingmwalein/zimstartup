@@ -72,12 +72,14 @@ const AddCompanyGeneralDetails: React.FC<AddCompanyGeneralDetailsProps> = ({ par
 
     const updatePayload = {
       ...data,
-      national_id: "10000000A0",
+      national_id: user.national_id,
       company_start_date: format(new Date(data.company_start_date), "yyyy-MM-dd"),
     }
 
     try {
       const response = await dispatch(createNewCompany(updatePayload)).unwrap()
+
+      console.log(response);
 
       if (response.data) {
         toast.success("Company details added successfully")
@@ -332,9 +334,9 @@ const AddCompanyGeneralDetails: React.FC<AddCompanyGeneralDetailsProps> = ({ par
                   <CustomButton
                     type="submit"
                     disabled={isSubmitting}
-                    variant="solid" onClick={() => router.back()}>
+                    variant="solid">
                     <span>  {isSubmitting ? "Saving..." : "Continue to Next Step"}</span>
-                     <ChevronRight />
+                    <ChevronRight />
                   </CustomButton>
                 </div>
 
@@ -343,7 +345,7 @@ const AddCompanyGeneralDetails: React.FC<AddCompanyGeneralDetailsProps> = ({ par
           </div>
         </div>
 
-        <ToastContainer position="bottom-right" />
+        <ToastContainer position="bottom-center" />
       </div>
     </DefaultLayout>
   )

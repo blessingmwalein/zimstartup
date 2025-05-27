@@ -6,6 +6,7 @@ import { Menu } from "@headlessui/react"
 import { Edit, Trash2, MoreVertical, Building2, MapPin, Globe, AlertTriangle } from "lucide-react"
 import { Company } from "../../../state/models/company"
 import CustomButton from "../Buttons/CustomButton"
+import { useRouter } from "next/navigation"
 
 interface CompanyProps {
   company: Company
@@ -13,6 +14,7 @@ interface CompanyProps {
 
 const UserCompanyCard: React.FC<CompanyProps> = ({ company }) => {
   const [isHovered, setIsHovered] = useState(false)
+  const router = useRouter()
 
   // Function to determine status badge color
   const getStatusColor = (status: string) => {
@@ -167,12 +169,20 @@ const UserCompanyCard: React.FC<CompanyProps> = ({ company }) => {
       </div>
 
       {/* Footer Section */}
-      {/* <div className="bg-gray-50 p-4">
-        <CustomButton variant="'outline'">
-          <Edit className="mr-2 h-4 w-4" />
+      <div className="px-6 pb-4 w-100">
+        <CustomButton
+        onClick={() => router.push(`/profile/companies/view-company/${company.company_id}`)}
+          type="button"
+          variant="outlined"
+          color="#001f3f"
+          fullWidth
+          
+          icon={<Edit className="h-4 w-4" />}
+        >
           Manage Company
         </CustomButton>
-      </div> */}
+      </div>
+
     </div>
   )
 }

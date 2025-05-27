@@ -286,9 +286,9 @@ export const fetchCompaniesBySector = createAsyncThunk(
 //fetch company data combined
 export const fetchCompanyDataCombined = createAsyncThunk(
   "company/fetchCompanyDataCombined",
-  async (companyName: any, { rejectWithValue }) => {
+  async (companyId: any, { rejectWithValue }) => {
     try {
-      return await getCompanyDataCombined(companyName);
+      return await getCompanyDataCombined(companyId);
     } catch (error: any) {
       console.error("Failed to fetch company data combined:", error.message);
       return rejectWithValue("Failed to fetch company data combined");

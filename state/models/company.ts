@@ -11,7 +11,9 @@ export interface CreateCompanyRequest {
   website: string;
   employees: number;
   business_state_id: string;
+  national_id: string
 }
+
 
 export interface CreateCompanyContactRequest {
   company_id: number;
@@ -191,15 +193,15 @@ export interface CompanyListBySectorResponse {
 
 export interface Company {
   company_id: number
-    national_id: string
-    company_abbreviations: string
-    company_name: string
-    status: string
-    location: string
-    website: string
-    company_logo: string
-    completeness_score: number
-    grade: string
+  national_id: string
+  company_abbreviations: string
+  company_name: string
+  status: string
+  location: string
+  website: string
+  company_logo: string
+  completeness_score: number
+  grade: string
 }
 
 export enum CompanyStatus {
@@ -330,7 +332,7 @@ export interface AddDirectorDetailsRequest {
 }
 
 export interface AddDirectorPositionRequest {
-  employee_id: number;
+  employee_id: number | string | null;
   overall_position: string;
   position: string;
   start_date: Date;
@@ -347,7 +349,7 @@ export interface AddEducationalQualificationsRequest {
 }
 
 export interface AddEmploymentHistoryRequest {
-  employee_id: number;
+  employee_id: number | string | null;
   company_name: string;
   position: string;
   start_date: Date;
@@ -376,27 +378,27 @@ export interface UploadCompanyLogoRequest {
 
 
 export interface UserCompaniesResponse {
-  national_id:           string;
+  national_id: string;
   company_abbreviations: string;
-  company_name:          string;
-  status:                string;
-  location:              string;
-  website:               string;
-  state_name:            string;
+  company_name: string;
+  status: string;
+  location: string;
+  website: string;
+  state_name: string;
 }
 
 
 export interface AddCompanyRequestRequest {
-  company_id:   number;
+  company_id: number;
   request_type: string;
-  status:       string;
+  status: string;
 }
 
 export interface AddCompanyRequestDetailRequest {
-  request_id:       number;
-  total_shares:     number;
-  share_price:      number;
-  currency:         string;
+  request_id: number;
+  total_shares: number;
+  share_price: number;
+  currency: string;
   amount_requested: number;
 }
 
@@ -407,7 +409,7 @@ export interface InvestorQuestionRequest {
 
 
 export interface CompanyQuestionRequestion {
-  request_id:  number;
+  request_id: number;
   question_id: number;
-  answer:      string;
+  answer: string;
 }

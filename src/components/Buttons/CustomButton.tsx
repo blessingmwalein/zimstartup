@@ -10,7 +10,8 @@ interface ButtonProps {
   icon?: React.ReactNode;
   children: React.ReactNode;
   onClick?: () => void;
-  borderRadius?: string; // 👈 New prop for custom border radius
+  borderRadius?: string;
+  fullWidth?: boolean; // 👈 Optional prop to enable full width
 }
 
 const CustomButton: React.FC<ButtonProps> = ({
@@ -22,11 +23,13 @@ const CustomButton: React.FC<ButtonProps> = ({
   icon,
   children,
   onClick,
-  borderRadius = "rounded-md", // 👈 Default to rounded-md
+  borderRadius = "rounded-[10px]",
+  fullWidth = false, // 👈 default false
 }) => {
   const baseStyles = clsx(
-    "flex-1 py-3 flex justify-center items-center gap-2 px-3",
-    borderRadius // 👈 Apply custom border radius
+    "py-3 flex justify-center items-center gap-2 px-3",
+    borderRadius,
+    fullWidth && "w-full" // 👈 Apply full width if enabled
   );
 
   const solidStyles = clsx(
@@ -36,7 +39,7 @@ const CustomButton: React.FC<ButtonProps> = ({
   );
 
   const outlinedStyles = clsx(
-    `border text-[${color}]`,
+    `border text-[${color}] border-[${color}]`,
     isDisabled && "border-gray-400 text-gray-400 cursor-not-allowed",
     isLoading && "opacity-50"
   );

@@ -18,8 +18,9 @@ import CustomAlert from "@/components/common/notification/Alert"
 import type { AppDispatch } from "../../../../../../../../state/store"
 import { createCompanyContact } from "../../../../../../../../state/slices/companySlice"
 
-import { Mail, Phone, MapPin, Globe, Instagram, Linkedin, Twitter, Building2 } from "lucide-react"
+import { Mail, Phone, MapPin, Globe, Instagram, Linkedin, Twitter, Building2, ChevronRight } from "lucide-react"
 import TextField from "@/components/FormElements/TextField"
+import CustomButton from "@/components/Buttons/CustomButton"
 
 // Yup validation schema
 const schema = Yup.object({
@@ -98,8 +99,8 @@ const AddCompanyContactDetails: React.FC = ({ params }: any) => {
 
   return (
     <DefaultLayout>
-      <div className="mx-auto max-w-5xl px-4 py-8">
-        <Breadcrumb pageName="Company Contact Details" />
+      <div className="mx-auto  px-4 py-8">
+        {/* <Breadcrumb pageName="Company Contact Details" /> */}
 
         <div className="mt-6 rounded-xl border border-gray-200 bg-white shadow-sm">
           <div className="border-b border-gray-200 px-8 py-6">
@@ -108,8 +109,10 @@ const AddCompanyContactDetails: React.FC = ({ params }: any) => {
           </div>
 
           <div className="px-8 py-6">
-            <Stepper currentStep={currentStep} headings={headings} />
+            <div className="mb-4 px-6 py-2">
 
+              <Stepper currentStep={currentStep} headings={headings} />
+            </div>
             {error && (
               <div className="mb-6">
                 <CustomAlert title="Oops, something went wrong" subtitle={error} type={"error"} />
@@ -274,20 +277,21 @@ const AddCompanyContactDetails: React.FC = ({ params }: any) => {
 
               {/* Submit Button */}
               <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  className="rounded-md border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  onClick={() => router.back()}
-                >
-                  Previous Step
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70"
-                >
-                  {isSubmitting ? "Saving..." : "Continue to Next Step"}
-                </button>
+                <div className="w-[70px]">
+                  <CustomButton variant="'outline'" onClick={() => router.back()}>
+                    Cancel
+                  </CustomButton>
+                </div>
+                <div>
+                  <CustomButton
+                    type="submit"
+                    disabled={isSubmitting}
+                    variant="solid">
+                    <span>  {isSubmitting ? "Saving..." : "Continue to Next Step"}</span>
+                    <ChevronRight />
+                  </CustomButton>
+                </div>
+
               </div>
             </form>
           </div>

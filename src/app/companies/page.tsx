@@ -1,4 +1,5 @@
 "use client";
+
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useDispatch, useSelector } from "react-redux";
@@ -6,7 +7,6 @@ import { useEffect, useRef, useState } from "react";
 import CompanyCard from "@/components/Companies/CompanyCard";
 import { AppDispatch } from "../../../state/store";
 import { fetchCompanySearch } from "../../../state/slices/companySlice";
-import Loader from "@/components/common/Loader";
 import { fetchAllConfigs } from "../../../state/slices/configSlice";
 import { BusinessState, CompanyIndustry } from "../../../state/models/config";
 
@@ -42,7 +42,6 @@ const Companies: React.FC = () => {
         .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
         .join("&");
 
-      console.log("searchQuery as string:", queryString);
       await dispatch(fetchCompanySearch(queryString)).unwrap();
     } catch (err: any) {
       console.error("Error fetching companies:", err);
@@ -58,7 +57,7 @@ const Companies: React.FC = () => {
   }, [dispatch]);
 
   return (
-    <DefaultLayout>
+    <DefaultLayout loading={status === "loading"}>
       <div className="mx-auto max-w-full">
         {/* Search Section */}
         <section className="relative bg-center px-8 py-16">
@@ -69,7 +68,6 @@ const Companies: React.FC = () => {
               onSubmit={searchCompanies}
               className="flex w-full max-w-4xl items-center overflow-hidden rounded-full bg-white p-3 shadow-lg"
             >
-              {/* Company Name Input */}
               <input
                 type="text"
                 name="company_name"
@@ -78,8 +76,6 @@ const Companies: React.FC = () => {
                 placeholder="Company Name or Keyword"
                 className="flex-grow px-4 py-4 text-gray-700 focus:outline-none"
               />
-
-              {/* Location Input */}
               <input
                 type="text"
                 name="location"
@@ -88,8 +84,6 @@ const Companies: React.FC = () => {
                 placeholder="Location"
                 className="flex-grow px-4 py-4 text-gray-700 focus:outline-none"
               />
-
-              {/* Search Button */}
               <button
                 type="submit"
                 className="ml-2 rounded-full bg-blue-500 px-8 py-4 font-semibold text-white hover:bg-blue-600 focus:outline-none"
@@ -100,7 +94,7 @@ const Companies: React.FC = () => {
           </div>
         </section>
 
-        {/* Filters Section */}
+        {/* Filters and Results Section */}
         <main className="mt-10 flex px-8">
           <aside className="mr-6 w-1/4 space-y-6">
             <div>
@@ -138,13 +132,9 @@ const Companies: React.FC = () => {
             </div>
           </aside>
 
-          {/* Results Section */}
+          {/* Company List Section */}
           <section className="flex-1 flex flex-col items-center justify-center">
-            {status === "loading" ? (
-              <div className="flex items-center justify-center">
-                <Loader />
-              </div>
-            ) : companyList && companyList.length > 0 ? (
+            {companyList && companyList.length > 0 ? (
               <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {companyList.map((company: any) => (
                   <CompanyCard key={company.id} company={company} />

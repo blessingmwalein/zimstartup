@@ -21,10 +21,11 @@ import { createStockMarketDetails } from "../../../../../../../../state/slices/c
 import { fetchAllConfigs } from "../../../../../../../../state/slices/configSlice"
 import type { MarketType, StockExchangeEntity } from "../../../../../../../../state/models/config"
 
-import { DollarSign, Building2, BarChart2 } from "lucide-react"
+import { DollarSign, Building2, BarChart2, ChevronRight } from "lucide-react"
 import Select from "@/components/FormElements/SelectInput"
 import CustomDatePicker from "@/components/FormElements/DatePicker/CustomDatePicker"
 import TextField from "@/components/FormElements/TextField"
+import CustomButton from "@/components/Buttons/CustomButton"
 
 // Yup validation schema
 const schema = Yup.object({
@@ -112,26 +113,26 @@ const AddCompanyStockMarketDetails: React.FC = ({ params }: any) => {
 
   return (
     <DefaultLayout>
-      <div className="mx-auto max-w-5xl px-4 py-8">
-        <Breadcrumb pageName="Company Stock Market Details" />
+      <div className="mx-auto  px-4 py-8">
+        {/* <Breadcrumb pageName="Company Stock Market Details" /> */}
 
         <div className="mt-6 rounded-xl border border-gray-200 bg-white shadow-sm">
           <div className="border-b border-gray-200 px-8 py-6">
-            <h2 className="text-xl font-semibold text-gray-800">{companyName}</h2>
+            <h2 className="text-xl font-semibold text-gray-800">Company Stock Market Details - {companyName}</h2>
             <p className="mt-1 text-sm text-gray-500">
               Add stock market information for your company. This is step 3 of 4.
             </p>
           </div>
 
           <div className="px-8 py-6">
-            <Stepper currentStep={currentStep} headings={headings} />
-
+            <div className="mb-4 px-6 py-2">
+              <Stepper currentStep={currentStep} headings={headings} />
+            </div>
             {error && (
               <div className="mb-6">
                 <CustomAlert title="Oops, something went wrong" subtitle={error} type={"error"} />
               </div>
             )}
-
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {/* Market Information */}
               <div className="rounded-lg border border-gray-200 bg-white p-6">
@@ -281,28 +282,29 @@ const AddCompanyStockMarketDetails: React.FC = ({ params }: any) => {
 
               {/* Submit Button */}
               <div className="flex justify-end space-x-4">
-                <button
-                  type="button"
-                  className="rounded-md border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                  onClick={() => router.back()}
-                >
-                  Previous Step
-                </button>
-                <button
-                  type="button"
-                  className="rounded-md border border-gray-300 bg-amber-500 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
-                  onClick={() => router.push(`/profile/companies/view-company/${params.company_id}`)}
-                >
-                  Add Details Later
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="rounded-md bg-blue-600 px-6 py-3 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70"
-                >
-                  {isSubmitting ? "Saving..." : "Continue to Next Step"}
-                </button>
+                <div className="w-[70px]">
+                  <CustomButton variant="'outline'" onClick={() => router.back()}>
+                    Cancel
+                  </CustomButton>
+                </div>
+                <div className="w-[70px]">
+                  <CustomButton variant="'outline'" onClick={() => router.push(`/profile/companies/view-company/${params.company_id}`)}
+                  >
+                    Add Details Later
+                  </CustomButton>
+                </div>
+                <div>
+                  <CustomButton
+                    type="submit"
+                    disabled={isSubmitting}
+                    variant="solid">
+                    <span>  {isSubmitting ? "Saving..." : "Continue to Next Step"}</span>
+                    <ChevronRight />
+                  </CustomButton>
+                </div>
+
               </div>
+
             </form>
           </div>
         </div>

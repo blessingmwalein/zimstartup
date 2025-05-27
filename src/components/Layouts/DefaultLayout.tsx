@@ -1,41 +1,43 @@
 "use client";
+
 import React, { useState, ReactNode } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
-import { ToastContainer, toast } from "react-toastify";
-
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-export default function DefaultLayout({
-  children,
-}: {
+import Loader from "../common/Loader";
+
+type DefaultLayoutProps = {
   children: React.ReactNode;
-}) {
+  loading?: boolean; // <- Accept the loading prop
+};
+
+export default function DefaultLayout({ children, loading = false }: DefaultLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <>
-      {/* <!-- ===== Page Wrapper Start ===== --> */}
       <div className="flex">
-        {/* <!-- ===== Sidebar Start ===== --> */}
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        {/* <!-- ===== Sidebar End ===== --> */}
 
-        {/* <!-- ===== Content Area Start ===== --> */}
-        <div className="relative flex flex-1 flex-col lg:ml-72.5">
-          {/* <!-- ===== Header Start ===== --> */}
+        <div className="relative flex flex-1 flex-col lg:ml-72.5 bg-transparent">
           <Header sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-          {/* <!-- ===== Header End ===== --> */}
 
-          {/* <!-- ===== Main Content Start ===== --> */}
           <main>
-            <div className="mx-auto ">{children}</div>
+            <div className="mx-auto">
+              {loading ? (
+                <div className="flex items-center justify-center h-[60vh] bg-transparent">
+                  <Loader />
+                </div>
+              ) : (
+                children
+              )}
+            </div>
           </main>
-          {/* <!-- ===== Main Content End ===== --> */}
         </div>
-        {/* <!-- ===== Content Area End ===== --> */}
       </div>
 
       <ToastContainer />
-      {/* <!-- ===== Page Wrapper End ===== --> */}
     </>
   );
 }
