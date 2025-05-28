@@ -56,7 +56,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="md:w-1/2 relative">
-                <div className="relative z-10">
+                <div className="relative z-0">
                   <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                     <div className="p-6">
                       <div className="flex justify-between items-center mb-6">

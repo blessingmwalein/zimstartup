@@ -21,7 +21,7 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ onLogOut }) => {
   //log out user
 
   return (
-    <ClickOutside onClick={() => setDropdownOpen(false)} className="relative">
+    <ClickOutside onClick={() => setDropdownOpen(false)} className="relative z-9999">
       <Link
         onClick={() => setDropdownOpen(!dropdownOpen)}
         className="flex items-center text-white gap-4 border-2 border-white rounded-full py-2 px-4"

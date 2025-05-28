@@ -1,20 +1,167 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { CompanyDetailsResponse, CompanyDocumentsResponse, CompanySummary, CompanyValuations } from "../../state/models/investment"
+import { fetchCompanyDetails, fetchCompanyDirectors, fetchCompanyDocuments, fetchCompanySummary, fetchCompanyUpdates, fetchCompanyValuations, fetchPreviousFunds, handleApiError } from "../../state/services/investment"
 import * as api from "../../state/services/company"
-import type { CreateCompanyRequest } from "../../state/models/company"
-import type { UpdateContactInforRequest } from "../../state/models/employement"
+import { UpdateContactInforRequest } from "../../state/models/employement"
+import { CreateCompanyRequest } from "../../state/models/company"
+
 
 export function useCompanyData(companyId: number) {
+  // Data states
   const [companyData, setCompanyData] = useState<any>(null)
   const [employeeData, setEmployeeData] = useState<any>(null)
+  const [companyValuations, setCompanyValuations] = useState<CompanyValuations | null>(null)
+  const [companyDocuments, setCompanyDocuments] = useState<CompanyDocumentsResponse | null>(null)
   const [directors, setDirectors] = useState<any[]>([])
-  const [documents, setDocuments] = useState<any[]>([])
   const [updates, setUpdates] = useState<any[]>([])
   const [previousFunds, setPreviousFunds] = useState<any[]>([])
   const [financialMetrics, setFinancialMetrics] = useState<any>(null)
+
+  // Loading and error states
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
+  const [dataLoaded, setDataLoaded] = useState(false)
+  const [apiErrors, setApiErrors] = useState<string[]>([])
+
+  // Individual loading states
+  const [loadingStates, setLoadingStates] = useState({
+    summary: false,
+    valuations: false,
+    details: false,
+    documents: false,
+    directors: false,
+    updates: false,
+    previousFunds: false,
+    financialMetrics: false,
+  })
+
+  // Generic error handler
+  const handleError = (err: any, context: string) => {
+    const errorMessage = handleApiError(err)
+    console.warn(`${context}:`, errorMessage)
+    setApiErrors((prev) => [...prev, `${context}: ${errorMessage}`])
+  }
+
+  // Fetch company summary
+
+  // Fetch company valuations
+  const fetchValuations = async () => {
+    setLoadingStates((prev) => ({ ...prev, valuations: true }))
+    try {
+      const data = await fetchCompanyValuations(companyId)
+      setCompanyValuations(data)
+    } catch (err) {
+      handleError(err, "Failed to load company valuations")
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, valuations: false }))
+    }
+  }
+
+  // Fetch company details
+ 
+
+  // Fetch company documents
+  const fetchDocuments = async () => {
+    setLoadingStates((prev) => ({ ...prev, documents: true }))
+    try {
+      const data = await fetchCompanyDocuments(companyId)
+      setCompanyDocuments(data)
+    } catch (err) {
+      handleError(err, "Failed to load company documents")
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, documents: false }))
+    }
+  }
+
+  // Fetch directors
+  const fetchDirectorsData = async () => {
+    setLoadingStates((prev) => ({ ...prev, directors: true }))
+    try {
+      const data = await fetchCompanyDirectors(companyId)
+      setDirectors(Array.isArray(data) ? data : [])
+    } catch (err) {
+      handleError(err, "Failed to load company directors")
+      setDirectors([])
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, directors: false }))
+    }
+  }
+
+  // Fetch company updates
+  const fetchUpdatesData = async () => {
+    setLoadingStates((prev) => ({ ...prev, updates: true }))
+    try {
+      const data = await fetchCompanyUpdates(companyId)
+      setUpdates(Array.isArray(data) ? data : [])
+    } catch (err) {
+      handleError(err, "Failed to load company updates")
+      setUpdates([])
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, updates: false }))
+    }
+  }
+
+  // Fetch previous funds
+  const fetchPreviousFundsData = async () => {
+    setLoadingStates((prev) => ({ ...prev, previousFunds: true }))
+    try {
+      const data = await fetchPreviousFunds(companyId)
+      setPreviousFunds(Array.isArray(data) ? data : [])
+    } catch (err) {
+      handleError(err, "Failed to load previous funds")
+      setPreviousFunds([])
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, previousFunds: false }))
+    }
+  }
+
+  // Fetch financial metrics
+  // const fetchFinancialMetricsData = async () => {
+  //   setLoadingStates((prev) => ({ ...prev, financialMetrics: true }))
+  //   try {
+  //     const data = await fetchFinancialMetrics(companyId)
+  //     setFinancialMetrics(data)
+  //   } catch (err) {
+  //     handleError(err, "Failed to load financial metrics")
+  //     setFinancialMetrics(null)
+  //   } finally {
+  //     setLoadingStates((prev) => ({ ...prev, financialMetrics: false }))
+  //   }
+  // }
+
+  // Fetch all company data
+  const fetchAllCompanyData = async () => {
+    if (!companyId) return
+
+    setLoading(true)
+    setDataLoaded(false)
+    setApiErrors([])
+
+    try {
+      // Fetch all data in parallel
+      await Promise.allSettled([
+        // fetchSummary(),
+        fetchValuations(),
+        // fetchDetails(),
+        fetchCompanyData(),
+        fetchDocuments(),
+        fetchDirectorsData(),
+        fetchUpdatesData(),
+        // fetchPreviousFundsData(),
+        // fetchFinancialMetricsData(),
+      ])
+
+      setDataLoaded(true)
+    } catch (err) {
+      console.error("Failed to load company data:", err)
+      setError("Failed to load company data")
+    } finally {
+      setLoading(false)
+    }
+  }
+  
 
   const fetchCompanyData = async () => {
     setLoading(true)
@@ -27,32 +174,14 @@ export function useCompanyData(companyId: number) {
         fetchDirectors(),
         fetchDocuments(),
         fetchUpdates(),
-        fetchPreviousFunds(),
-        fetchFinancialMetrics(),
+        // fetchPreviousFunds(),
+        // fetchFinancialMetrics(),
       ])
 
       setLoading(false)
     } catch (err: any) {
       setError(err.message || "Failed to fetch company data")
       setLoading(false)
-    }
-  }
-
-  const fetchDirectors = async () => {
-    try {
-      const data = await api.getCompanyDirectors(companyId)
-      setDirectors(data.post_details || [])
-    } catch (err: any) {
-      console.error("Failed to fetch directors:", err)
-    }
-  }
-
-  const fetchDocuments = async () => {
-    try {
-      const data = await api.getCompanyDocuments(companyId)
-      setDocuments(data.documents || [])
-    } catch (err: any) {
-      console.error("Failed to fetch documents:", err)
     }
   }
 
@@ -65,27 +194,68 @@ export function useCompanyData(companyId: number) {
     }
   }
 
-  const fetchPreviousFunds = async () => {
+  // const fetchPreviousFunds = async () => {
+  //   try {
+  //     const data = await api.getPreviousFunds(companyId)
+  //     setPreviousFunds(data.funds || [])
+  //   } catch (err: any) {
+  //     console.error("Failed to fetch previous funds:", err)
+  //     setPreviousFunds([])
+  //   }
+  // }
+
+  // const fetchFinancialMetrics = async () => {
+  //   try {
+  //     const data = await api.getFinancialMetrics(companyId)
+  //     setFinancialMetrics(data.metrics || null)
+  //   } catch (err: any) {
+  //     console.error("Failed to fetch financial metrics:", err)
+  //     setFinancialMetrics(null)
+  //   }
+  // }
+
+  const fetchDirectors = async () => {
     try {
-      const data = await api.getPreviousFunds(companyId)
-      setPreviousFunds(data.funds || [])
+      const data = await api.getCompanyDirectors(companyId)
+      setDirectors(data.post_details || [])
     } catch (err: any) {
-      console.error("Failed to fetch previous funds:", err)
-      setPreviousFunds([])
+      console.error("Failed to fetch directors:", err)
     }
   }
 
-  const fetchFinancialMetrics = async () => {
-    try {
-      const data = await api.getFinancialMetrics(companyId)
-      setFinancialMetrics(data.metrics || null)
-    } catch (err: any) {
-      console.error("Failed to fetch financial metrics:", err)
-      setFinancialMetrics(null)
-    }
+  // const fetchDocuments = async () => {
+  //   try {
+  //     const data = await api.getCompanyDocuments(companyId)
+  //     setDocuments(data.documents || [])
+  //   } catch (err: any) {
+  //     console.error("Failed to fetch documents:", err)
+  //   }
+  // }
+
+  // Utility functions
+  const clearError = () => {
+    setError(null)
+    setApiErrors([])
   }
 
-  // Update company details
+  const refreshData = () => {
+    fetchAllCompanyData()
+  }
+
+  // Data availability checks
+  const hasData = {
+    valuations: !!companyValuations && companyValuations.valuation?.length > 0,
+    documents: !!companyDocuments && companyDocuments.documents?.length > 0,
+    directors: directors.length > 0,
+    updates: updates.length > 0,
+    previousFunds: previousFunds.length > 0,
+    financialMetrics: !!financialMetrics,
+    contactDetails: !!companyData?.company_contact_details,
+    stockMarketDetails:
+      !!companyData?.stock_market_details && companyData.stock_market_details.type_of_market !== "N/A",
+  }
+
+
   const updateCompany = async (data: CreateCompanyRequest, companyId: number) => {
     try {
       await api.updateCompanyDetails(data, companyId)
@@ -112,7 +282,6 @@ export function useCompanyData(companyId: number) {
     }
   }
 
-  // Update contact details
   const updateContactData = async (data: UpdateContactInforRequest) => {
     try {
       await api.updateCompanyContactDetails(
@@ -153,7 +322,8 @@ export function useCompanyData(companyId: number) {
         company_id: companyId,
       })
       // Refresh previous funds
-      fetchPreviousFunds()
+      // fetchPreviousFunds()
+      fetchCompanyData()
       return { success: true }
     } catch (err: any) {
       return { success: false, error: err.message || "Failed to add previous funds" }
@@ -168,7 +338,8 @@ export function useCompanyData(companyId: number) {
         company_id: companyId,
       })
       // Refresh financial metrics
-      fetchFinancialMetrics()
+      // fetchFinancialMetrics()
+      fetchCompanyData()
       return { success: true }
     } catch (err: any) {
       return { success: false, error: err.message || "Failed to add financial metrics" }
@@ -263,7 +434,10 @@ export function useCompanyData(companyId: number) {
   // Upload document
   const uploadDocument = async (file: File) => {
     try {
-      await api.uploadCompanyDocument(companyId, file)
+      await api.uploadCompanyDocument({
+        companyId,
+        file
+      })
       // Refresh documents
       fetchDocuments()
       return { success: true }
@@ -308,7 +482,6 @@ export function useCompanyData(companyId: number) {
     }
   }
 
-  // Update financial metrics
   const updateFinancialMetrics = async (data: any) => {
     try {
       await api.updateFinancialMetrics({
@@ -316,7 +489,7 @@ export function useCompanyData(companyId: number) {
         company_id: companyId,
       })
       // Refresh financial metrics
-      fetchFinancialMetrics()
+      // fetchFinancialMetrics()
       return { success: true }
     } catch (err: any) {
       return { success: false, error: err.message || "Failed to update financial metrics" }
@@ -328,62 +501,71 @@ export function useCompanyData(companyId: number) {
     try {
       await api.deletePreviousFunds(fundId)
       // Refresh previous funds
-      fetchPreviousFunds()
+      // fetchPreviousFunds()
       return { success: true }
     } catch (err: any) {
       return { success: false, error: err.message || "Failed to delete funding record" }
     }
   }
 
+  // Initialize data on mount
   useEffect(() => {
     if (companyId) {
-      fetchCompanyData()
+      fetchAllCompanyData()
     }
   }, [companyId])
 
   return {
-    // Data
+    // Data states
     companyData,
+    employeeData,
+    companyValuations,
+    companyDocuments,
     directors,
-    documents,
+    // documents,
     updates,
     previousFunds,
     financialMetrics,
-    employeeData,
+
+    // Loading and error states
     loading,
     error,
+    dataLoaded,
+    apiErrors,
+    loadingStates,
 
-    // Company operations
+    // Data availability checks
+    hasData,
+
+    // Refresh functions
     updateCompany,
     updateContactData,
-    refreshData: fetchCompanyData,
-
-    // Stock market operations
     updateStockMarket,
-
-    // Updates operations
     addUpdate,
-
-    // Director operations
     addDirector,
     fetchEmployeeData,
 
-    // Document operations
     uploadDocument,
     uploadLogo,
     deleteDocument,
 
-    // Financial operations
     addPreviousFunds,
     addFinancialMetrics,
     updateFinancialMetrics,
     deletePreviousFunds,
 
-    // Refresh individual sections
-    refreshDirectors: fetchDirectors,
+
+    refreshData,
+    // refreshSummary: fetchSummary,
+    refreshValuations: fetchValuations,
+    // refreshDetails: fetchDetails,
     refreshDocuments: fetchDocuments,
-    refreshUpdates: fetchUpdates,
-    refreshPreviousFunds: fetchPreviousFunds,
-    refreshFinancialMetrics: fetchFinancialMetrics,
+    refreshDirectors: fetchDirectorsData,
+    refreshUpdates: fetchUpdatesData,
+    refreshPreviousFunds: fetchPreviousFundsData,
+    // refreshFinancialMetrics: fetchFinancialMetricsData,
+
+    // Utility functions
+    clearError,
   }
 }

@@ -47,12 +47,12 @@ export default function CompanyView() {
   const companyId = Number.parseInt(company_id)
 
   const {
-    companyData,
     directors,
-    documents,
+    companyDocuments,
     employeeData,
     updates,
     previousFunds,
+    companyValuations,
     financialMetrics,
     loading,
     error,
@@ -66,6 +66,7 @@ export default function CompanyView() {
     addFinancialMetrics,
     refreshData,
     fetchEmployeeData,
+    companyData
   } = useCompanyData(companyId)
 
   // State for dialogs
@@ -317,7 +318,7 @@ ${selected ? "bg-white text-[#001f3f] shadow" : "text-gray-600 hover:bg-white/[0
 
               <Tab.Panel>
                 <FinancialMetricsSection
-                  metricsData={financialMetrics}
+                  metricsData={companyData.financial_metrics}
                   onAddMetrics={() => setAddFinancialMetricsDialogOpen(true)}
                 />
               </Tab.Panel>
@@ -327,7 +328,7 @@ ${selected ? "bg-white text-[#001f3f] shadow" : "text-gray-600 hover:bg-white/[0
               </Tab.Panel>
 
               <Tab.Panel>
-                <CompanyDocumentsSection documents={documents} onUpload={handleDocumentUpload} />
+                <CompanyDocumentsSection documents={companyDocuments?.documents} onUpload={handleDocumentUpload} />
               </Tab.Panel>
             </Tab.Panels>
           </Tab.Group>

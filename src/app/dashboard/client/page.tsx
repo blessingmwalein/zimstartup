@@ -187,7 +187,7 @@ export default function Dashboard() {
                         <h2 className="text-3xl font-semibold mb-8">Explore Sectors</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                             {sectors.map((sector: any) => (
-                                <Link href={`/sectors/${sector.id}`} key={sector.id} className="group">
+                                <Link href={`/sectors/${sector.sector}`} key={sector.id} className="group">
                                     <div className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:translate-y-[-5px] h-full">
                                         <div className="p-6 flex flex-col items-center">
                                             <div className="bg-gray-50 p-4 rounded-full mb-4 text-secondary group-hover:bg-secondary group-hover:text-white transition-colors duration-300">

@@ -372,7 +372,7 @@ export interface AddAwardRequest {
 
 
 export interface UploadCompanyLogoRequest {
-  companyId: string;
+  companyId: string | number;
   file: File; // Use Blob or File for binary data
 }
 

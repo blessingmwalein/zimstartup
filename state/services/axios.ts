@@ -56,9 +56,9 @@ export const createAxiosInstance = (
     (error) => {
       console.error("Axios Error (Custom Instance):", error.status);
       if (error.status === 401) {
-        // Cookies.remove("access_token");
-        // Cookies.remove("user");
-        // Router.push("/auth/signin");
+        Cookies.remove("access_token");
+        Cookies.remove("user");
+        Router.push("/auth/signin");
       }
       return Promise.reject(error);
     },

@@ -122,7 +122,7 @@ export const createNewCompanyUpdate = async (
 
 //get-company-updates
 export const getCompanyUpdates = async (companyId: any): Promise<any> => {
-  const response = await api.get<>(`get-company-updates/${companyId}`);
+  const response = await api.get(`/companies/${companyId}/update`);
   return response.data;
 };
 
@@ -473,10 +473,7 @@ export const getPreviousFunds = async (companyId: number) => {
 }
 
 // Get financial metrics
-export const getFinancialMetrics = async (companyId: number) => {
-  const response = await api.get(`/get-financial-metrics/${companyId}`)
-  return response.data
-}
+
 
 // Add financial metrics
 export const addFinancialMetrics = async (data: any) => {
