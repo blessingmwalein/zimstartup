@@ -60,6 +60,7 @@ import { useInvestmentData } from "@/hooks/useInvestmentData"
 import CustomButton from "@/components/Companies/ui/custom-button"
 import TextField from "@/components/FormElements/TextField"
 import CompanyInfoCards from "@/components/Companies/infor-card"
+import EnhancedCompanyHero from "@/components/Companies/company-hero"
 
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ")
@@ -376,106 +377,31 @@ export default function CompanyPage() {
         {hasData.summary && companySummary && (
           <>
             {/* Enhanced Company Hero Section */}
-            <div className="relative mb-12 overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-emerald-600/10 rounded-3xl"></div>
-              <div className="relative bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/50 p-8">
-                <div className="flex flex-col lg:flex-row items-start lg:items-center space-y-6 lg:space-y-0 lg:space-x-8">
-                  <div className="relative">
-                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl blur opacity-20"></div>
-                    <img
-                      src={
-                        companySummary.company_details?.company_logo
-                          ? `https://zimstartup-861d8915d228.herokuapp.com/${companySummary.company_details.company_logo}`
-                          : "/placeholder.svg?height=100&width=100"
-                      }
-                      alt={companySummary.company_details?.company_name || "Company Logo"}
-                      className="relative w-24 h-24 object-contain rounded-2xl border-2 border-white shadow-lg"
-                    />
-                  </div>
+            <EnhancedCompanyHero
+              companySummary={companySummary}
+              formatDate={formatDate}
+              formatCurrency={formatCurrency}
+              onInvestClick={() => setIsInvestmentModalOpen(true)}
+              onQuestionClick={() => setIsQuestionModalOpen(true)}
+              onWatchlistClick={() => setIsQuestionModalOpen(true)}
+            />
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <h1 className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent">
-                        {companySummary.company_details?.company_name || "Company Name"}
-                      </h1>
-                      <div className="flex items-center space-x-1">
-                        {[...Array(5)].map((_, i) => (
-                          <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* <p className="text-lg text-gray-600 mb-4 leading-relaxed">
-                      {companySummary.company_details?.company_short_description || "No description available"}
-                    </p> */}
-
-                    <div className="flex flex-wrap items-center gap-3">
-                      {companySummary.company_details?.sector && (
-                        <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-emerald-100 to-green-100 text-emerald-800 border border-emerald-200">
-                          <Briefcase className="h-4 w-4 mr-2" />
-                          {companySummary.company_details.sector}
-                        </span>
-                      )}
-                      {companySummary.company_details?.state_name && (
-                        <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-800 border border-blue-200">
-                          <TrendingUp className="h-4 w-4 mr-2" />
-                          {companySummary.company_details.state_name}
-                        </span>
-                      )}
-                      {companySummary.company_details?.status && (
-                        <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-200">
-                          <CheckCircle2 className="h-4 w-4 mr-2" />
-                          {companySummary.company_details.status}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-3">
-                    <CustomButton
-                      variant="outlined"
-                      size="sm"
-                      className="border-pink-200 text-pink-600 hover:bg-pink-50"
-                    >
-                      <Heart className="h-4 w-4 mr-2" />
-                      Watchlist
-                    </CustomButton>
-                    <CustomButton
-                      variant="outlined"
-                      size="sm"
-                      className="border-blue-200 text-blue-600 hover:bg-blue-50"
-                    >
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share
-                    </CustomButton>
-                    <CustomButton
-                      variant="solid"
-                      size="sm"
-                      onClick={() => setIsQuestionModalOpen(true)}
-                      className="bg-gradient-to-r from-blue-500 to-indigo-500 hover:from-blue-600 hover:to-indigo-600"
-                    >
-                      <MessageSquare className="h-4 w-4 mr-2" />
-                      Ask Question
-                    </CustomButton>
-                  </div>
-                </div>
-              </div>
-            </div>
+            
 
             {/* Enhanced Company Info Cards */}
-            <div className="mb-12">
+            {/* <div className="mb-12">
               <CompanyInfoCards
                 companySummary={companySummary}
                 formatDate={formatDate}
                 formatCurrency={formatCurrency}
                 onInvestClick={() => setIsInvestmentModalOpen(true)}
               />
-            </div>
+            </div> */}
 
             {/* Enhanced Tabs Section */}
             <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-gray-200/50 overflow-hidden">
               <Tab.Group>
-                <div className="bg-gradient-to-r from-gray-50 to-blue-50 px-6 py-4">
+                <div className=" px-6 py-4">
                   <Tab.List className="flex space-x-2 overflow-x-auto">
                     {tabs.map((tab) => (
                       <ModernTab key={tab.name}>

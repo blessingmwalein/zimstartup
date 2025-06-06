@@ -19,12 +19,13 @@ import { useRouter } from "next/navigation"// import { Button } from "@/componen
 const Companies: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const { user } = useSelector((state: any) => state.auth)
 
   const { status, userCompanies } = useSelector((state: any) => state.company)
 
   const fetchCompanyList = async () => {
     try {
-      await dispatch(fetchUserCompanies("10000000A00")).unwrap()
+      await dispatch(fetchUserCompanies(user.national_id)).unwrap()
     } catch (err: any) {
       console.error("Error fetching companies:", err)
     }
@@ -69,8 +70,8 @@ const Companies: React.FC = () => {
             </Button> */}
             <div>
               <CustomButton
-              onClick={() => router.push("/profile/companies/add-company")}
-              type="button" variant="solid" isLoading={status === "loading"}>
+                onClick={() => router.push("/profile/companies/add-company")}
+                type="button" variant="solid" isLoading={status === "loading"}>
                 <Plus className="h-5 w-5" />
                 Add New Company
               </CustomButton>

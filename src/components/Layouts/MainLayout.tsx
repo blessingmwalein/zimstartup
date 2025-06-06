@@ -80,7 +80,7 @@ export default function MainLayout({
                                         Login
                                     </Link>
                                     <Link
-                                        href="/register"
+                                        href="/auth/signup"
                                         className="bg-white text-[#052941] rounded-full px-6 py-2 font-medium hover:bg-gray-200 transition-colors"
                                     >
                                         Get Started

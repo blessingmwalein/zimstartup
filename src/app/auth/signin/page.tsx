@@ -29,6 +29,8 @@ const SignIn: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { status, error: reduxError } = useSelector((state: RootState) => state.auth);
 
+  const router = useRouter();
+
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
   });
@@ -101,18 +103,21 @@ const SignIn: React.FC = () => {
               </div>
 
               <div className="flex space-x-4">
-           
-                  <CustomButton
+
+                <CustomButton
                   fullWidth
                   type="submit" variant="solid" isLoading={status === "loading"} disabled={status === "loading"}>
-                    Login
-                  </CustomButton>
-         
-                  <CustomButton
+                  Login
+                </CustomButton>
+
+                <CustomButton
+                  onClick={
+                    () => router.push('/auth/signup')
+                  }
                   fullWidth type="button" variant="outlined" isLoading={status === "loading"}>
-                    Register
-                  </CustomButton>
-                
+                  Register
+                </CustomButton>
+
               </div>
 
               <div className="flex items-center gap-2 my-4">
