@@ -51,9 +51,9 @@ export function useOnboarding() {
         // "company", "account-verification", 
         "credentials"]
     const stepTitles = [
-        "Investor Type",
-        "Basic Information",
-        "Contact Details",
+        "About You",
+        "Your Investment Focus",
+        "Set Your Password",
         // "Company Information",
         // "Account Verification",
         "Credentials",

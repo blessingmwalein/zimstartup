@@ -413,3 +413,25 @@ export interface CompanyQuestionRequestion {
   question_id: number;
   answer: string;
 }
+
+export interface CompanySearchResult {
+    company_id: number;
+    company_name: string;
+    company_abbreviations: string;
+    company_start_date: string;
+    location: string;
+    website: string;
+    employees: number;
+    company_logo: string | null;
+    sector: string;
+    state_name: string;
+    completeness_score: number | null;
+    grade: string | null;
+}
+
+export interface SearchCompaniesResponse {
+    search_query: string;
+    match_type: string;
+    total_matches: number;
+    companies: CompanySearchResult[];
+}

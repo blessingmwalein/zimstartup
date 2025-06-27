@@ -3,20 +3,14 @@
 import Image from "next/image"
 import { Search, X, Loader2 } from "lucide-react"
 import { classNames } from "@/util/other"
-
-interface Company {
-  company_id: string | number
-  company_name: string
-  company_logo: string
-  sector: string
-}
+import { CompanySearchResult } from "../../../../state/models/company"
 
 interface SearchInputProps {
   query: string
   setQuery: (query: string) => void
-  suggestions: Company[]
+  suggestions: CompanySearchResult[]
   loading: boolean
-  onCompanySelect: (company: Company) => void
+  onCompanySelect: (company: CompanySearchResult) => void
   error?: string
   label?: string
 }
@@ -90,7 +84,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
                 className="flex w-full py-[10px] px-[15px] pl-[23px] text-[15px] cursor-pointer hover:bg-[#0000000F] text-left"
               >
                 <Image
-                  src={`/${company.company_logo}`}
+                  src={company.company_logo ? `/${company.company_logo}` : '/images/logo/logo-icon.svg'}
                   alt={company.company_name}
                   width={50}
                   height={50}

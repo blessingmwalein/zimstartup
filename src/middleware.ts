@@ -2,18 +2,39 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
+  const path = request.nextUrl.pathname;
   const accessToken = request.cookies.get("access_token")?.value;
 
-  if (!accessToken) {
-    // Redirect to the login page if no access token is found
+  const isPublicPath =
+    path === "/" ||
+    path.startsWith("/auth/signin") ||
+    path.startsWith("/auth/signup");
+  
+  const isAuthPath = path.startsWith("/auth/signin") || path.startsWith("/auth/signup")
+
+  if (isAuthPath && accessToken) {
+    return NextResponse.redirect(new URL("/dashboard/client", request.url));
+  }
+
+  if (!isPublicPath && !accessToken) {
     return NextResponse.redirect(new URL("/auth/signin", request.url));
   }
 
-  // Allow the request to continue if access token exists
   return NextResponse.next();
 }
 
-// Specify which routes should use this middleware
+// See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/profile/:path*"], // Match `/profile` and any sub-paths
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - images
+     * - backgrounds
+     */
+    "/((?!api|_next/static|_next/image|favicon.ico|images|backgrounds).*)",
+  ],
 };

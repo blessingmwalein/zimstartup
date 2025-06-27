@@ -213,7 +213,7 @@ export interface CompanyDetailsResponse {
 }
 
 export interface FilterOptions {
-  company_status?: string
+  status?: string
   location?: string
   request_type?: string
   region?: string

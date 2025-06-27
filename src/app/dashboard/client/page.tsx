@@ -22,13 +22,9 @@ import SearchInput from "@/components/FormElements/SearchInput/SearchInput"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchIndustryList } from "../../../../state/slices/configSlice"
 import type { AppDispatch } from "../../../../state/store"
-
-interface Company {
-    company_id: string | number
-    company_name: string
-    company_logo: string
-    sector: string
-}
+import { useCompanySearch } from "@/hooks/useCompanySearch"
+import { CompanySearchResult } from "../../../../state/models/company"
+import { useRouter } from "next/navigation"
 
 interface Sector {
     id: number
@@ -40,65 +36,26 @@ interface Sector {
 
 export default function Dashboard() {
     const [query, setQuery] = useState("")
-    const [suggestions, setSuggestions] = useState<Company[]>([])
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState("")
+    const { searchResults, loading, error, search } = useCompanySearch()
     const { status, error: reduxError, companyList } = useSelector((state: any) => state.companyConfig)
 
     const { industryList, businessStatesList, stockExchangeList } = useSelector((state: any) => state.companyConfig)
     const dispatch = useDispatch<AppDispatch>()
+    const router = useRouter()
 
-    // Dummy fetch logic — replace with real API call
     useEffect(() => {
-        if (query.trim() === "") {
-            setSuggestions([])
-            return
-        }
-
-        setLoading(true)
-        setError("")
-
-        const fetchSuggestions = async () => {
-            try {
-                // Simulate network call
-                await new Promise((resolve) => setTimeout(resolve, 1000))
-
-                const mockData: Company[] = [
-                    {
-                        company_id: 1,
-                        company_name: "Solar Grid Co",
-                        company_logo: "images/logo1.png",
-                        sector: "Energy",
-                    },
-                    {
-                        company_id: 2,
-                        company_name: "Agri Growers",
-                        company_logo: "images/logo2.png",
-                        sector: "Agriculture",
-                    },
-                ]
-
-                const filtered = mockData.filter((company) => company.company_name.toLowerCase().includes(query.toLowerCase()))
-
-                setSuggestions(filtered)
-                if (!filtered.length) {
-                    setError("No matching companies found.")
-                }
-            } catch (err) {
-                setError("Failed to fetch suggestions.")
-            } finally {
-                setLoading(false)
+        const debounceSearch = setTimeout(() => {
+            if (query.trim() !== "") {
+                search(query)
             }
-        }
+        }, 300) // 300ms debounce delay
 
-        fetchSuggestions()
-    }, [query])
+        return () => clearTimeout(debounceSearch)
+    }, [query, search])
 
-    const handleCompanySelect = (company: Company) => {
+    const handleCompanySelect = (company: CompanySearchResult) => {
         console.log("Selected company:", company)
-        // You can route or display company info here
-        setQuery("")
-        setSuggestions([])
+        router.push(`/companies/${company.company_id}`)
     }
     const isFetched = useRef(false)
 
@@ -129,39 +86,39 @@ export default function Dashboard() {
     }
 
     // Sample sectors data if industryList is not available
-    const sampleSectors: Sector[] = [
-        {
-            id: 1,
-            created_at: "2024-11-18T16:55:52.120777",
-            status: "ACTIVE",
-            sector: "Banking",
-            number_of_sectors: 120,
-        },
-        {
-            id: 2,
-            created_at: "2024-11-18T16:55:52.120777",
-            status: "ACTIVE",
-            sector: "Technology",
-            number_of_sectors: 85,
-        },
-        {
-            id: 3,
-            created_at: "2024-11-18T16:55:52.120777",
-            status: "ACTIVE",
-            sector: "Healthcare",
-            number_of_sectors: 64,
-        },
-        {
-            id: 4,
-            created_at: "2024-11-18T16:55:52.120777",
-            status: "ACTIVE",
-            sector: "Manufacturing",
-            number_of_sectors: 92,
-        },
-    ]
+    // const sampleSectors: Sector[] = [
+    //     {
+    //         id: 1,
+    //         created_at: "2024-11-18T16:55:52.120777",
+    //         status: "ACTIVE",
+    //         sector: "Banking",
+    //         number_of_sectors: 120,
+    //     },
+    //     {
+    //         id: 2,
+    //         created_at: "2024-11-18T16:55:52.120777",
+    //         status: "ACTIVE",
+    //         sector: "Technology",
+    //         number_of_sectors: 85,
+    //     },
+    //     {
+    //         id: 3,
+    //         created_at: "2024-11-18T16:55:52.120777",
+    //         status: "ACTIVE",
+    //         sector: "Healthcare",
+    //         number_of_sectors: 64,
+    //     },
+    //     {
+    //         id: 4,
+    //         created_at: "2024-11-18T16:55:52.120777",
+    //         status: "ACTIVE",
+    //         sector: "Manufacturing",
+    //         number_of_sectors: 92,
+    //     },
+    // ]
 
     // Use industryList from Redux if available, otherwise use sample data
-    const sectors = industryList?.length ? industryList : sampleSectors
+    const sectors = industryList?.length ? industryList : [];
 
     return (
         <MainLayout>
@@ -175,10 +132,10 @@ export default function Dashboard() {
                     <SearchInput
                         query={query}
                         setQuery={setQuery}
-                        suggestions={suggestions}
+                        suggestions={searchResults}
                         loading={loading}
                         onCompanySelect={handleCompanySelect}
-                        error={error}
+                        error={error || ""}
                         label="companies"
                     />
 

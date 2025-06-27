@@ -31,7 +31,7 @@ export default function MainLayout({
     return (
         <div className="flex flex-col min-h-screen bg-white">
             {/* Navigation */}
-            <header className="bg-[#052941] border-b border-gray-100 py-6 text-white">
+            <header className="bg-[#052941] border-b border-gray-100 py-2 text-white">
                 <div className="container mx-auto px-4 md:px-8">
                     <div className="flex justify-between items-center">
                         {/* <Link href="/" className="text-2xl font-bold text-white">
@@ -164,14 +164,14 @@ export default function MainLayout({
                         <div>
                             <h3 className="text-lg font-semibold mb-4">Platform</h3>
                             <ul className="space-y-3">
-                                <li>
+                                {/* <li>
                                     <Link href="#" className="text-white-600 hover:text-white transition-colors">
                                         How it Works
                                     </Link>
-                                </li>
+                                </li> */}
                                 <li>
-                                    <Link href="#" className="text-white-600 hover:text-white transition-colors">
-                                        Browse Startups
+                                    <Link href="/dashboard/client" className="text-white-600 hover:text-white transition-colors">
+                                        Browse Companies
                                     </Link>
                                 </li>
                                 <li>
@@ -179,16 +179,7 @@ export default function MainLayout({
                                         Investment Process
                                     </Link>
                                 </li>
-                                <li>
-                                    <Link href="#" className="text-white-600 hover:text-white transition-colors">
-                                        Success Stories
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link href="#" className="text-white-600 hover:text-white transition-colors">
-                                        Pricing
-                                    </Link>
-                                </li>
+                              
                             </ul>
                         </div>
 
@@ -200,21 +191,21 @@ export default function MainLayout({
                                         About Us
                                     </Link>
                                 </li>
-                                <li>
+                                {/* <li>
                                     <Link href="#" className="text-white-600 hover:text-white transition-colors">
                                         Team
                                     </Link>
-                                </li>
-                                <li>
+                                </li> */}
+                                {/* <li>
                                     <Link href="#" className="text-white-600 hover:text-white transition-colors">
                                         Careers
                                     </Link>
-                                </li>
-                                <li>
+                                </li> */}
+                                {/* <li>
                                     <Link href="#" className="text-white-600 hover:text-white transition-colors">
                                         Press
                                     </Link>
-                                </li>
+                                </li> */}
                                 <li>
                                     <Link href="#" className="text-white-600 hover:text-white transition-colors">
                                         Contact
@@ -228,29 +219,21 @@ export default function MainLayout({
                             <ul className="space-y-3">
                                 <li>
                                     <Link href="#" className="text-white-600 hover:text-white transition-colors">
-                                        Blog
+                                        Competitions
                                     </Link>
                                 </li>
-                                <li>
-                                    <Link href="#" className="text-white-600 hover:text-white transition-colors">
-                                        Guides
-                                    </Link>
-                                </li>
-                                <li>
+                              
+                                {/* <li>
                                     <Link href="#" className="text-white-600 hover:text-white transition-colors">
                                         FAQ
                                     </Link>
-                                </li>
+                                </li> */}
                                 <li>
                                     <Link href="/helpdesk" className="text-white-600 hover:text-white transition-colors">
-                                        Help Center
+                                        Help Desk
                                     </Link>
                                 </li>
-                                <li>
-                                    <Link href="#" className="text-white-600 hover:text-white transition-colors">
-                                        Events
-                                    </Link>
-                                </li>
+                               
                             </ul>
                         </div>
                     </div>

@@ -16,11 +16,12 @@ import Stepper from "@/components/common/Stepper"
 // import { useOnboarding } from "@/hooks/use-onboarding"
 import AuthLayout from "@/components/Layouts/AuthLayout"
 import { useOnboarding } from "@/hooks/useOnboarding"
+import PhoneNumberInput from "@/components/FormElements/PhoneNumberInput"
 
 // Validation schemas matching your project structure
 const stepSchemas = {
   type: Yup.object({
-    national_id: Yup.string().required("National ID is required"),
+    national_id: Yup.string(),
     reason: Yup.string().required("Please select at least one investor type"),
     place: Yup.string().required("Location is required"),
   }),
@@ -32,7 +33,7 @@ const stepSchemas = {
     dob: Yup.date().required("Date of birth is required"),
     marital_status: Yup.string().required("Marital status is required"),
     nationality: Yup.string().required("Nationality is required"),
-    national_id: Yup.string().required("National ID is required"),
+    national_id: Yup.string(),
   }),
   contact: Yup.object({
     email: Yup.string().email("Invalid email").required("Email is required"),
@@ -133,13 +134,13 @@ const InvestorOnboardingForm = () => {
               <p className="text-gray-600">Help us understand your investment profile</p>
             </div>
 
-            <TextField
+            {/* <TextField
               label="National ID"
               placeholder="Enter your national ID"
               {...register("national_id")}
               error={formErrors.national_id?.message || errors?.national_id}
               icon={<Shield className="h-5 w-5" />}
-            />
+            /> */}
 
             <div>
               <label className="mb-2 block text-sm font-medium text-gray-700">Investor Type</label>
@@ -148,7 +149,7 @@ const InvestorOnboardingForm = () => {
                   <div
                     key={index}
                     className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${watchedValues.reason?.includes(type)
-                        ? "border-red-500 bg-red-50"
+                        ? "border-green-500 bg-red-50"
                         : "border-gray-200 hover:border-red-300"
                       }`}
                     onClick={() => {
@@ -163,7 +164,7 @@ const InvestorOnboardingForm = () => {
                   >
                     <div className="flex items-center space-x-3">
                       <div
-                        className={`w-4 h-4 rounded border-2 flex items-center justify-center ${watchedValues.reason?.includes(type) ? "border-red-500 bg-red-500" : "border-gray-300"
+                        className={`w-4 h-4 rounded border-2 flex items-center justify-center ${watchedValues.reason?.includes(type) ? "border-green-500 bg-green-500" : "border-gray-300"
                           }`}
                       >
                         {watchedValues.reason?.includes(type) && (
@@ -215,7 +216,8 @@ const InvestorOnboardingForm = () => {
               <p className="text-gray-600">Tell us about yourself</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            {/* Title and Nationality in the same row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Controller
                 control={control}
                 name="title"
@@ -231,8 +233,29 @@ const InvestorOnboardingForm = () => {
                   />
                 )}
               />
+              <Controller
+                control={control}
+                name="nationality"
+                render={({ field }) => (
+                  <Select
+                    label="Nationality"
+                    options={[
+                      { value: "Zimbabwean", label: "Zimbabwean" },
+                      { value: "South African", label: "South African" },
+                      { value: "Kenyan", label: "Kenyan" },
+                      { value: "Other", label: "Other" },
+                    ]}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select nationality"
+                    error={formErrors.nationality?.message || errors?.nationality}
+                    icon={<Shield className="h-5 w-5" />}
+                  />
+                )}
+              />
             </div>
 
+            {/* First and Middle Name */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <TextField
                 label="First Name"
@@ -251,6 +274,7 @@ const InvestorOnboardingForm = () => {
               />
             </div>
 
+            {/* Last and Nickname */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <TextField
                 label="Last Name"
@@ -269,6 +293,7 @@ const InvestorOnboardingForm = () => {
               />
             </div>
 
+            {/* DOB, Gender, Marital Status */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <CustomDatePicker
                 control={control}
@@ -318,37 +343,6 @@ const InvestorOnboardingForm = () => {
                 />
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Controller
-                control={control}
-                name="nationality"
-                render={({ field }) => (
-                  <Select
-                    label="Nationality"
-                    options={[
-                      { value: "Zimbabwean", label: "Zimbabwean" },
-                      { value: "South African", label: "South African" },
-                      { value: "Kenyan", label: "Kenyan" },
-                      { value: "Other", label: "Other" },
-                    ]}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Select nationality"
-                    error={formErrors.nationality?.message || errors?.nationality}
-                    icon={<Shield className="h-5 w-5" />}
-                  />
-                )}
-              />
-
-              <TextField
-                label="National ID"
-                placeholder="Enter your national ID"
-                {...register("national_id")}
-                error={formErrors.national_id?.message || errors?.national_id}
-                icon={<Shield className="h-5 w-5" />}
-              />
-            </div>
           </div>
         )
 
@@ -381,20 +375,34 @@ const InvestorOnboardingForm = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <TextField
-                label="Phone Number"
-                placeholder="Enter your phone number"
-                {...register("phone1")}
-                error={formErrors.phone1?.message || errors?.phone1}
-                icon={<Phone className="h-5 w-5" />}
+              <Controller
+                control={control}
+                name="phone1"
+                render={({ field }) => (
+                  <PhoneNumberInput
+                    label="Phone Number"
+                    placeholder="7XXXXXXXX"
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={formErrors.phone1?.message || errors?.phone1}
+                    icon={<Phone className="h-5 w-5" />}
+                  />
+                )}
               />
 
-              <TextField
-                label="Alternative Phone (Optional)"
-                placeholder="Enter alternative phone"
-                {...register("phone2")}
-                error={formErrors.phone2?.message || errors?.phone2}
-                icon={<Phone className="h-5 w-5" />}
+              <Controller
+                control={control}
+                name="phone2"
+                render={({ field }) => (
+                  <PhoneNumberInput
+                    label="Alternative Phone (Optional)"
+                    placeholder="7XXXXXXXX"
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={formErrors.phone2?.message || errors?.phone2}
+                    icon={<Phone className="h-5 w-5" />}
+                  />
+                )}
               />
             </div>
 
@@ -406,7 +414,8 @@ const InvestorOnboardingForm = () => {
               icon={<MapPin className="h-5 w-5" />}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Town, City, State/Country, Postal Code in one row */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <TextField
                 label="Town"
                 placeholder="Enter your town"
@@ -430,9 +439,7 @@ const InvestorOnboardingForm = () => {
                 error={formErrors.state?.message || errors?.state}
                 icon={<MapPin className="h-5 w-5" />}
               />
-            </div>
 
-            <div className="max-w-xs">
               <TextField
                 label="Postal Code (Optional)"
                 placeholder="Enter postal code"
@@ -620,13 +627,20 @@ const InvestorOnboardingForm = () => {
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="px-8 py-6 border-b border-gray-200">
               <div className="flex items-center justify-between">
-                <div>
+                <div className="w-full">
                   <h3 className="text-lg font-semibold text-gray-800">
                     Step {currentStep + 1} of {stepTitles.length}
                   </h3>
                   <p className="text-sm text-gray-600">{currentStepInfo.title}</p>
+                  {/* Lively Progress Bar */}
+                  <div className="w-full mt-4 h-3 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full transition-all duration-500 ease-in-out bg-gradient-to-r from-red-500 to-pink-400"
+                      style={{ width: `${progressPercentage}%` }}
+                    ></div>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500">{progressPercentage}% Complete</div>
+                <div className="text-sm text-gray-500 whitespace-nowrap ml-6">{progressPercentage}% Complete</div>
               </div>
             </div>
 

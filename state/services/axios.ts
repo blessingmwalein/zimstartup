@@ -1,6 +1,8 @@
 import axios, { AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
 import Router from "next/router";
+import { clearUser } from "../slices/authSlice";
+import store from "../store";
 
 // Base URL for all requests
 const BASE_URL =
@@ -15,20 +17,23 @@ const axiosInstance = axios.create({
   },
 });
 
-// Add interceptor to handle 401 Unauthorized responses
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    console.error("Axios Error:", error);
-    if (error.response?.status === 401) {
-      // Clear authentication tokens
-      Cookies.remove("access_token");
-      Cookies.remove("user"); // If you use a refresh token
+const handleAuthError = (error: any) => {
+  console.error("Axios Error:", error);
+  const status = error.response?.status;
+  if (status === 401 || status === 403) {
+    store.dispatch(clearUser());
+    if (typeof window !== "undefined") {
       // Redirect to login page
       Router.push("/auth/signin");
     }
-    return Promise.reject(error);
-  },
+  }
+  return Promise.reject(error);
+};
+
+// Add interceptor to handle 401 Unauthorized responses
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  handleAuthError,
 );
 
 // Function to create an Axios instance with optional custom config and token from cookies
@@ -53,15 +58,7 @@ export const createAxiosInstance = (
   // Add the same interceptors to the custom instance
   instance.interceptors.response.use(
     (response) => response,
-    (error) => {
-      console.error("Axios Error (Custom Instance):", error.status);
-      if (error.status === 401) {
-        Cookies.remove("access_token");
-        Cookies.remove("user");
-        Router.push("/auth/signin");
-      }
-      return Promise.reject(error);
-    },
+    handleAuthError,
   );
 
   return instance;

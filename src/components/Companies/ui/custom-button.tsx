@@ -4,7 +4,7 @@ import type React from "react"
 import clsx from "clsx"
 
 interface ButtonProps {
-  type: "button" | "submit" | "reset"
+  type?: "button" | "submit" | "reset"
   variant: "solid" | "outlined"
   color?: string
   isLoading?: boolean
@@ -14,10 +14,12 @@ interface ButtonProps {
   onClick?: () => void
   borderRadius?: string
   fullWidth?: boolean // 👈 Optional prop to enable full width
+  className?: string
+  size?: "sm" | "md" | "lg"
 }
 
 const CustomButton: React.FC<ButtonProps> = ({
-  type,
+  type = "button",
   variant,
   color = "#001f3f",
   isLoading = false,
@@ -27,11 +29,20 @@ const CustomButton: React.FC<ButtonProps> = ({
   onClick,
   borderRadius = "rounded-[10px]",
   fullWidth = false, // 👈 default false
+  className,
+  size = "md",
 }) => {
+  const sizeStyles = {
+    sm: "py-2 px-2 text-sm",
+    md: "py-3 px-3",
+    lg: "py-4 px-4 text-lg",
+  }
   const baseStyles = clsx(
-    "py-3 flex justify-center items-center gap-2 px-3",
+    "flex justify-center items-center gap-2",
+    sizeStyles[size],
     borderRadius,
     fullWidth && "w-full", // 👈 Apply full width if enabled
+    className,
   )
 
   const solidStyles = clsx(

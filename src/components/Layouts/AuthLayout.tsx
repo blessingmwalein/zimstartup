@@ -18,7 +18,7 @@ export default function AuthLayout({
 
       <main>
         <div className="mx-auto">
-          <nav className="flex justify-between items-center px-8 py-4 bg-[#052941] text-white shadow-md">
+          <nav className="flex justify-between items-center px-8 py-2 bg-[#052941] text-white shadow-md">
             <Link className="inline-block" href="/">
               <Image
                 className="hidden dark:block"

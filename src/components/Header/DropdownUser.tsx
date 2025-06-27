@@ -30,7 +30,8 @@ const DropdownUser: React.FC<DropdownUserProps> = ({ onLogOut }) => {
         <Menu />
         <span className="hidden text-right lg:block">
           <span className="block text-sm font-medium text-white dark:text-white">
-            {user?.first_name} {user?.last_name}
+            {user?.first_name} 
+            {/* {user?.last_name} */}
           </span>
           {/* <span className="block text-base">{user?.username}</span> */}
         </span>
