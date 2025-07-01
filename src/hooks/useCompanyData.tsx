@@ -6,6 +6,7 @@ import { fetchCompanyDetails, fetchCompanyDirectors, fetchCompanyDocuments, fetc
 import * as api from "../../state/services/company"
 import { UpdateContactInforRequest } from "../../state/models/employement"
 import { CreateCompanyRequest } from "../../state/models/company"
+import { getCompanyRequests } from "../../state/services/company"
 
 
 export function useCompanyData(companyId: number) {
@@ -18,6 +19,7 @@ export function useCompanyData(companyId: number) {
   const [updates, setUpdates] = useState<any[]>([])
   const [previousFunds, setPreviousFunds] = useState<any[]>([])
   const [financialMetrics, setFinancialMetrics] = useState<any>(null)
+  const [companyRequests, setCompanyRequests] = useState<any[]>([])
 
   // Loading and error states
   const [loading, setLoading] = useState<boolean>(true)
@@ -58,10 +60,7 @@ export function useCompanyData(companyId: number) {
       setLoadingStates((prev) => ({ ...prev, valuations: false }))
     }
   }
-
-  // Fetch company details
  
-
   // Fetch company documents
   const fetchDocuments = async () => {
     setLoadingStates((prev) => ({ ...prev, documents: true }))
@@ -117,42 +116,32 @@ export function useCompanyData(companyId: number) {
     }
   }
 
-  // Fetch financial metrics
-  // const fetchFinancialMetricsData = async () => {
-  //   setLoadingStates((prev) => ({ ...prev, financialMetrics: true }))
-  //   try {
-  //     const data = await fetchFinancialMetrics(companyId)
-  //     setFinancialMetrics(data)
-  //   } catch (err) {
-  //     handleError(err, "Failed to load financial metrics")
-  //     setFinancialMetrics(null)
-  //   } finally {
-  //     setLoadingStates((prev) => ({ ...prev, financialMetrics: false }))
-  //   }
-  // }
+  // Fetch company requests
+  const fetchCompanyRequests = async () => {
+    try {
+      const data = await getCompanyRequests(companyId)
+      setCompanyRequests(data.requests || [])
+    } catch (err: any) {
+      setCompanyRequests([])
+      handleError(err, "Failed to load company requests")
+    }
+  }
 
   // Fetch all company data
   const fetchAllCompanyData = async () => {
     if (!companyId) return
-
     setLoading(true)
     setDataLoaded(false)
     setApiErrors([])
-
     try {
-      // Fetch all data in parallel
       await Promise.allSettled([
-        // fetchSummary(),
         fetchValuations(),
-        // fetchDetails(),
         fetchCompanyData(),
         fetchDocuments(),
         fetchDirectorsData(),
         fetchUpdatesData(),
-        // fetchPreviousFundsData(),
-        // fetchFinancialMetricsData(),
+        fetchCompanyRequests(),
       ])
-
       setDataLoaded(true)
     } catch (err) {
       console.error("Failed to load company data:", err)
@@ -168,16 +157,12 @@ export function useCompanyData(companyId: number) {
     try {
       const data = await api.getCompanyData(companyId)
       setCompanyData(data)
-
-      // Fetch additional data
       await Promise.all([
         fetchDirectors(),
         fetchDocuments(),
         fetchUpdates(),
-        // fetchPreviousFunds(),
-        // fetchFinancialMetrics(),
+        fetchCompanyRequests(),
       ])
-
       setLoading(false)
     } catch (err: any) {
       setError(err.message || "Failed to fetch company data")
@@ -526,6 +511,7 @@ export function useCompanyData(companyId: number) {
     updates,
     previousFunds,
     financialMetrics,
+    companyRequests,
 
     // Loading and error states
     loading,

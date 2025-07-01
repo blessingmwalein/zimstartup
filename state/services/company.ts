@@ -490,3 +490,9 @@ export const deletePreviousFunds = async (fundId: number) => {
   const response = await api.delete(`/delete-previous-funds/${fundId}`)
   return response.data
 };
+
+// Fetch company requests for a given company ID
+export const getCompanyRequests = async (companyId: number): Promise<any> => {
+  const response = await api.get(`/company-request/${companyId}`)
+  return response.data
+}

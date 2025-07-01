@@ -41,10 +41,11 @@ import PreviousFundsSection from "@/components/Companies/previous-funds-section"
 import FinancialMetricsSection from "@/components/Companies/finantial-metrics"
 import AddPreviousFundsDialog from "@/components/Companies/dialogs/add-previous-funds-dialog"
 import AddFinancialMetricsDialog from "@/components/Companies/dialogs/add-financial-metrics-dialog"
+import MoneyDisplay from "@/components/common/MoneyDisplay"
 
 export default function CompanyView() {
   const { company_id } = useParams()
-  const companyId = Number.parseInt(company_id)
+  const companyId = Array.isArray(company_id) ? Number.parseInt(company_id[0]) : Number.parseInt(company_id)
 
   const {
     directors,
@@ -54,6 +55,7 @@ export default function CompanyView() {
     previousFunds,
     companyValuations,
     financialMetrics,
+    companyRequests,
     loading,
     error,
     updateCompany,
@@ -86,7 +88,7 @@ export default function CompanyView() {
   const handleCompanyUpdate = async (updatedData: CreateCompanyRequest) => {
     const result: any = await updateCompany(updatedData, companyId)
     if (result.success) {
-      toast.success(result?.message || "Company information updated successfully")
+      toast.success("Company information updated successfully")
     } else {
       toast.error(result.error || "Failed to update company information")
     }
@@ -99,7 +101,7 @@ export default function CompanyView() {
       company_id: companyId,
     })
     if (result.success) {
-      toast.success(result?.message || "Company contact updated successfully")
+      toast.success("Company contact updated successfully")
     } else {
       toast.error(result.error || "Failed to update company contact")
     }
@@ -109,7 +111,7 @@ export default function CompanyView() {
   const handleStockMarketUpdate = async (updatedData: any) => {
     const result = await updateStockMarket(updatedData)
     if (result.success) {
-      toast.success(result?.message || "Stock market details updated successfully")
+      toast.success("Stock market details updated successfully")
     } else {
       toast.error(result.error || "Failed to update stock market details")
     }
@@ -119,7 +121,7 @@ export default function CompanyView() {
   const handleAddUpdate = async (newUpdate: any) => {
     const result = await addUpdate(newUpdate)
     if (result.success) {
-      toast.success(result?.message || "Company update added successfully")
+      toast.success("Company update added successfully")
     } else {
       toast.error(result.error || "Failed to add company update")
     }
@@ -129,7 +131,7 @@ export default function CompanyView() {
   const handleAddDirector = async (newDirector: any) => {
     const result = await addDirector(newDirector)
     if (result.success) {
-      toast.success(result?.message || "Director added successfully")
+      toast.success("Director added successfully")
     } else {
       toast.error(result.error || "Failed to add director")
     }
@@ -139,7 +141,7 @@ export default function CompanyView() {
   const handleDocumentUpload = async (file: File) => {
     const result = await uploadDocument(file)
     if (result.success) {
-      toast.success(result?.message || "Document uploaded successfully")
+      toast.success("Document uploaded successfully")
     } else {
       toast.error(result.error || "Failed to upload document")
     }
@@ -176,6 +178,8 @@ export default function CompanyView() {
     { name: "Stock Market", icon: <BarChart4 className="h-5 w-5" /> },
     { name: "Previous Funds", icon: <DollarSign className="h-5 w-5" /> },
     { name: "Financial Metrics", icon: <TrendingUp className="h-5 w-5" /> },
+    { name: "Company Requests", icon: <TrendingUp className="h-5 w-5" /> },
+
     { name: "Updates", icon: <Bell className="h-5 w-5" /> },
     { name: "Documents", icon: <FileText className="h-5 w-5" /> },
   ]
@@ -323,12 +327,59 @@ ${selected ? "bg-white text-[#001f3f] shadow" : "text-gray-600 hover:bg-white/[0
                 />
               </Tab.Panel>
 
+              {/* Company Requests Tab */}
+              <Tab.Panel>
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-xl font-semibold">Company Requests</h2>
+                    <CustomButton type="button" variant="solid" onClick={() => { /* TODO: open add request dialog */ }}>
+                      Add Request
+                    </CustomButton>
+                  </div>
+                  {companyRequests && companyRequests.length > 0 ? (
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-gray-200">
+                        <thead>
+                          <tr>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Project Name</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Currency</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Stage</th>
+                            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {companyRequests.map((req: any) => (
+                            <tr key={req.request_id}>
+                              <td className="px-4 py-2 whitespace-nowrap">{req.project_name}</td>
+                              <td className="px-4 py-2 whitespace-nowrap">
+                              <MoneyDisplay amount={req.amount} />
+
+
+                              </td>
+                              <td className="px-4 py-2 whitespace-nowrap">{req.currency}</td>
+                              <td className="px-4 py-2 whitespace-nowrap">{req.current_project_stage}</td>
+                              <td className="px-4 py-2 whitespace-nowrap">
+                                <CustomButton type="button" variant="outlined" size="sm" onClick={() => { /* TODO: view logic */ }}>View</CustomButton>
+                                <CustomButton type="button" variant="outlined" size="sm" onClick={() => { /* TODO: edit logic */ }}>Edit</CustomButton>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  ) : (
+                    <div className="text-gray-500">No company requests found.</div>
+                  )}
+                </div>
+              </Tab.Panel>
+
               <Tab.Panel>
                 <CompanyUpdatesSection updates={updates} onAddUpdate={() => setAddUpdateDialogOpen(true)} />
               </Tab.Panel>
 
               <Tab.Panel>
-                <CompanyDocumentsSection documents={companyDocuments?.documents} onUpload={handleDocumentUpload} />
+                <CompanyDocumentsSection documents={companyDocuments?.documents || []} onUpload={handleDocumentUpload} />
               </Tab.Panel>
             </Tab.Panels>
           </Tab.Group>

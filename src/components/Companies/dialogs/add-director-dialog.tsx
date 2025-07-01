@@ -49,8 +49,8 @@ const positionSchema = Yup.object({
     overall_position: Yup.string(),
     department: Yup.string(),
     reporting_to: Yup.string(),
-    direct_reports: Yup.number().typeError("Must be a number").min(0, "Cannot be negative"),
-    responsibilities: Yup.string(),
+    // direct_reports: Yup.number().typeError("Must be a number").min(0, "Cannot be negative"),
+    // responsibilities: Yup.string(),
     start_date: Yup.date().required("Start date is required"),
     end_date: Yup.date()
       .nullable()
@@ -73,8 +73,8 @@ const qualificationSchema = Yup.object({
         .required("Year is required")
         .min(1950, "Year must be after 1950")
         .max(new Date().getFullYear(), "Year cannot be in the future"),
-      grade: Yup.string(),
-      additional_info: Yup.string(),
+      // grade: Yup.string(),
+      // additional_info: Yup.string(),
     }),
   ),
 })
@@ -84,8 +84,8 @@ const employmentSchema = Yup.object({
     Yup.object({
       company_name: Yup.string().required("Company name is required"),
       position: Yup.string().required("Position is required"),
-      industry: Yup.string(),
-      location: Yup.string(),
+      // industry: Yup.string(),
+      // location: Yup.string(),
       start_date: Yup.date().required("Start date is required"),
       end_date: Yup.date().nullable(),
       achievements: Yup.string(),
@@ -222,19 +222,19 @@ const PersonalInfoStep = () => {
           placeholder="Enter email address"
         />
 
-        <TextField
+        {/* <TextField
           label="Phone Number"
           {...register("phone_number")}
           error={errors.phone_number?.message}
           placeholder="Enter phone number"
-        />
+        /> */}
 
-        <TextField
+        {/* <TextField
           label="ID Number"
           {...register("id_number")}
           error={errors.id_number?.message}
           placeholder="Enter ID number"
-        />
+        /> */}
       </div>
     </div>
   )
@@ -289,12 +289,12 @@ const PositionStep = () => {
           placeholder="Enter overall position (e.g., Executive, Non-Executive)"
         />
 
-        <TextField
+        {/* <TextField
           label="Department"
           {...register("position.department")}
           error={errors.position?.department?.message}
           placeholder="Enter department"
-        />
+        /> */}
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -326,27 +326,27 @@ const PositionStep = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <TextField
+        {/* <TextField
           label="Reporting To"
           {...register("position.reporting_to")}
           error={errors.position?.reporting_to?.message}
           placeholder="Enter supervisor's name/position"
-        />
+        /> */}
 
-        <TextField
+        {/* <TextField
           label="Direct Reports"
           type="number"
           {...register("position.direct_reports")}
           error={errors.position?.direct_reports?.message}
           placeholder="Number of direct reports"
-        />
+        /> */}
 
-        <TextField
+        {/* <TextField
           label="Responsibilities"
           {...register("position.responsibilities")}
           error={errors.position?.responsibilities?.message}
           placeholder="Key responsibilities"
-        />
+        /> */}
       </div>
     </div>
   )
@@ -442,19 +442,19 @@ const QualificationsStep = () => {
               placeholder="Enter year obtained"
             />
 
-            <TextField
+            {/* <TextField
               label="Grade/Result"
               {...register(`qualifications.${index}.grade`)}
               error={errors.qualifications?.[index]?.grade?.message}
               placeholder="Enter grade or result"
-            />
-
+            /> */}
+{/* 
             <TextField
               label="Additional Info"
               {...register(`qualifications.${index}.additional_info`)}
               error={errors.qualifications?.[index]?.additional_info?.message}
               placeholder="Any additional information"
-            />
+            /> */}
           </div>
         </div>
       ))}
@@ -532,12 +532,12 @@ const EmploymentHistoryStep = () => {
               placeholder="Enter position"
             />
 
-            <TextField
+            {/* <TextField
               label="Industry"
               {...register(`employment_history.${index}.industry`)}
               error={errors.employment_history?.[index]?.industry?.message}
               placeholder="Enter industry"
-            />
+            /> */}
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
@@ -555,12 +555,12 @@ const EmploymentHistoryStep = () => {
               error={errors.employment_history?.[index]?.end_date?.message}
             />
 
-            <TextField
+            {/* <TextField
               label="Location"
               {...register(`employment_history.${index}.location`)}
               error={errors.employment_history?.[index]?.location?.message}
               placeholder="Enter location"
-            />
+            /> */}
           </div>
 
           <div className="mt-4">

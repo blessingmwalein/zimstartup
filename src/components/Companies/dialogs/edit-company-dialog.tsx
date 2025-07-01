@@ -86,6 +86,7 @@ export default function EditCompanyDialog({ isOpen, onClose, initialData, onSave
                   {...register("company_name", { required: "Company name is required" })}
                   error={errors.company_name?.message}
                   placeholder="Enter company name"
+                  disabled={true}
                 />
 
                 <TextField
