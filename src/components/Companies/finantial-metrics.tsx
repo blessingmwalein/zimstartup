@@ -1,18 +1,40 @@
 "use client"
 
-import { TrendingUp, Plus } from "lucide-react"
+import { useState } from "react"
+import { TrendingUp, Plus, Eye } from "lucide-react"
 import CustomButton from "./ui/custom-button"
+import ViewFinancialMetricDialog from "./dialogs/view-financial-metric-dialog"
+import MoneyDisplay from "@/components/common/MoneyDisplay"
+
+interface FinancialMetric {
+  metric_id: number;
+  company_id: number;
+  revenue: number;
+  profit_margin: number;
+  ebitda: number;
+  cash_flow: number;
+  total_assets: number;
+  total_liabilities: number;
+  debt_level: number;
+  valuation_multiple: number;
+  revenue_growth_rate: number;
+  customer_growth_rate: number;
+  market_share: number;
+  retention_rate: number;
+}
+
 interface FinancialMetricsSectionProps {
-  metricsData: any
+  metricsData: FinancialMetric[] | null
   onAddMetrics: () => void
 }
 
 export default function FinancialMetricsSection({ metricsData, onAddMetrics }: FinancialMetricsSectionProps) {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount)
+  const [selectedMetric, setSelectedMetric] = useState<FinancialMetric | null>(null)
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false)
+
+  const handleViewMore = (metric: FinancialMetric) => {
+    setSelectedMetric(metric)
+    setIsViewModalOpen(true)
   }
 
   const formatPercentage = (value: number) => {
@@ -28,7 +50,7 @@ export default function FinancialMetricsSection({ metricsData, onAddMetrics }: F
         </CustomButton>
       </div>
 
-      {!metricsData ? (
+      {!metricsData || metricsData.length === 0 ? (
         <div className="flex h-40 items-center justify-center rounded-lg border-2 border-dashed">
           <div className="text-center text-gray-500">
             <TrendingUp className="mx-auto h-10 w-10" />
@@ -39,77 +61,61 @@ export default function FinancialMetricsSection({ metricsData, onAddMetrics }: F
           </div>
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Financial Performance */}
-          <div className="space-y-4">
-            <h4 className="font-medium text-gray-900">Financial Performance</h4>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Revenue</span>
-                <span className="font-medium">{formatCurrency(metricsData.revenue)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Profit Margin</span>
-                <span className="font-medium">{formatPercentage(metricsData.profit_margin)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">EBITDA</span>
-                <span className="font-medium">{formatCurrency(metricsData.ebitda)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Cash Flow</span>
-                <span className="font-medium">{formatCurrency(metricsData.cash_flow)}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Financial Position */}
-          <div className="space-y-4">
-            <h4 className="font-medium text-gray-900">Financial Position</h4>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Total Assets</span>
-                <span className="font-medium">{formatCurrency(metricsData.total_assets)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Total Liabilities</span>
-                <span className="font-medium">{formatCurrency(metricsData.total_liabilities)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Debt Level</span>
-                <span className="font-medium">{formatCurrency(metricsData.debt_level)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Valuation Multiple</span>
-                <span className="font-medium">{metricsData.valuation_multiple}x</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Growth & Market */}
-          <div className="space-y-4">
-            <h4 className="font-medium text-gray-900">Growth & Market</h4>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Revenue Growth</span>
-                <span className="font-medium">{formatPercentage(metricsData.revenue_growth_rate)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Customer Growth</span>
-                <span className="font-medium">{formatPercentage(metricsData.customer_growth_rate)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Market Share</span>
-                <span className="font-medium">{formatPercentage(metricsData.market_share)}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Retention Rate</span>
-                <span className="font-medium">{formatPercentage(metricsData.retention_rate)}</span>
-              </div>
-            </div>
-          </div>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Metric ID
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Revenue
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Profit Margin
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  EBITDA
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Cash Flow
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {metricsData.map((metric) => (
+                <tr key={metric.metric_id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{metric.metric_id}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><MoneyDisplay amount={metric.revenue} /></td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatPercentage(metric.profit_margin)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><MoneyDisplay amount={metric.ebitda} /></td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><MoneyDisplay amount={metric.cash_flow} /></td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <CustomButton
+                      type="button"
+                      variant="outlined"
+                      size="sm"
+                      icon={<Eye className="h-4 w-4" />}
+                      onClick={() => handleViewMore(metric)}
+                    >
+                      View More
+                    </CustomButton>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
+
+      <ViewFinancialMetricDialog
+        isOpen={isViewModalOpen}
+        onClose={() => setIsViewModalOpen(false)}
+        metricData={selectedMetric}
+      />
     </div>
   )
 }

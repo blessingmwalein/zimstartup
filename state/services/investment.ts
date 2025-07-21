@@ -26,7 +26,7 @@ export const fetchSectorCompanies = async (
     }
   })
 
-  const url = `/filtered-sector-companies2/${sector}?${queryParams.toString()}`
+  const url = `/filtered-sector-companies/${sector}?${queryParams.toString()}`
   const response = await api.get<SectorCompaniesResponse>(url)
   return response.data
 }
@@ -142,6 +142,11 @@ export const submitInvestorQuestion = async (data: {
   investor_email: string
 }): Promise<any> => {
   const response = await api.post("/register-investor-question", data)
+  return response.data
+}
+
+export const addCompanyValuation = async (data: any): Promise<any> => {
+  const response = await api.post("/add-company-valuation", data)
   return response.data
 }
 

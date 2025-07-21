@@ -2,7 +2,17 @@
 
 import { useState, useEffect } from "react"
 import { CompanyDetailsResponse, CompanyDocumentsResponse, CompanySummary, CompanyValuations } from "../../state/models/investment"
-import { fetchCompanyDetails, fetchCompanyDirectors, fetchCompanyDocuments, fetchCompanySummary, fetchCompanyUpdates, fetchCompanyValuations, fetchPreviousFunds, handleApiError } from "../../state/services/investment"
+import {
+  fetchCompanyDetails,
+  fetchCompanyDirectors,
+  fetchCompanyDocuments,
+  fetchCompanySummary,
+  fetchCompanyUpdates,
+  fetchCompanyValuations,
+  fetchPreviousFunds,
+  handleApiError,
+  addCompanyValuation
+} from "../../state/services/investment"
 import * as api from "../../state/services/company"
 import { UpdateContactInforRequest } from "../../state/models/employement"
 import { CreateCompanyRequest } from "../../state/models/company"
@@ -116,6 +126,19 @@ export function useCompanyData(companyId: number) {
     }
   }
 
+  const fetchFinancialMetrics = async () => {
+    setLoadingStates((prev) => ({ ...prev, financialMetrics: true }))
+    try {
+      const data = await api.getFinancialMetrics(companyId)
+      setFinancialMetrics(data.data || [])
+    } catch (err) {
+      handleError(err, "Failed to load financial metrics")
+      setFinancialMetrics([])
+    } finally {
+      setLoadingStates((prev) => ({ ...prev, financialMetrics: false }))
+    }
+  }
+
   // Fetch company requests
   const fetchCompanyRequests = async () => {
     try {
@@ -141,6 +164,7 @@ export function useCompanyData(companyId: number) {
         fetchDirectorsData(),
         fetchUpdatesData(),
         fetchCompanyRequests(),
+        fetchFinancialMetrics(),
       ])
       setDataLoaded(true)
     } catch (err) {
@@ -162,6 +186,7 @@ export function useCompanyData(companyId: number) {
         fetchDocuments(),
         fetchUpdates(),
         fetchCompanyRequests(),
+        fetchFinancialMetrics(),
       ])
       setLoading(false)
     } catch (err: any) {
@@ -323,8 +348,7 @@ export function useCompanyData(companyId: number) {
         company_id: companyId,
       })
       // Refresh financial metrics
-      // fetchFinancialMetrics()
-      fetchCompanyData()
+      fetchFinancialMetrics()
       return { success: true }
     } catch (err: any) {
       return { success: false, error: err.message || "Failed to add financial metrics" }
@@ -434,7 +458,7 @@ export function useCompanyData(companyId: number) {
   // Upload logo
   const uploadLogo = async (file: File) => {
     try {
-      await api.uploadCompanyLogo(companyId, file)
+      await api.uploadCompanyLogo({ companyId, file })
       // Refresh company data
       fetchCompanyData()
       return { success: true }
@@ -474,7 +498,7 @@ export function useCompanyData(companyId: number) {
         company_id: companyId,
       })
       // Refresh financial metrics
-      // fetchFinancialMetrics()
+      fetchFinancialMetrics()
       return { success: true }
     } catch (err: any) {
       return { success: false, error: err.message || "Failed to update financial metrics" }
@@ -490,6 +514,19 @@ export function useCompanyData(companyId: number) {
       return { success: true }
     } catch (err: any) {
       return { success: false, error: err.message || "Failed to delete funding record" }
+    }
+  }
+
+  const addValuation = async (data: any) => {
+    try {
+      await addCompanyValuation({
+        ...data,
+        company_id: companyId,
+      })
+      fetchValuations()
+      return { success: true }
+    } catch (err: any) {
+      return { success: false, error: err.message || "Failed to add valuation" }
     }
   }
 
@@ -539,6 +576,7 @@ export function useCompanyData(companyId: number) {
     addFinancialMetrics,
     updateFinancialMetrics,
     deletePreviousFunds,
+    addValuation,
 
 
     refreshData,
@@ -549,7 +587,7 @@ export function useCompanyData(companyId: number) {
     refreshDirectors: fetchDirectorsData,
     refreshUpdates: fetchUpdatesData,
     refreshPreviousFunds: fetchPreviousFundsData,
-    // refreshFinancialMetrics: fetchFinancialMetricsData,
+    refreshFinancialMetrics: fetchFinancialMetrics,
 
     // Utility functions
     clearError,

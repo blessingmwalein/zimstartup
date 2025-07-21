@@ -1,22 +1,33 @@
-"use client"
+"use client";
 
-import React from "react"
-import { useForm, Controller } from "react-hook-form"
-import * as Yup from "yup"
-import { yupResolver } from "@hookform/resolvers/yup"
-import { ToastContainer } from "react-toastify"
-import "react-toastify/dist/ReactToastify.css"
-import { User, Mail, Phone, Building2, MapPin, Shield, Key, ChevronRight, ChevronLeft, CheckCircle } from "lucide-react"
+import React from "react";
+import { useForm, Controller } from "react-hook-form";
+import * as Yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {
+  User,
+  Mail,
+  Phone,
+  Building2,
+  MapPin,
+  Shield,
+  Key,
+  ChevronRight,
+  ChevronLeft,
+  CheckCircle,
+} from "lucide-react";
 
-import TextField from "@/components/FormElements/TextField"
-import Select from "@/components/FormElements/SelectInput"
-import CustomDatePicker from "@/components/FormElements/DatePicker/CustomDatePicker"
-import CustomButton from "@/components/Buttons/CustomButton"
-import Stepper from "@/components/common/Stepper"
+import TextField from "@/components/FormElements/TextField";
+import Select from "@/components/FormElements/SelectInput";
+import CustomDatePicker from "@/components/FormElements/DatePicker/CustomDatePicker";
+import CustomButton from "@/components/Buttons/CustomButton";
+import Stepper from "@/components/common/Stepper";
 // import { useOnboarding } from "@/hooks/use-onboarding"
-import AuthLayout from "@/components/Layouts/AuthLayout"
-import { useOnboarding } from "@/hooks/useOnboarding"
-import PhoneNumberInput from "@/components/FormElements/PhoneNumberInput"
+import AuthLayout from "@/components/Layouts/AuthLayout";
+import { useOnboarding } from "@/hooks/useOnboarding";
+import PhoneNumberInput from "@/components/FormElements/PhoneNumberInput";
 
 // Validation schemas matching your project structure
 const stepSchemas = {
@@ -54,12 +65,14 @@ const stepSchemas = {
   //   document_number: Yup.string().required("Document number is required"),
   // }),
   credentials: Yup.object({
-    password: Yup.string().min(8, "Password must be at least 8 characters").required("Password is required"),
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .required("Password is required"),
     confirm_password: Yup.string()
       .oneOf([Yup.ref("password")], "Passwords must match")
       .required("Please confirm your password"),
   }),
-}
+};
 
 const InvestorOnboardingForm = () => {
   const {
@@ -81,10 +94,11 @@ const InvestorOnboardingForm = () => {
     investorTypes,
     titles,
     initData,
-  } = useOnboarding()
+  } = useOnboarding();
 
-  const currentStepInfo = getCurrentStepInfo()
-  const currentSchema = stepSchemas[currentStepInfo.key as keyof typeof stepSchemas]
+  const currentStepInfo = getCurrentStepInfo();
+  const currentSchema =
+    stepSchemas[currentStepInfo.key as keyof typeof stepSchemas];
 
   const {
     register,
@@ -96,42 +110,49 @@ const InvestorOnboardingForm = () => {
   } = useForm({
     resolver: yupResolver(currentSchema),
     defaultValues: currentStepInfo.data,
-  })
+  });
 
   // Watch form values and update step data
-  const watchedValues = watch()
-  const previousValuesRef = React.useRef(watchedValues)
+  const watchedValues = watch();
+  const previousValuesRef = React.useRef(watchedValues);
 
   React.useEffect(() => {
     // Only update if values have actually changed
-    if (JSON.stringify(previousValuesRef.current) !== JSON.stringify(watchedValues)) {
-      previousValuesRef.current = { ...watchedValues }
-      updateStepData(currentStepInfo.key, watchedValues)
+    if (
+      JSON.stringify(previousValuesRef.current) !==
+      JSON.stringify(watchedValues)
+    ) {
+      previousValuesRef.current = { ...watchedValues };
+      updateStepData(currentStepInfo.key, watchedValues);
     }
-  }, [watchedValues, currentStepInfo.key, updateStepData])
+  }, [watchedValues, currentStepInfo.key, updateStepData]);
 
   const onSubmit = async (data: any) => {
     try {
-      await submitStep(currentStepInfo.key, data)
+      await submitStep(currentStepInfo.key, data);
 
       if (isLastStep) {
-        completeOnboarding()
+        completeOnboarding();
       } else {
-        goToNextStep()
+        goToNextStep();
       }
     } catch (error) {
       // Error is handled in the hook
     }
-  }
+  };
 
   const renderStepContent = () => {
     switch (currentStepInfo.key) {
       case "type":
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">What type of investor are you?</h2>
-              <p className="text-gray-600">Help us understand your investment profile</p>
+            <div className="mb-8 text-center">
+              <h2 className="mb-2 text-2xl font-bold text-gray-800">
+                What type of investor are you?
+              </h2>
+              <p className="text-gray-600">
+                Help us understand your investment profile
+              </p>
             </div>
 
             {/* <TextField
@@ -143,32 +164,42 @@ const InvestorOnboardingForm = () => {
             /> */}
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">Investor Type</label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <label className="mb-2 block text-sm font-medium text-gray-700">
+                Investor Type
+              </label>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 {investorTypes.map((type, index) => (
                   <div
                     key={index}
-                    className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${watchedValues.reason?.includes(type)
+                    className={`cursor-pointer rounded-lg border-2 p-4 transition-all ${
+                      watchedValues.reason?.includes(type)
                         ? "border-green-500 bg-red-50"
                         : "border-gray-200 hover:border-red-300"
-                      }`}
+                    }`}
                     onClick={() => {
-                      let reason = watchedValues.reason || ""
+                      let reason = watchedValues.reason || "";
                       if (reason.includes(type)) {
-                        reason = reason.replace(type + ".", "")
+                        reason = reason.replace(type + ".", "");
                       } else {
-                        reason = reason + type + "."
+                        reason = reason + type + ".";
                       }
-                      setValue("reason", reason)
+                      setValue("reason", reason);
                     }}
                   >
                     <div className="flex items-center space-x-3">
                       <div
-                        className={`w-4 h-4 rounded border-2 flex items-center justify-center ${watchedValues.reason?.includes(type) ? "border-green-500 bg-green-500" : "border-gray-300"
-                          }`}
+                        className={`flex h-4 w-4 items-center justify-center rounded border-2 ${
+                          watchedValues.reason?.includes(type)
+                            ? "border-green-500 bg-green-500"
+                            : "border-gray-300"
+                        }`}
                       >
                         {watchedValues.reason?.includes(type) && (
-                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <svg
+                            className="h-3 w-3 text-white"
+                            fill="currentColor"
+                            viewBox="0 0 20 20"
+                          >
                             <path
                               fillRule="evenodd"
                               d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
@@ -177,13 +208,17 @@ const InvestorOnboardingForm = () => {
                           </svg>
                         )}
                       </div>
-                      <span className="text-sm font-medium text-gray-700">{type}</span>
+                      <span className="text-sm font-medium text-gray-700">
+                        {type}
+                      </span>
                     </div>
                   </div>
                 ))}
               </div>
               {(formErrors.reason?.message || errors?.reason) && (
-                <p className="mt-1 text-sm text-red-500">{formErrors.reason?.message || errors?.reason}</p>
+                <p className="mt-1 text-sm text-red-500">
+                  {formErrors.reason?.message || errors?.reason}
+                </p>
               )}
             </div>
 
@@ -194,8 +229,14 @@ const InvestorOnboardingForm = () => {
                 <Select
                   label="Current Location"
                   options={[
-                    { value: "Currently in Zimbabwe", label: "Currently in Zimbabwe" },
-                    { value: "Currently outside Zimbabwe", label: "Currently outside Zimbabwe" },
+                    {
+                      value: "Currently in Zimbabwe",
+                      label: "Currently in Zimbabwe",
+                    },
+                    {
+                      value: "Currently outside Zimbabwe",
+                      label: "Currently outside Zimbabwe",
+                    },
                   ]}
                   value={field.value}
                   onChange={field.onChange}
@@ -206,25 +247,30 @@ const InvestorOnboardingForm = () => {
               )}
             />
           </div>
-        )
+        );
 
       case "basic":
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Personal Information</h2>
+            <div className="mb-8 text-center">
+              <h2 className="mb-2 text-2xl font-bold text-gray-800">
+                Personal Information
+              </h2>
               <p className="text-gray-600">Tell us about yourself</p>
             </div>
 
             {/* Title and Nationality in the same row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               <Controller
                 control={control}
                 name="title"
                 render={({ field }) => (
                   <Select
                     label="Title"
-                    options={titles.map((title) => ({ label: title, value: title }))}
+                    options={titles.map((title) => ({
+                      label: title,
+                      value: title,
+                    }))}
                     value={field.value}
                     onChange={field.onChange}
                     placeholder="Title"
@@ -248,15 +294,24 @@ const InvestorOnboardingForm = () => {
                     value={field.value}
                     onChange={field.onChange}
                     placeholder="Select nationality"
-                    error={formErrors.nationality?.message || errors?.nationality}
+                    error={
+                      formErrors.nationality?.message || errors?.nationality
+                    }
                     icon={<Shield className="h-5 w-5" />}
                   />
                 )}
               />
+              <TextField
+                label="National ID"
+                placeholder="Enter your national ID"
+                {...register("national_id")}
+                error={formErrors.national_id?.message || errors?.national_id}
+                icon={<Shield className="h-5 w-5" />}
+              />
             </div>
 
             {/* First and Middle Name */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <TextField
                 label="First Name"
                 placeholder="Enter your first name"
@@ -275,7 +330,7 @@ const InvestorOnboardingForm = () => {
             </div>
 
             {/* Last and Nickname */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <TextField
                 label="Last Name"
                 placeholder="Enter your last name"
@@ -294,7 +349,7 @@ const InvestorOnboardingForm = () => {
             </div>
 
             {/* DOB, Gender, Marital Status */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <CustomDatePicker
                 control={control}
                 name="dob"
@@ -336,7 +391,10 @@ const InvestorOnboardingForm = () => {
                       value={field.value}
                       onChange={field.onChange}
                       placeholder="Status"
-                      error={formErrors.marital_status?.message || errors?.marital_status}
+                      error={
+                        formErrors.marital_status?.message ||
+                        errors?.marital_status
+                      }
                       icon={<User className="h-5 w-5" />}
                     />
                   )}
@@ -344,17 +402,19 @@ const InvestorOnboardingForm = () => {
               </div>
             </div>
           </div>
-        )
+        );
 
       case "contact":
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Contact Information</h2>
+            <div className="mb-8 text-center">
+              <h2 className="mb-2 text-2xl font-bold text-gray-800">
+                Contact Information
+              </h2>
               <p className="text-gray-600">How can we reach you?</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <TextField
                 label="Email Address"
                 type="email"
@@ -374,7 +434,7 @@ const InvestorOnboardingForm = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <Controller
                 control={control}
                 name="phone1"
@@ -415,7 +475,7 @@ const InvestorOnboardingForm = () => {
             />
 
             {/* Town, City, State/Country, Postal Code in one row */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
               <TextField
                 label="Town"
                 placeholder="Enter your town"
@@ -449,17 +509,21 @@ const InvestorOnboardingForm = () => {
               />
             </div>
           </div>
-        )
+        );
 
       case "company":
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Employment Information</h2>
-              <p className="text-gray-600">Tell us about your current employment</p>
+            <div className="mb-8 text-center">
+              <h2 className="mb-2 text-2xl font-bold text-gray-800">
+                Employment Information
+              </h2>
+              <p className="text-gray-600">
+                Tell us about your current employment
+              </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <TextField
                 label="Company Name"
                 placeholder="Enter company name"
@@ -477,7 +541,7 @@ const InvestorOnboardingForm = () => {
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <Controller
                 control={control}
                 name="industry"
@@ -511,14 +575,18 @@ const InvestorOnboardingForm = () => {
               />
             </div>
           </div>
-        )
+        );
 
       case "account-verification":
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Account Verification</h2>
-              <p className="text-gray-600">Verify your identity to secure your account</p>
+            <div className="mb-8 text-center">
+              <h2 className="mb-2 text-2xl font-bold text-gray-800">
+                Account Verification
+              </h2>
+              <p className="text-gray-600">
+                Verify your identity to secure your account
+              </p>
             </div>
 
             <Controller
@@ -549,13 +617,15 @@ const InvestorOnboardingForm = () => {
               icon={<Shield className="h-5 w-5" />}
             />
           </div>
-        )
+        );
 
       case "credentials":
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-800 mb-2">Create Your Account</h2>
+            <div className="mb-8 text-center">
+              <h2 className="mb-2 text-2xl font-bold text-gray-800">
+                Create Your Account
+              </h2>
               <p className="text-gray-600">
                 Set up your login credentials
                 {initData.email && (
@@ -581,32 +651,34 @@ const InvestorOnboardingForm = () => {
               type="password"
               placeholder="Confirm your password"
               {...register("confirm_password")}
-              error={formErrors.confirm_password?.message || errors?.confirm_password}
+              error={
+                formErrors.confirm_password?.message || errors?.confirm_password
+              }
               icon={<Key className="h-5 w-5" />}
             />
           </div>
-        )
+        );
 
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600 mx-auto mb-4"></div>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-red-600"></div>
           <p className="text-gray-600">Loading onboarding...</p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <AuthLayout>
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
+      <div className="min-h-screen bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-4xl">
           {/* Header */}
           {/* <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
@@ -624,23 +696,27 @@ const InvestorOnboardingForm = () => {
           </div>
 
           {/* Form Card */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-            <div className="px-8 py-6 border-b border-gray-200">
+          <div className="overflow-hidden rounded-xl bg-white shadow-lg">
+            <div className="border-b border-gray-200 px-8 py-6">
               <div className="flex items-center justify-between">
                 <div className="w-full">
                   <h3 className="text-lg font-semibold text-gray-800">
                     Step {currentStep + 1} of {stepTitles.length}
                   </h3>
-                  <p className="text-sm text-gray-600">{currentStepInfo.title}</p>
+                  <p className="text-sm text-gray-600">
+                    {currentStepInfo.title}
+                  </p>
                   {/* Lively Progress Bar */}
-                  <div className="w-full mt-4 h-3 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="mt-4 h-3 w-full overflow-hidden rounded-full bg-gray-200">
                     <div
-                      className="h-full transition-all duration-500 ease-in-out bg-gradient-to-r from-red-500 to-pink-400"
+                      className="h-full bg-gradient-to-r from-red-500 to-pink-400 transition-all duration-500 ease-in-out"
                       style={{ width: `${progressPercentage}%` }}
                     ></div>
                   </div>
                 </div>
-                <div className="text-sm text-gray-500 whitespace-nowrap ml-6">{progressPercentage}% Complete</div>
+                <div className="ml-6 whitespace-nowrap text-sm text-gray-500">
+                  {progressPercentage}% Complete
+                </div>
               </div>
             </div>
 
@@ -648,28 +724,36 @@ const InvestorOnboardingForm = () => {
               {renderStepContent()}
 
               {/* Navigation Buttons */}
-              <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
+              <div className="mt-8 flex justify-between border-t border-gray-200 pt-6">
                 <div>
                   {!isFirstStep && (
-                    <CustomButton type="button" variant="outline" onClick={goToPreviousStep}>
-                      <ChevronLeft className="h-4 w-4 mr-2" />
+                    <CustomButton
+                      type="button"
+                      variant="outline"
+                      onClick={goToPreviousStep}
+                    >
+                      <ChevronLeft className="mr-2 h-4 w-4" />
                       Previous
                     </CustomButton>
                   )}
                 </div>
 
-                <CustomButton type="submit" disabled={isSubmitting} variant="solid">
+                <CustomButton
+                  type="submit"
+                  disabled={isSubmitting}
+                  variant="solid"
+                >
                   {isSubmitting ? (
                     "Processing..."
                   ) : isLastStep ? (
                     <>
-                      <CheckCircle className="h-4 w-4 mr-2" />
+                      <CheckCircle className="mr-2 h-4 w-4" />
                       Complete Registration
                     </>
                   ) : (
                     <>
                       Continue
-                      <ChevronRight className="h-4 w-4 ml-2" />
+                      <ChevronRight className="ml-2 h-4 w-4" />
                     </>
                   )}
                 </CustomButton>
@@ -678,7 +762,7 @@ const InvestorOnboardingForm = () => {
           </div>
 
           {/* Footer */}
-          <div className="text-center mt-8">
+          <div className="mt-8 text-center">
             <p className="text-sm text-gray-500">
               By clicking create account, you agree to our{" "}
               <a href="#" className="text-red-600 hover:underline">
@@ -691,7 +775,7 @@ const InvestorOnboardingForm = () => {
         <ToastContainer position="bottom-center" />
       </div>
     </AuthLayout>
-  )
-}
+  );
+};
 
-export default InvestorOnboardingForm
+export default InvestorOnboardingForm;

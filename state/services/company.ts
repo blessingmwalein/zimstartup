@@ -466,6 +466,10 @@ export const getPreviousFunds = async (companyId: number) => {
 };
 
 // Get financial metrics
+export const getFinancialMetrics = async (companyId: number) => {
+  const response = await api.get(`/financial-metrics/${companyId}`)
+  return response.data
+};
 
 // Add financial metrics
 export const addFinancialMetrics = async (data: any) => {
@@ -496,3 +500,27 @@ export const getCompanyRequests = async (companyId: number): Promise<any> => {
   const response = await api.get(`/company-request/${companyId}`)
   return response.data
 }
+
+// Acquisition Request
+export const createAcquisitionRequest = async (data: any): Promise<any> => {
+  const response = await api.post<any>(`acquisition-requests`, data);
+  return response.data;
+};
+
+// Equity Financing Request
+export const createEquityFinancingRequest = async (data: any): Promise<any> => {
+  const response = await api.post<any>(`equity-financing-requests`, data);
+  return response.data;
+};
+
+// Project Financing Request
+export const createProjectFinancingRequest = async (data: any): Promise<any> => {
+  const response = await api.post<any>(`project-financing-requests`, data);
+  return response.data;
+};
+
+// Revenue-Based Financing Request
+export const createRevenueBasedFinancingRequest = async (data: any): Promise<any> => {
+  const response = await api.post<any>(`revenue-based-financing-requests`, data);
+  return response.data;
+};

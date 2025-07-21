@@ -1218,6 +1218,10 @@ export default function AddDirectorDialog({ isOpen, onClose, companyId, onSave }
 
   const finishProcess = () => {
     toast.success("Director added successfully")
+    // Get the current form data and pass it to onSave to trigger the parent's refresh logic
+    const formData = methods.getValues()
+    const formattedData = formatDates(formData)
+    onSave(formattedData)
     handleClose()
   }
 

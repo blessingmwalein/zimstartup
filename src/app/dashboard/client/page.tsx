@@ -16,7 +16,7 @@ import {
     Hammer,
     Droplets,
 } from "lucide-react"
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import MainLayout from "@/components/Layouts/MainLayout"
 import SearchInput from "@/components/FormElements/SearchInput/SearchInput"
 import { useDispatch, useSelector } from "react-redux"
@@ -35,7 +35,8 @@ interface Sector {
 }
 
 export default function Dashboard() {
-    const [query, setQuery] = useState("")
+    const [inputValue, setInputValue] = useState(""); // raw input value
+    const [query, setQuery] = useState(""); // debounced value
     const { searchResults, loading, error, search } = useCompanySearch()
     const { status, error: reduxError, companyList } = useSelector((state: any) => state.companyConfig)
 
@@ -43,15 +44,20 @@ export default function Dashboard() {
     const dispatch = useDispatch<AppDispatch>()
     const router = useRouter()
 
+    // Debounce inputValue -> query
     useEffect(() => {
-        const debounceSearch = setTimeout(() => {
-            if (query.trim() !== "") {
-                search(query)
-            }
-        }, 300) // 300ms debounce delay
+        const handler = setTimeout(() => {
+            setQuery(inputValue);
+        }, 300); // 300ms debounce delay
+        return () => clearTimeout(handler);
+    }, [inputValue]);
 
-        return () => clearTimeout(debounceSearch)
-    }, [query, search])
+    // Only search when debounced query changes
+    useEffect(() => {
+        if (query.trim() !== "") {
+            search(query);
+        }
+    }, [query, search]);
 
     const handleCompanySelect = (company: CompanySearchResult) => {
         console.log("Selected company:", company)
@@ -130,8 +136,8 @@ export default function Dashboard() {
                     <p className="text-[25px] mb-8 mt-12">An Entrepreneur City shaped by the youth and Community.</p>
 
                     <SearchInput
-                        query={query}
-                        setQuery={setQuery}
+                        query={inputValue}
+                        setQuery={setInputValue}
                         suggestions={searchResults}
                         loading={loading}
                         onCompanySelect={handleCompanySelect}

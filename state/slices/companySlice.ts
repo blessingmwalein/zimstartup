@@ -36,6 +36,10 @@ import {
   getWatchList,
   searchCompanies,
   addInvestorQuestion,
+  createAcquisitionRequest,
+  createEquityFinancingRequest,
+  createProjectFinancingRequest,
+  createRevenueBasedFinancingRequest,
 } from "../services/company";
 import {
   CheckCompanyNameResponse,
@@ -709,6 +713,102 @@ export const addInvestorQuestions = createAsyncThunk(
         return rejectWithValue(data.detail);
       }
       return rejectWithValue("Failed to add company to watchlist");
+    }
+  },
+);
+
+// Thunk for acquisition request
+export const createAcquisitionRequestThunk = createAsyncThunk(
+  "company/createAcquisitionRequest",
+  async (data: any, { rejectWithValue }) => {
+    try {
+      return await createAcquisitionRequest(data);
+    } catch (error: any) {
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      return rejectWithValue("Failed to create acquisition request");
+    }
+  },
+);
+
+// Thunk for equity financing request
+export const createEquityFinancingRequestThunk = createAsyncThunk(
+  "company/createEquityFinancingRequest",
+  async (data: any, { rejectWithValue }) => {
+    try {
+      return await createEquityFinancingRequest(data);
+    } catch (error: any) {
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      return rejectWithValue("Failed to create equity financing request");
+    }
+  },
+);
+
+// Thunk for project financing request
+export const createProjectFinancingRequestThunk = createAsyncThunk(
+  "company/createProjectFinancingRequest",
+  async (data: any, { rejectWithValue }) => {
+    try {
+      return await createProjectFinancingRequest(data);
+    } catch (error: any) {
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      return rejectWithValue("Failed to create project financing request");
+    }
+  },
+);
+
+// Thunk for revenue-based financing request
+export const createRevenueBasedFinancingRequestThunk = createAsyncThunk(
+  "company/createRevenueBasedFinancingRequest",
+  async (data: any, { rejectWithValue }) => {
+    try {
+      return await createRevenueBasedFinancingRequest(data);
+    } catch (error: any) {
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 422 && data?.detail) {
+          const validationErrors = data.detail
+            .map((err: any) => `- ${err.msg} (at ${err.loc.join(", ")})`)
+            .join("\n");
+          return rejectWithValue(`Validation Error:\n${validationErrors}`);
+        }
+        if (data?.message) {
+          return rejectWithValue(data.message);
+        }
+      }
+      return rejectWithValue("Failed to create revenue-based financing request");
     }
   },
 );
