@@ -531,16 +531,17 @@ export default function CompanyPage() {
 
   const handleQuestionSubmit = async () => {
     if (!investorQuestion || !investorEmail) return;
-    const result = await submitQuestion(
-      companyId,
-      investorQuestion,
-      investorEmail,
-    );
-    if (result.success) {
-      setIsQuestionModalOpen(false);
-      setInvestorQuestion("");
-      setInvestorEmail("");
-    }
+    // TODO: Implement submitQuestion function
+    // const result = await submitQuestion(
+    //   companyId,
+    //   investorQuestion,
+    //   investorEmail,
+    // );
+    // if (result.success) {
+    //   setIsQuestionModalOpen(false);
+    //   setInvestorQuestion("");
+    //   setInvestorEmail("");
+    // }
   };
 
   const openDocumentModal = (document: any) => {
@@ -564,7 +565,7 @@ export default function CompanyPage() {
       ]
     : [];
 
-  const renderStarRating = (rating: number, size = "sm") => {
+  const renderStarRating = (rating: number, size: "sm" | "md" | "lg" = "sm") => {
     const sizeClasses = {
       sm: "h-4 w-4",
       md: "h-5 w-5",
@@ -615,50 +616,62 @@ export default function CompanyPage() {
                       <Building2 className="mr-1 h-4 w-4" />
                       {companyDetails?.business_category?.state_name || "Sector"}
                     </span>
+                    {companyDetails?.company_data?.website && (
+                      <a
+                        href={companyDetails.company_data.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center text-blue-600 hover:text-blue-800"
+                      >
+                        <Globe className="mr-1 h-4 w-4" />
+                        Website
+                      </a>
+                    )}
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="mb-1 text-2xl font-bold text-blue-600">
-                    {companyDetails?.company_score?.completeness_score || 0}%
-                  </div>
-                  <div className="text-sm text-gray-600">Company Score</div>
+                <div className="flex items-center space-x-3">
+                  {/* Grade Badge */}
+                  <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+                    Grade: {companyDetails?.company_score?.grade || "N/A"}
+                  </span>
+                  {/* Completeness Score */}
+                  <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">
+                    {companyDetails?.company_score?.completeness_score || 0}% Complete
+                  </span>
                 </div>
               </div>
 
-              {/* Key Metrics */}
+              {/* Key Metrics - Reorganized as requested */}
               <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
                 <MetricCard
-                  icon={Calendar}
-                  title="Founded"
-                  value={
-                    companyDetails?.company_data?.company_start_date
-                      ? formatDate(companyDetails.company_data.company_start_date)
-                      : "N/A"
-                  }
+                  icon={Award}
+                  title="Score & Grade"
+                  value={`${companyDetails?.company_score?.completeness_score || 0}%`}
+                  subtitle={companyDetails?.company_score?.grade || "N/A"}
                   color="blue"
                 />
                 <MetricCard
-                  icon={DollarSign}
-                  title="Moving Price"
-                  value={formatCurrency(
-                    Number(companyDetails?.company_request_details?.total_required_cash) || 0,
-                  )}
+                  icon={Send}
+                  title="Request Type"
+                  value={companyDetails?.company_request?.request_type || "N/A"}
+                  subtitle={companyDetails?.company_request?.request_status || "N/A"}
                   color="green"
                 />
                 <MetricCard
-                  icon={Target}
-                  title="Raised"
+                  icon={DollarSign}
+                  title="Current Valuation"
                   value={formatCurrency(
-                    Number(companyDetails?.company_request_details?.total_received_cash) || 0,
+                    companyDetails?.company_valuation?.[0]?.valuation_amount || 0,
+                    companyDetails?.company_valuation?.[0]?.valuation_currency || "USD"
                   )}
+                  subtitle={companyDetails?.company_valuation?.[0]?.valuation_method || "N/A"}
                   color="purple"
                 />
                 <MetricCard
                   icon={TrendingUp}
-                  title="Remaining"
-                  value={formatCurrency(
-                    Number(companyDetails?.company_request_details?.remaining_cash) || 0,
-                  )}
+                  title="Growth Rate"
+                  value={`${companyDetails?.company_valuation?.[0]?.current_growth_rate || 0}%`}
+                  subtitle="Annual Growth"
                   color="orange"
                 />
               </div>
@@ -685,9 +698,90 @@ export default function CompanyPage() {
               </div>
             </div>
 
-            {/* Charts Section */}
+            {/* Charts Section - Reorganized to start with Company Profile */}
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              {/* Pie Chart */}
+              {/* Company Profile - Now first */}
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h3 className="mb-4 text-lg font-semibold text-gray-900">
+                  Company Profile
+                </h3>
+                <div className="space-y-4">
+                  <div className="rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 p-4 text-center text-white">
+                    <h4 className="mb-1 text-xl font-bold">
+                      {companyDetails?.company_data?.company_name || "N/A"}
+                    </h4>
+                    <p className="opacity-90">
+                      {companyDetails?.company_data?.company_abbreviations || "N/A"}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="rounded-lg bg-green-50 p-3">
+                      <span className="text-gray-600">Valuation Amount:</span>
+                      <p className="font-semibold text-green-600">
+                        {formatCurrency(
+                          companyDetails?.company_valuation?.[0]?.valuation_amount || 0,
+                          companyDetails?.company_valuation?.[0]?.valuation_currency || "USD"
+                        )}
+                      </p>
+                    </div>
+                    <div className="rounded-lg bg-blue-50 p-3">
+                      <span className="text-gray-600">Company Location:</span>
+                      <p className="font-semibold text-blue-600">
+                        {companyDetails?.company_contact_details?.address_city || companyDetails?.company_data?.location || "N/A"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Contact Details */}
+                  <div className="border-t pt-4">
+                    <h5 className="mb-3 font-semibold text-gray-900">
+                      Contact Details
+                    </h5>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <MapPin className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-600">Address:</span>
+                        <span className="font-medium">
+                          {companyDetails?.company_contact_details?.address || "N/A"}, {companyDetails?.company_contact_details?.address_city || "N/A"}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Phone className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-600">Phone:</span>
+                        <span className="font-medium">
+                          {companyDetails?.company_contact_details?.phone1 || "N/A"}
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Mail className="h-4 w-4 text-gray-400" />
+                        <span className="text-gray-600">Email:</span>
+                        <span className="font-medium">
+                          {companyDetails?.company_contact_details?.work_email || companyDetails?.company_contact_details?.email || "N/A"}
+                        </span>
+                      </div>
+                      {companyDetails?.company_data?.website && (
+                        <div className="flex items-center space-x-2">
+                          <Globe className="h-4 w-4 text-gray-400" />
+                          <span className="text-gray-600">Website:</span>
+                          <a
+                            href={companyDetails.company_data.website}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-blue-600 hover:text-blue-800"
+                          >
+                            Visit Website
+                          </a>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+
+                </div>
+              </div>
+
+              {/* Pie Chart - Now second */}
               <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h3 className="mb-4 text-lg font-semibold text-gray-900">
                   Funding Breakdown
@@ -715,6 +809,21 @@ export default function CompanyPage() {
                         />
                       </PieChart>
                     </ResponsiveContainer>
+                    
+                    {/* Legend */}
+                    <div className="mt-4 flex justify-center space-x-4">
+                      {pieData.map((entry, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <div
+                            className="h-3 w-3 rounded-full"
+                            style={{ backgroundColor: entry.color }}
+                          />
+                          <span className="text-sm text-gray-600">
+                            {entry.name}: {formatCurrency(entry.value)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ) : (
                   <div className="flex h-64 items-center justify-center text-gray-500">
@@ -722,76 +831,38 @@ export default function CompanyPage() {
                   </div>
                 )}
               </div>
+            </div>
 
-              {/* Company Profile */}
+            {/* Project Description Section */}
+            {companyDetails?.company_updates?.[0]?.update_content && (
               <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
                 <h3 className="mb-4 text-lg font-semibold text-gray-900">
-                  Company Profile
+                  Project Description
                 </h3>
                 <div className="space-y-4">
-                  <div className="rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 p-4 text-center text-white">
-                    <h4 className="mb-1 text-xl font-bold">
-                      {companyDetails?.company_data?.company_name || "N/A"}
-                    </h4>
-                    <p className="opacity-90">
-                      {companyDetails?.company_data?.company_abbreviations || "N/A"}
+                  <div className="prose max-w-none text-gray-700">
+                    <p className="leading-relaxed">
+                      {companyDetails.company_updates[0].update_content}
                     </p>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="rounded-lg bg-gray-50 p-3">
-                      <span className="text-gray-600">Sector:</span>
-                      <p className="font-semibold text-gray-900">
-                        {companyDetails?.business_category?.state_name || "N/A"}
-                      </p>
-                    </div>
-                    <div className="rounded-lg bg-gray-50 p-3">
-                      <span className="text-gray-600">Founded:</span>
-                      <p className="font-semibold text-gray-900">
-                        {companyDetails?.company_data?.company_start_date
-                          ? formatDate(companyDetails.company_data.company_start_date)
-                          : "N/A"}
-                      </p>
-                    </div>
-                  </div>
-
-                  {companyDetails?.company_valuation?.[0] && (
-                    <div className="border-t pt-4">
-                      <h5 className="mb-3 font-semibold text-gray-900">
-                        Latest Valuation
-                      </h5>
-                      <div className="grid grid-cols-2 gap-3 text-sm">
-                        <div className="rounded-lg bg-green-50 p-3">
-                          <span className="text-gray-600">Amount:</span>
-                          <p className="font-semibold text-green-600">
-                            {formatCurrency(
-                              companyDetails.company_valuation[0].valuation_amount,
-                              companyDetails.company_valuation[0].valuation_currency,
-                            )}
-                          </p>
-                        </div>
-                        <div className="rounded-lg bg-blue-50 p-3">
-                          <span className="text-gray-600">Growth Rate:</span>
-                          <p className="font-semibold text-blue-600">
-                            {companyDetails.company_valuation[0].current_growth_rate || 0}%
-                          </p>
-                        </div>
-                      </div>
+                  {companyDetails?.company_updates?.[0]?.url && (
+                    <div className="pt-2">
+                      <a
+                        href={companyDetails.company_updates[0].url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center text-blue-600 hover:text-blue-800"
+                      >
+                        <Globe className="mr-2 h-4 w-4" />
+                        Learn More
+                      </a>
                     </div>
                   )}
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* About Company Section */}
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h3 className="mb-4 text-lg font-semibold text-gray-900">
-                About Company
-              </h3>
-              <p className="leading-relaxed text-gray-700">
-                {companyDetails?.company_data?.company_short_description || "No company description available at this time."}
-              </p>
-            </div>
+
           </div>
         );
 
@@ -882,7 +953,7 @@ export default function CompanyPage() {
                       <span className="text-sm text-gray-600">Ticker Symbol</span>
                       <p className="font-semibold text-gray-900">
                         {/* No ticker_symbol in sample, fallback to N/A */}
-                        {companyDetails?.stock_market_details?.ticker_symbol || "N/A"}
+                        N/A
                       </p>
                     </div>
                   </div>
@@ -1431,10 +1502,10 @@ export default function CompanyPage() {
                           Prize: {competition.prize}
                         </span>
                       </div>
-                      <CustomButton type="button" variant="outlined" size="sm">
-                        <ExternalLink className="mr-2 h-4 w-4" />
-                        View Certificate
-                      </CustomButton>
+                                              <CustomButton type="button" variant="outlined">
+                          <ExternalLink className="mr-2 h-4 w-4" />
+                          View Certificate
+                        </CustomButton>
                     </div>
                   </div>
                 ))}
@@ -1881,7 +1952,6 @@ export default function CompanyPage() {
                       variant="solid"
                       fullWidth
                       onClick={handleInvestment}
-                      className="bg-gradient-to-r from-emerald-500 to-blue-500 hover:from-emerald-600 hover:to-blue-600"
                     >
                       <DollarSign className="mr-2 h-4 w-4" />
                       Confirm Investment
@@ -2057,7 +2127,6 @@ export default function CompanyPage() {
                       variant="solid"
                       fullWidth
                       onClick={handleQuestionSubmit}
-                      className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600"
                     >
                       <MessageSquare className="mr-2 h-4 w-4" />
                       Submit Question

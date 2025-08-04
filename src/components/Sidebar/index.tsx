@@ -7,6 +7,7 @@ import Image from "next/image";
 import SidebarItem from "@/components/Sidebar/SidebarItem";
 import ClickOutside from "@/components/ClickOutside";
 import useLocalStorage from "@/hooks/useLocalStorage";
+import { useSelector } from "react-redux";
 
 interface SidebarProps {
   sidebarOpen: boolean;
@@ -167,6 +168,27 @@ const menuGroups = [
     name: "Essentials",
     route: "#",
     menuItems: [
+      // Only show Youth Hub to authenticated users
+      ...(isAuthenticated ? [{
+        icon: (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a6.031 6.031 0 0 0-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-1.712-.065 6.01 6.01 0 0 1-1.243-.59m-5.916 0a24.255 24.255 0 0 1-1.712-.065 6.01 6.01 0 0 1-1.243-.59"
+            />
+          </svg>
+        ),
+        label: "Youth Hub",
+        route: "/youth-hub",
+      }] : []),
       {
         icon: (
           <svg
@@ -209,6 +231,7 @@ const menuGroups = [
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const pathname = usePathname();
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
+  const { isAuthenticated } = useSelector((state: any) => state.auth);
 
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
