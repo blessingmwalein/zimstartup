@@ -11,7 +11,7 @@ interface AuthGuardProps {
 
 const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
   const router = useRouter()
-  const { isAuthenticated, status } = useSelector((state: any) => state.auth)
+  const { isAuthenticated = false, status } = useSelector((state: any) => state.auth)
 
   useEffect(() => {
     if (status === 'idle' && !isAuthenticated) {

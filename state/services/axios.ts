@@ -1,8 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import Cookies from "js-cookie";
 import Router from "next/router";
-import { clearUser } from "../slices/authSlice";
-import store from "../store";
 
 // Base URL for all requests
 const BASE_URL =
@@ -21,8 +19,9 @@ const handleAuthError = (error: any) => {
   console.error("Axios Error:", error);
   const status = error.response?.status;
   if (status === 401 || status === 403) {
-    store.dispatch(clearUser());
+    // Clear the token from cookies instead of dispatching to store
     if (typeof window !== "undefined") {
+      Cookies.remove("access_token");
       // Redirect to login page
       Router.push("/auth/signin");
     }

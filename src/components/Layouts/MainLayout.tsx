@@ -21,7 +21,7 @@ export default function MainLayout({
     //  const [isAuthenticated, setIsAuthenticated] = useState(true)
     const dispatch = useDispatch<AppDispatch>();
 
-    const { status, error: reduxError, user, isAuthenticated } = useSelector((state: any) => state.auth);
+    const { status, error: reduxError, user, isAuthenticated = false } = useSelector((state: any) => state.auth);
     const onLogOut = async () => {
         dispatch(logoutUser());
         window.location.href = '/auth/signin';

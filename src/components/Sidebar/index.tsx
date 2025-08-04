@@ -168,8 +168,7 @@ const menuGroups = [
     name: "Essentials",
     route: "#",
     menuItems: [
-      // Only show Youth Hub to authenticated users
-      ...(isAuthenticated ? [{
+      {
         icon: (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -188,7 +187,7 @@ const menuGroups = [
         ),
         label: "Youth Hub",
         route: "/youth-hub",
-      }] : []),
+      },
       {
         icon: (
           <svg
@@ -231,7 +230,7 @@ const menuGroups = [
 const Sidebar = ({ sidebarOpen, setSidebarOpen }: SidebarProps) => {
   const pathname = usePathname();
   const [pageName, setPageName] = useLocalStorage("selectedMenu", "dashboard");
-  const { isAuthenticated } = useSelector((state: any) => state.auth);
+  const { isAuthenticated = false } = useSelector((state: any) => state.auth);
 
   return (
     <ClickOutside onClick={() => setSidebarOpen(false)}>
