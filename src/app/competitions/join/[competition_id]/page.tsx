@@ -5,15 +5,15 @@ import { useParams, useRouter } from "next/navigation";
 import MainLayout from "@/components/Layouts/MainLayout";
 import { Loader2, ArrowRight, CheckCircle } from "lucide-react";
 import { Company } from "@/hooks/useInvestmentData";
-import { CompetitionQuestion } from "../../../../../state/models/competitions";
+import { CompetitionQuestion } from "@/state/models/competitions";
 import {
   getCompetitionQuestions,
   joinCompetition,
   submitCompetitionAnswers,
-} from "../../../../../state/services/competitions";
+} from "@/state/services/competitions";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchUserCompanies } from "../../../../../state/slices/companySlice";
-import { AppDispatch } from "../../../../../state/store";
+import { fetchUserCompanies } from "@/state/slices/companySlice";
+import { AppDispatch } from "@/state/store";
 import Stepper from "@/components/common/Stepper";
 import CustomButton from "@/components/Buttons/CustomButton";
 import { ToastContainer, toast } from "react-toastify";

@@ -11,8 +11,8 @@ import ViewStockMarketDetails from "@/components/Companies/ViewPages/ViewStockMa
 import ViewPreviousFundsDetails from "@/components/Companies/ViewPages/ViewPreviousFunds";
 import ViewCompanyDocuments from "@/components/Companies/Dashboard/ViewCompanyDocuments";
 import ViewCompanyRequest from "@/components/Companies/ViewPages/ViewCompanyRequest";
-import { fetchCompanyDataCombined, fetchCompanyDocuments } from "../../../../../state/slices/companySlice";
-import { AppDispatch } from "../../../../../state/store";
+import { fetchCompanyDataCombined, fetchCompanyDocuments } from "@/state/slices/companySlice";
+import { AppDispatch } from "@/state/store";
 import TopCompanyWidget from "@/components/Companies/Dashboard/TopWidget";
 import ViewCompanyProfile from "@/components/Companies/Dashboard/ViewCompanyProfile";
 import ViewCompanyFunds from "@/components/Companies/Dashboard/ViewCompanyFunds";
