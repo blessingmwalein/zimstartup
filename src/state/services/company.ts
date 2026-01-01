@@ -524,3 +524,9 @@ export const createRevenueBasedFinancingRequest = async (data: any): Promise<any
   const response = await api.post<any>(`revenue-based-financing-requests`, data);
   return response.data;
 };
+
+// Get Employee Details
+export const getEmployeeDetails = async (employeeId: number): Promise<any> => {
+  const response = await api.get<any>(`get-employee-details/${employeeId}`);
+  return response.data;
+};

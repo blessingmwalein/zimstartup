@@ -56,6 +56,8 @@ import {
   ChevronRight,
   AlertCircle,
   Percent,
+  Instagram,
+  Twitter,
 } from "lucide-react";
 import MainLayout from "@/components/Layouts/MainLayout";
 import CustomButton from "@/components/Buttons/CustomButton";
@@ -684,9 +686,9 @@ export default function CompanyPage() {
                       </p>
                     </div>
                     <div className="rounded-lg bg-blue-50 p-3">
-                      <span className="text-gray-600">Company Location:</span>
+                      <span className="text-gray-600">Headquarters Country:</span>
                       <p className="font-semibold text-blue-600">
-                        {companyDetails?.company_contact_details?.address_city || companyDetails?.company_data?.location || "N/A"}
+                        {companyDetails?.company_contact_details?.country || companyDetails?.company_data?.location || "N/A"}
                       </p>
                     </div>
                   </div>
@@ -735,6 +737,38 @@ export default function CompanyPage() {
                     </div>
                   </div>
 
+                  {/* Social Media Links */}
+                  {(companyDetails?.company_contact_details?.instagram || companyDetails?.company_contact_details?.twitter) && (
+                    <div className="border-t pt-4">
+                      <h5 className="mb-3 font-semibold text-gray-900">
+                        Social Media
+                      </h5>
+                      <div className="flex items-center gap-3">
+                        {companyDetails?.company_contact_details?.instagram && (
+                          <a
+                            href={companyDetails.company_contact_details.instagram}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white transition-all hover:scale-110 hover:shadow-lg"
+                            title="Instagram"
+                          >
+                            <Instagram className="h-5 w-5" />
+                          </a>
+                        )}
+                        {companyDetails?.company_contact_details?.twitter && (
+                          <a
+                            href={companyDetails.company_contact_details.twitter}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-400 to-blue-600 text-white transition-all hover:scale-110 hover:shadow-lg"
+                            title="Twitter/X"
+                          >
+                            <Twitter className="h-5 w-5" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                 </div>
               </div>

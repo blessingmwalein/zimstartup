@@ -6,6 +6,7 @@ import companyConfigReducer from "./slices/configSlice"; // Adjust path if neces
 import walletReducer from "./slices/walletSlice"; // Adjust path if necessary
 import competitionsReducer from "./slices/competitionSlice"
 import companyReviewsReducer from "./slices/companyReviewsSlice";
+import employeeReducer from "./slices/employeeSlice";
 
 const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ const store = configureStore({
     wallet: walletReducer,
     competitions: competitionsReducer,
     companyReviews: companyReviewsReducer,
+    employee: employeeReducer,
     // Add your auth slice reducer here
   },
 });
