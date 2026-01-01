@@ -11,7 +11,7 @@ import CustomAlert from "@/components/common/notification/Alert";
 import Stepper from "@/components/common/Stepper";
 import { toast } from "react-toastify";
 import { AppDispatch } from "../../../../../../../state/store";
-import { submitUpdateContactDetails } from "../../../../../../../state/slices/companySlice";
+import { submitUpdateContactDetails } from "@/state/slices/companySlice";
 import Link from "next/link";
 
 // Yup validation schema

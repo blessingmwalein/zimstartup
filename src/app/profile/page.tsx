@@ -6,9 +6,9 @@ import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Link from "next/link";
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../../state/store";
-import { UserResponse } from '../../../state/models/user';
-import { getCustomerData } from "../../../state/slices/authSlice";
+import { AppDispatch } from "@/state/store";
+import { UserResponse } from '@/state/models/user';
+import { getCustomerData } from "@/state/slices/authSlice";
 import InitialsAvatar from "@/components/Header/Avatar";
 import WalletOverView from "@/components/Wallet/OverViewCard";
 import PersonalInformationCard from "@/components/Profile/PersonalDataCard";  // New Notifications card

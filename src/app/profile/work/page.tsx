@@ -12,8 +12,8 @@ import WorkInformationCard from "@/components/Profile/WorkInformationCard";
 import BeneficiaryInformationCard from "@/components/Profile/BenerficiaryInformationCard";
 import PersonalInformationCard from "@/components/Profile/PersonalDataCard";
 import WalletOverView from "@/components/Wallet/OverViewCard";
-import { getCustomerData } from "../../../../state/slices/authSlice";
-import { AppDispatch } from "../../../../state/store";
+import { getCustomerData } from "@/state/slices/authSlice";
+import { AppDispatch } from "@/state/store";
 
 // export const metadata: Metadata = {
 //   title: "Next.js Profile | TailAdmin - Next.js Dashboard Template",

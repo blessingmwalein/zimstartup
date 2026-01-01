@@ -15,8 +15,8 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb"
 import Stepper from "@/components/common/Stepper"
 import CustomAlert from "@/components/common/notification/Alert"
 
-import type { AppDispatch } from "../../../../../../../../state/store"
-import { createCompanyContact } from "../../../../../../../../state/slices/companySlice"
+import type { AppDispatch } from "@/state/store"
+import { createCompanyContact } from "@/state/slices/companySlice"
 
 import { Mail, Phone, MapPin, Globe, Instagram, Linkedin, Twitter, Building2, ChevronRight } from "lucide-react"
 import TextField from "@/components/FormElements/TextField"

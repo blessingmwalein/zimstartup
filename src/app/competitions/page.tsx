@@ -6,7 +6,7 @@ import MainLayout from "@/components/Layouts/MainLayout";
 import { useCompetitions } from "../../hooks/useCompetitions";
 import CompetitionCard from "../../components/Competitions/CompetitionCard";
 import CompetitionDetailsModal from "../../components/Competitions/CompetitionDetailsModal";
-import { Competition } from "../../../state/models/competitions";
+import { Competition } from "@/state/models/competitions";
 import { Loader2 } from "lucide-react";
 import CompetitionSearchInput from "@/components/FormElements/SearchInput/CompetitionSearchInput";
 

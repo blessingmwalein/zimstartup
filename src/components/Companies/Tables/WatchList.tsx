@@ -3,7 +3,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../../state/store";
-import { fetchUserWatchList } from "../../../../state/slices/companySlice";
+import { fetchUserWatchList } from "@/state/slices/companySlice";
 import { WatchlistDetail } from "@/types/package";
 import Link from "next/link";
 

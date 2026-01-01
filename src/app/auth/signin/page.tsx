@@ -21,7 +21,7 @@ import CustomAlert from "@/components/common/notification/Alert";
 // Yup validation schema
 const schema = Yup.object({
   username: Yup.string().email("Invalid email format").required("Email is required"),
-  password: Yup.string().min(8, "Password must be at least 8 characters").required("Password is required"),
+  password: Yup.string().min(4, "Password must be at least 8 characters").required("Password is required"),
 }).required();
 
 const SignIn: React.FC = () => {

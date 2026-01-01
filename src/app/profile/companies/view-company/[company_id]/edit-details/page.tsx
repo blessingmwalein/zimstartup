@@ -13,11 +13,11 @@ import {
   createNewCompany,
   fetchCompanyDataCombined,
   submitUpdateCompanyDetails,
-} from "../../../../../../../state/slices/companySlice";
+} from "@/state/slices/companySlice";
 import Stepper from "@/components/common/Stepper";
 import { format } from "date-fns";
 import { toast, ToastContainer } from "react-toastify";
-import { fetchAllConfigs } from "../../../../../../../state/slices/configSlice";
+import { fetchAllConfigs } from "@/state/slices/configSlice";
 import {
   BusinessState,
   CompanyIndustry,

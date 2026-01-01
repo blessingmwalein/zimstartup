@@ -9,11 +9,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import CustomAlert from "@/components/common/notification/Alert";
-import { AppDispatch } from "../../../../../state/store";
+import { AppDispatch } from "@/state/store";
 import {
   getCustomerData,
   updateEmploymentInformationAsync,
-} from "../../../../../state/slices/authSlice";
+} from "@/state/slices/authSlice";
 
 // Updated validation schema based on the new interface
 const schema = Yup.object({

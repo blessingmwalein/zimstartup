@@ -10,7 +10,7 @@ import CustomButton from "../ui/custom-button"
 import { useEffect, useRef } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { AppDispatch } from "../../../../state/store"
-import { fetchAllConfigs } from "../../../../state/slices/configSlice"
+import { fetchAllConfigs } from "@/state/slices/configSlice"
 import { BusinessState, CompanyIndustry, StockExchangeEntity } from "../../../../state/models/config"
 
 interface EditCompanyDialogProps {

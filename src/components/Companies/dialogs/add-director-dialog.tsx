@@ -28,7 +28,7 @@ import { useDispatch } from "react-redux"
 
 import type { AddAwardRequest, AddDirectorPositionRequest, AddEmploymentHistoryRequest } from "@/state/models/company"
 import { AppDispatch } from "../../../../state/store"
-import { addEducationalQualifications, addEmploymentHistory, addNewAward, addNewDirectorPosition, createDirectorDetails } from "../../../../state/slices/companySlice"
+import { addEducationalQualifications, addEmploymentHistory, addNewAward, addNewDirectorPosition, createDirectorDetails } from "@/state/slices/companySlice"
 
 // Define validation schemas for each step
 const personalInfoSchema = Yup.object({

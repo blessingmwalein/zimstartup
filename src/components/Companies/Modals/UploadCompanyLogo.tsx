@@ -6,7 +6,7 @@ import {
   addCompanyDocument,
   submitUploadCompanyLogo,
   uploadCompanyLogo,
-} from "../../../../state/slices/companySlice";
+} from "@/state/slices/companySlice";
 import { toast } from "react-toastify";
 
 const UploadCompanyDialog: React.FC = ({}) => {

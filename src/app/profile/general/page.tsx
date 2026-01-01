@@ -10,9 +10,9 @@ import { useDispatch, useSelector } from "react-redux";
 import ContactInformationCard from "@/components/Profile/ContactInformationCard";
 import WorkInformationCard from "@/components/Profile/WorkInformationCard";
 import BeneficiaryInformationCard from "@/components/Profile/BenerficiaryInformationCard";
-import { AppDispatch } from "../../../../state/store";
+import { AppDispatch } from "@/state/store";
 import PersonalInformationCard from "@/components/Profile/PersonalDataCard";
-import { getCustomerData } from "../../../../state/slices/authSlice";
+import { getCustomerData } from "@/state/slices/authSlice";
 
 // export const metadata: Metadata = {
 //   title: "Next.js Profile | TailAdmin - Next.js Dashboard Template",

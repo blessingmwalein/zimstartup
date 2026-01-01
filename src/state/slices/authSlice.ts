@@ -166,3 +166,15 @@ const authSlice = createSlice({
 
 export const { clearUser } = authSlice.actions;
 export default authSlice.reducer;
+
+// Re-export thunks for convenience
+export {
+  loginUser,
+  updateContactInformationAsync,
+  updateEmploymentInformationAsync,
+  createNextOfKinAsync,
+  fetchUserData,
+  getCustomerData,
+  forgotPasswordAsync,
+  resetPasswordAsync
+};

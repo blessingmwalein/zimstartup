@@ -9,12 +9,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import CustomAlert from "@/components/common/notification/Alert";
-import { AppDispatch } from "../../../../../../../state/store";
+import { AppDispatch } from "@/state/store";
 import {
   addCompanyRequest,
   addCompanyRequestDetail,
   fetchCompanyDataCombined,
-} from "../../../../../../../state/slices/companySlice";
+} from "@/state/slices/companySlice";
 import { toast } from "react-toastify";
 import Link from "next/link";
 

@@ -16,10 +16,10 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb"
 import Stepper from "@/components/common/Stepper"
 import CustomAlert from "@/components/common/notification/Alert"
 
-import type { AppDispatch } from "../../../../../../../state/store"
-import { createNewCompany } from "../../../../../../../state/slices/companySlice"
-import { fetchAllConfigs } from "../../../../../../../state/slices/configSlice"
-import type { BusinessState, CompanyIndustry, StockExchangeEntity } from "../../../../../../../state/models/config"
+import type { AppDispatch } from "@/state/store"
+import { createNewCompany } from "@/state/slices/companySlice"
+import { fetchAllConfigs } from "@/state/slices/configSlice"
+import type { BusinessState, CompanyIndustry, StockExchangeEntity } from "@/state/models/config"
 
 import { Building2, Calendar, Globe, Info, MapPin, Users, Briefcase, FileText, ChevronRight } from 'lucide-react'
 import TextField from "@/components/FormElements/TextField"

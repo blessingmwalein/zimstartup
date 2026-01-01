@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../../state/store";
-import { fetchUserWallet } from "../../../state/slices/walletSlice";
+import { fetchUserWallet } from "@/state/slices/walletSlice";
 import { useEffect } from "react";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";

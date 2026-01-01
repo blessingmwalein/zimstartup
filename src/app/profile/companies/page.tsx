@@ -8,13 +8,13 @@ import { Plus, Search, Building2 } from "lucide-react"
 
 import DefaultLayout from "@/components/Layouts/DefaultLayout"
 import UserCompanyCard from "@/components/Companies/UserCompanyCard"
-import { fetchUserCompanies } from "../../../../state/slices/companySlice"
-import { AppDispatch } from "../../../../state/store"
+import { fetchUserCompanies } from "@/state/slices/companySlice"
+import { AppDispatch } from "@/state/store"
 import { Button } from "@headlessui/react"
 import CustomButton from "@/components/Buttons/CustomButton"
 import { useRouter } from "next/navigation"// import { Button } from "@/components/ui/button"
-// import type { AppDispatch } from "../../../state/store"
-// import { fetchUserCompanies } from "../../../state/slices/companySlice"
+// import type { AppDispatch } from "@/state/store"
+// import { fetchUserCompanies } from "@/state/slices/companySlice"
 
 const Companies: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()

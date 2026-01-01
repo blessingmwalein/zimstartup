@@ -6,7 +6,7 @@ import DropdownUser from "./DropdownUser";
 import Image from "next/image";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../state/store";
-import { logoutUser } from "../../../state/slices/authSlice";
+import { logoutUser } from "@/state/slices/authSlice";
 import { useRouter } from 'next/navigation';
 
 const Header = (props: {

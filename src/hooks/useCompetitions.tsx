@@ -1,6 +1,6 @@
 import { useSelector, useDispatch } from "react-redux"
 import { AppDispatch, RootState } from "../../state/store"
-import { fetchCompetitions, findCompetitions } from "../../state/slices/competitionSlice"
+import { fetchCompetitions, findCompetitions } from "@/state/slices/competitionSlice"
 import { useEffect } from "react"
 
 export const useCompetitions = () => {

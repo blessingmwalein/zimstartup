@@ -9,11 +9,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { AppDispatch } from "../../../../state/store";
-import { buyStock } from "../../../../state/services/wallet";
-import { submitBuyStock } from "../../../../state/slices/walletSlice";
-import { StockExchangeEntity } from "../../../../state/models/config";
-import { fetchAllConfigs } from "../../../../state/slices/configSlice";
+import { AppDispatch } from "@/state/store";
+import { buyStock } from "@/state/services/wallet";
+import { submitBuyStock } from "@/state/slices/walletSlice";
+import { StockExchangeEntity } from "@/state/models/config";
+import { fetchAllConfigs } from "@/state/slices/configSlice";
 
 // Define Yup schema for form validation
 const schema = yup.object().shape({

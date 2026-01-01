@@ -5,10 +5,10 @@ import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import CompanyCard from "@/components/Companies/CompanyCard";
-import { AppDispatch } from "../../../state/store";
-import { fetchCompanySearch } from "../../../state/slices/companySlice";
-import { fetchAllConfigs } from "../../../state/slices/configSlice";
-import { BusinessState, CompanyIndustry } from "../../../state/models/config";
+import { AppDispatch } from "@/state/store";
+import { fetchCompanySearch } from "@/state/slices/companySlice";
+import { fetchAllConfigs } from "@/state/slices/configSlice";
+import { BusinessState, CompanyIndustry } from "@/state/models/config";
 
 const Companies: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();

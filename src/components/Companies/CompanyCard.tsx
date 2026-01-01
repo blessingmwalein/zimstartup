@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Company, UserCompaniesResponse } from "../../../state/models/company";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../state/store";
-import { addCompanyToWatch } from "../../../state/slices/companySlice";
+import { addCompanyToWatch } from "@/state/slices/companySlice";
 import { toast } from "react-toastify";
 
 interface CompanyCardProps {

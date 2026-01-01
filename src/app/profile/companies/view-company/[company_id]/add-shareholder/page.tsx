@@ -14,7 +14,7 @@ import {
   addNewDirectorPosition,
   createDirectorDetails,
   fetchCompanyDataCombined,
-} from "../../../../../../../state/slices/companySlice";
+} from "@/state/slices/companySlice";
 import {
   AddDirectorDetailsRequest,
   AddDirectorPositionRequest,

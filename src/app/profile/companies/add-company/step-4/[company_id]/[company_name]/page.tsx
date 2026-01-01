@@ -16,8 +16,8 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb"
 import Stepper from "@/components/common/Stepper"
 import CustomAlert from "@/components/common/notification/Alert"
 
-import type { AppDispatch } from "../../../../../../../../state/store"
-import { createCompanyPreviousFunds } from "../../../../../../../../state/slices/companySlice"
+import type { AppDispatch } from "@/state/store"
+import { createCompanyPreviousFunds } from "@/state/slices/companySlice"
 
 import { DollarSign, Users, Building2 } from "lucide-react"
 import Select from "@/components/FormElements/SelectInput"

@@ -12,11 +12,11 @@ import {
   fetchPreviousFunds,
   handleApiError,
   addCompanyValuation
-} from "../../state/services/investment"
-import * as api from "../../state/services/company"
+} from "@/state/services/investment"
+import * as api from "@/state/services/company"
 import { UpdateContactInforRequest } from "../../state/models/employement"
 import { CreateCompanyRequest } from "../../state/models/company"
-import { getCompanyRequests } from "../../state/services/company"
+import { getCompanyRequests } from "@/state/services/company"
 
 
 export function useCompanyData(companyId: number) {

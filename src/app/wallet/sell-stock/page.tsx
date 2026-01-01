@@ -9,11 +9,11 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { AppDispatch } from "../../../../state/store";
-import { sellStock } from "../../../../state/services/wallet";
-import { submitSellStock } from "../../../../state/slices/walletSlice";
-import { fetchAllConfigs } from "../../../../state/slices/configSlice";
-import { StockExchangeEntity } from "../../../../state/models/config";
+import { AppDispatch } from "@/state/store";
+import { sellStock } from "@/state/services/wallet";
+import { submitSellStock } from "@/state/slices/walletSlice";
+import { fetchAllConfigs } from "@/state/slices/configSlice";
+import { StockExchangeEntity } from "@/state/models/config";
 
 const schema = yup.object().shape({
   national_id: yup

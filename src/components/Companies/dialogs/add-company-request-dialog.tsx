@@ -18,7 +18,7 @@ import {
   createEquityFinancingRequestThunk,
   createProjectFinancingRequestThunk,
   createRevenueBasedFinancingRequestThunk,
-} from "../../../../state/slices/companySlice"
+} from "@/state/slices/companySlice";
 import {
   registerCompanyRequest,
   createAcquisitionRequest,

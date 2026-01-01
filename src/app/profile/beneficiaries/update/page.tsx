@@ -5,10 +5,10 @@ import * as Yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../../../../state/store";
+import { AppDispatch } from "@/state/store";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { createNextOfKinAsync, updateContactInformationAsync } from "../../../../../state/slices/authSlice";
+import { createNextOfKinAsync, updateContactInformationAsync } from "@/state/slices/authSlice";
 import CustomAlert from "@/components/common/notification/Alert";
 
 // Yup validation schema

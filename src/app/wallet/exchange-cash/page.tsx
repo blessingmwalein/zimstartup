@@ -7,8 +7,8 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useDispatch, useSelector } from "react-redux";
-import { submitExchangeCash } from "../../../../state/slices/walletSlice";
-import { AppDispatch } from "../../../../state/store";
+import { submitExchangeCash } from "@/state/slices/walletSlice";
+import { AppDispatch } from "@/state/store";
 import { toast } from "react-toastify";
 
 // Define Yup schema for form validation

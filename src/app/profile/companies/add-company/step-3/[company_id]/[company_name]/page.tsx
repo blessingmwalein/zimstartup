@@ -16,9 +16,9 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb"
 import Stepper from "@/components/common/Stepper"
 import CustomAlert from "@/components/common/notification/Alert"
 
-import type { AppDispatch } from "../../../../../../../../state/store"
-import { createStockMarketDetails } from "../../../../../../../../state/slices/companySlice"
-import { fetchAllConfigs } from "../../../../../../../../state/slices/configSlice"
+import type { AppDispatch } from "@/state/store"
+import { createStockMarketDetails } from "@/state/slices/companySlice"
+import { fetchConfig } from "@/state/slices/configSlice"
 import type { MarketType, StockExchangeEntity } from "../../../../../../../../state/models/config"
 
 import { DollarSign, Building2, BarChart2, ChevronRight } from "lucide-react"
