@@ -12,8 +12,8 @@ import { useForm } from "react-hook-form";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
-import { RootState, AppDispatch } from "../../../../state/store";
-import { loginUser, fetchUserData } from "../../../../state/slices/authSlice";
+import { RootState, AppDispatch } from "@/state/store";
+import { loginUser, fetchUserData } from "@/state/thunks/auth";
 import TextField from "@/components/FormElements/TextField";
 import CustomButton from "@/components/Buttons/CustomButton";
 import CustomAlert from "@/components/common/notification/Alert";
@@ -60,8 +60,9 @@ const SignIn: React.FC = () => {
     <AuthLayout>
 
 
-      <div className="flex h-[calc(100vh-64px)]">
-        <div className="w-2/3 h-full relative overflow-hidden">
+      <div className="flex flex-col md:flex-row min-h-[calc(100vh-64px)]">
+        {/* Banner Section - Hidden on mobile */}
+        <div className="hidden md:block md:w-2/3 relative overflow-hidden">
           <Image
             src="/backgrounds/wallpaper.webp"
             alt="Banner"
@@ -71,12 +72,15 @@ const SignIn: React.FC = () => {
           />
         </div>
 
-        <div className="w-1/3 h-full flex items-center justify-center bg-gray-50">
-          <div className="w-full max-w-sm space-y-6">
-            <h2 className="text-3xl font-bold text-black">
-              Welcome to <span className="text-lime-600">StartUp</span>
-            </h2>
-            <p className="text-gray-500 text-sm">To get started Login</p>
+        {/* Form Section */}
+        <div className="w-full md:w-1/3 flex items-center justify-center bg-gray-50 p-6 md:p-8">
+          <div className="w-full max-w-md space-y-4 md:space-y-6">
+            <div className="text-center md:text-left">
+              <h2 className="text-2xl md:text-3xl font-bold text-black">
+                Welcome to <span className="text-lime-600">StartUp</span>
+              </h2>
+              <p className="text-gray-500 text-sm mt-2">To get started, please login</p>
+            </div>
             {error && <CustomAlert title="Opps something went wrong" subtitle={error} type={"error"} ></CustomAlert>}
 
             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -99,7 +103,7 @@ const SignIn: React.FC = () => {
               </div>
 
               <div className="text-right text-sm">
-                <Link href="#" className="text-blue-600 hover:underline">Forgot Password?</Link>
+                <Link href="/auth/forgot-password" title="Forgot Password" className="text-blue-600 hover:underline">Forgot Password?</Link>
               </div>
 
               <div className="flex space-x-4">

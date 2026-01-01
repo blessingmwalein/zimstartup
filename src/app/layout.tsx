@@ -6,7 +6,14 @@ import "@/css/style.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
 import { Provider } from "react-redux";
-import store from "../../state/store";
+import store from "@/state/store";
+import { useAutoLogout } from "@/hooks/useAutoLogout";
+
+// Wrapper component to use the hook within the Provider context
+const AutoLogoutCallback = () => {
+  useAutoLogout();
+  return null;
+};
 
 export default function RootLayout({
   children,
@@ -24,13 +31,14 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <Provider store={store}>
       <body suppressHydrationWarning={true}>
-        <div className="dark:bg-boxdark-2 dark:text-bodydark">
-          {loading ? <Loader /> : children}
-        </div>
+        <Provider store={store}>
+          <AutoLogoutCallback />
+          <div className="dark:bg-boxdark-2 dark:text-bodydark">
+            {loading ? <Loader /> : children}
+          </div>
+        </Provider>
       </body>
-      </Provider>
     </html>
   );
 }

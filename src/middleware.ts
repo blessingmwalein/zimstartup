@@ -8,7 +8,11 @@ export function middleware(request: NextRequest) {
   const isPublicPath =
     path === "/" ||
     path.startsWith("/auth/signin") ||
-    path.startsWith("/auth/signup");
+    path.startsWith("/auth/signup") ||
+    path.startsWith("/auth/forgot-password") ||
+    path.startsWith("/auth/reset-password")||
+    path.startsWith("/about") ||
+    path.startsWith("/youth-hub");
   
   const isAuthPath = path.startsWith("/auth/signin") || path.startsWith("/auth/signup")
 

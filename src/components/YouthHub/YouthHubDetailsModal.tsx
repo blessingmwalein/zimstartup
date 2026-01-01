@@ -55,34 +55,38 @@ const YouthHubDetailsModal: React.FC<YouthHubDetailsModalProps> = ({ youthHub, o
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-lg bg-white shadow-xl dark:bg-boxdark">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+      <div className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-xl border border-gray-200 bg-white shadow-2xl dark:border-boxdark-2 dark:bg-boxdark">
         {/* Modal Header */}
-        <div className="sticky top-0 flex items-center justify-between border-b border-gray-200 bg-white p-6 dark:border-boxdark-2 dark:bg-boxdark">
-          <div className="flex items-center space-x-4">
-            <div className="text-4xl">{getSectorIcon(youthHub.sector)}</div>
-            <div>
-              <h2 className="text-2xl font-bold text-black dark:text-white">
-                {youthHub.project_name}
-              </h2>
-              <div className="flex items-center space-x-2">
-                <span
-                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${getStatusColor(
-                    youthHub.status
-                  )}`}
-                >
-                  {youthHub.status}
-                </span>
-                <span className="text-sm text-bodydark2">• {youthHub.sector}</span>
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-[#052941] to-[#041f30] p-6 text-white">
+          <div className="flex items-start justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/10 text-3xl backdrop-blur-sm">
+                {getSectorIcon(youthHub.sector)}
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold\">
+                  {youthHub.project_name}
+                </h2>
+                <div className="mt-1 flex items-center space-x-2">
+                  <span
+                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${getStatusColor(
+                      youthHub.status
+                    )}`}
+                  >
+                    {youthHub.status}
+                  </span>
+                  <span className="text-sm text-gray-200\">• {youthHub.sector}</span>
+                </div>
               </div>
             </div>
+            <button
+              onClick={onClose}
+              className="rounded-lg p-2 text-white/80 hover:bg-white/10 hover:text-white\"
+            >
+              <X className="h-6 w-6" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-boxdark-2"
-          >
-            <X className="h-6 w-6" />
-          </button>
         </div>
 
         {/* Modal Content */}
@@ -186,8 +190,11 @@ const YouthHubDetailsModal: React.FC<YouthHubDetailsModalProps> = ({ youthHub, o
               type="button"
               variant="solid"
               onClick={() => {
-                // Handle contact action
-                window.location.href = `mailto:${youthHub.contact_email}?subject=Interest in ${youthHub.project_name}`
+                // Open email in new tab/window
+                window.open(
+                  `mailto:${youthHub.contact_email}?subject=Interest in ${youthHub.project_name}`,
+                  '_blank'
+                )
               }}
             >
               Contact

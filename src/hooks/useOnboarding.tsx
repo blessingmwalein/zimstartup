@@ -3,8 +3,8 @@
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "react-toastify"
-import { handleApiError } from "../../state/services/investment"
-import { InvestorTypeData, BasicInfoData, ContactInfoData, CompanyInfoData, AccountVerificationData, CredentialsData, OnboardingStepResponse, submitInvestorType, submitBasicInfo, submitContactInfo, submitCompanyInfo, submitAccountVerification, submitCredentials } from "../../state/services/onboading"
+import { handleApiError } from "@/state/services/investment"
+import { InvestorTypeData, BasicInfoData, ContactInfoData, CompanyInfoData, AccountVerificationData, CredentialsData, OnboardingStepResponse, submitInvestorType, submitBasicInfo, submitContactInfo, submitCompanyInfo, submitAccountVerification, submitCredentials } from "@/state/services/onboading"
 import moment from "moment"
 
 

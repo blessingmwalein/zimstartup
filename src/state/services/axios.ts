@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import Cookies from "js-cookie";
-import Router from "next/router";
+import { storage } from "./storage";
 
 // Base URL for all requests
 const BASE_URL =
@@ -19,11 +18,13 @@ const handleAuthError = (error: any) => {
   console.error("Axios Error:", error);
   const status = error.response?.status;
   if (status === 401 || status === 403) {
-    // Clear the token from cookies instead of dispatching to store
+    // Clear the token from cookies
+    storage.clearAll();
+
+    // Redirect to login page using window.location to strictly force a full reload and clear any state
+    // This is also safer than next/router in non-component contexts
     if (typeof window !== "undefined") {
-      Cookies.remove("access_token");
-      // Redirect to login page
-      Router.push("/auth/signin");
+      window.location.href = "/auth/signin";
     }
   }
   return Promise.reject(error);
@@ -40,7 +41,7 @@ export const createAxiosInstance = (
   token?: string,
   config?: AxiosRequestConfig,
 ) => {
-  const authToken = token || Cookies.get("access_token");
+  const authToken = token || storage.getToken();
 
   const configWithAuth = {
     ...config,

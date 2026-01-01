@@ -53,16 +53,15 @@ const YouthHubCard: React.FC<YouthHubCardProps> = ({ youthHub, onViewDetails }) 
   }
 
   return (
-    <div className="group relative overflow-hidden rounded-lg bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:bg-boxdark">
+    <div className="group relative overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:border-[#052941] hover:shadow-lg dark:bg-boxdark">
       {/* Card Header */}
-      <div className="relative h-48 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#80CAEE]/20 to-[#001f3f]/20" />
+      <div className="relative h-40 overflow-hidden bg-gradient-to-br from-[#052941] to-[#041f30]">
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-6xl">{getSectorIcon(youthHub.sector)}</div>
+          <div className="text-5xl">{getSectorIcon(youthHub.sector)}</div>
         </div>
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-3 right-3">
           <span
-            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${getStatusColor(
+            className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold shadow-sm ${getStatusColor(
               youthHub.status
             )}`}
           >

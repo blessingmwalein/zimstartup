@@ -64,3 +64,17 @@ export const createNextOfKin = async (data: CreateNextOfKeenRequest): Promise<Us
   const response = await api.post<UserResponse>('/create-new-next-of-keen-details', data);
   return response.data;
 };
+
+// Forgot Password
+export const forgotPassword = async (email: string): Promise<{ message: string }> => {
+  const response = await api.post<{ message: string }>('/forgot-password', { email });
+  return response.data;
+};
+
+// Reset Password
+export const resetPassword = async (data: any): Promise<{ message: string }> => {
+  // Assuming endpoint /reset-password based on flow requirements
+  // The user only provided verify-password-reset-token but requested the change password page implementation
+  const response = await api.post<{ message: string }>('/reset-password', data);
+  return response.data;
+};

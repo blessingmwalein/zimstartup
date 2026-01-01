@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSelector } from "react-redux"
+import { toast } from "react-toastify"
 import MainLayout from "@/components/Layouts/MainLayout"
 import AuthGuard from "@/components/AuthGuard"
 import { useYouthHub } from "../../../hooks/useYouthHub"
@@ -10,10 +11,16 @@ import { YouthHubRequest } from "../../../../state/models/youthHub"
 import { Loader2, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import CustomButton from "@/components/Buttons/CustomButton"
+import CustomDatePicker from "@/components/FormElements/DatePicker/CustomDatePicker"
+import { useForm, Controller } from "react-hook-form"
 
 export default function CreateYouthHubPage() {
+  const router = useRouter()
   const { createRequest, loadingStates } = useYouthHub()
   const { user } = useSelector((state: any) => state.auth)
+  
+  // React Hook Form
+  const { control } = useForm()
   
   // Auto-populate national_id and contact_email from current user
   useEffect(() => {
@@ -167,12 +174,27 @@ export default function CreateYouthHubPage() {
     try {
       const result = await createRequest(formData)
       if (result.success) {
-        router.push("/youth-hub")
+        toast.success("Project created successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+        })
+        // Redirect to youth hub page
+        setTimeout(() => {
+          router.push("/youth-hub")
+        }, 500)
       } else {
         // Handle error
+        toast.error(result.message || "Failed to create project", {
+          position: "top-right",
+          autoClose: 5000,
+        })
         console.error("Failed to create project:", result.message)
       }
     } catch (error) {
+      toast.error("An error occurred while creating the project", {
+        position: "top-right",
+        autoClose: 5000,
+      })
       console.error("Error creating project:", error)
     }
   }
@@ -186,26 +208,26 @@ export default function CreateYouthHubPage() {
           <div className="mb-8">
             <Link
               href="/youth-hub"
-              className="mb-4 inline-flex items-center text-sm text-bodydark2 hover:text-secondary"
+              className="mb-4 inline-flex items-center text-sm font-medium text-gray-600 transition-colors hover:text-[#052941]"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Youth Hub
             </Link>
-            <h1 className="text-3xl font-bold text-black dark:text-white">
+            <h1 className="text-3xl font-bold text-gray-900">
               Add Your Project
             </h1>
-            <p className="mt-2 text-bodydark2">
+            <p className="mt-2 text-gray-600">
               Share your project with the youth community and find collaborators.
             </p>
           </div>
 
           {/* Form */}
-          <div className="rounded-lg bg-white p-8 shadow-lg dark:bg-boxdark">
+          <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Project Name */}
               <div>
-                <label htmlFor="project_name" className="block text-sm font-medium text-black dark:text-white">
-                  Project Name *
+                <label htmlFor="project_name" className="mb-2 block text-sm font-medium text-gray-900">
+                  Project Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -213,8 +235,8 @@ export default function CreateYouthHubPage() {
                   name="project_name"
                   value={formData.project_name}
                   onChange={handleInputChange}
-                  className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:border-secondary focus:outline-none focus:ring-1 focus:ring-secondary dark:bg-boxdark-2 dark:text-white ${
-                    errors.project_name ? "border-red-500" : "border-gray-300 dark:border-boxdark-2"
+                  className={`block w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:border-[#052941] focus:outline-none focus:ring-2 focus:ring-[#052941]/20 ${
+                    errors.project_name ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Enter your project name"
                 />
@@ -226,16 +248,16 @@ export default function CreateYouthHubPage() {
               {/* Type of Request and Sector */}
               <div className="grid gap-6 md:grid-cols-2">
                 <div>
-                  <label htmlFor="type_of_request" className="block text-sm font-medium text-black dark:text-white">
-                    Type of Request *
+                  <label htmlFor="type_of_request" className="mb-2 block text-sm font-medium text-gray-900">
+                    Type of Request <span className="text-red-500">*</span>
                   </label>
                   <select
                     id="type_of_request"
                     name="type_of_request"
                     value={formData.type_of_request}
                     onChange={handleInputChange}
-                    className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:border-secondary focus:outline-none focus:ring-1 focus:ring-secondary dark:bg-boxdark-2 dark:text-white ${
-                      errors.type_of_request ? "border-red-500" : "border-gray-300 dark:border-boxdark-2"
+                    className={`block w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:border-[#052941] focus:outline-none focus:ring-2 focus:ring-[#052941]/20 ${
+                      errors.type_of_request ? "border-red-500" : "border-gray-300"
                     }`}
                   >
                     <option value="">Select request type</option>
@@ -251,16 +273,16 @@ export default function CreateYouthHubPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="sector" className="block text-sm font-medium text-black dark:text-white">
-                    Sector *
+                  <label htmlFor="sector" className="mb-2 block text-sm font-medium text-gray-900">
+                    Sector <span className="text-red-500">*</span>
                   </label>
                   <select
                     id="sector"
                     name="sector"
                     value={formData.sector}
                     onChange={handleInputChange}
-                    className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:border-secondary focus:outline-none focus:ring-1 focus:ring-secondary dark:bg-boxdark-2 dark:text-white ${
-                      errors.sector ? "border-red-500" : "border-gray-300 dark:border-boxdark-2"
+                    className={`block w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:border-[#052941] focus:outline-none focus:ring-2 focus:ring-[#052941]/20 ${
+                      errors.sector ? "border-red-500" : "border-gray-300"
                     }`}
                   >
                     <option value="">Select sector</option>
@@ -278,8 +300,8 @@ export default function CreateYouthHubPage() {
 
               {/* Project Details */}
               <div>
-                <label htmlFor="request_details" className="block text-sm font-medium text-black dark:text-white">
-                  Project Details *
+                <label htmlFor="request_details" className="mb-2 block text-sm font-medium text-gray-900">
+                  Project Details <span className="text-red-500">*</span>
                 </label>
                 <textarea
                   id="request_details"
@@ -287,8 +309,8 @@ export default function CreateYouthHubPage() {
                   value={formData.request_details}
                   onChange={handleInputChange}
                   rows={4}
-                  className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:border-secondary focus:outline-none focus:ring-1 focus:ring-secondary dark:bg-boxdark-2 dark:text-white ${
-                    errors.request_details ? "border-red-500" : "border-gray-300 dark:border-boxdark-2"
+                  className={`block w-full rounded-lg border px-4 py-3 text-sm transition-colors focus:border-[#052941] focus:outline-none focus:ring-2 focus:ring-[#052941]/20 ${
+                    errors.request_details ? "border-red-500" : "border-gray-300"
                   }`}
                   placeholder="Describe your project, what you're looking for, and how others can help..."
                 />
@@ -299,7 +321,7 @@ export default function CreateYouthHubPage() {
 
               {/* What You're Offering */}
               <div>
-                <label htmlFor="request_offer" className="block text-sm font-medium text-black dark:text-white">
+                <label htmlFor="request_offer" className="mb-2 block text-sm font-medium text-gray-900">
                   What You're Offering
                 </label>
                 <textarea
@@ -308,7 +330,7 @@ export default function CreateYouthHubPage() {
                   value={formData.request_offer}
                   onChange={handleInputChange}
                   rows={3}
-                  className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-secondary focus:outline-none focus:ring-1 focus:ring-secondary dark:bg-boxdark-2 dark:border-boxdark-2 dark:text-white"
+                  className="block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-[#052941] focus:outline-none focus:ring-2 focus:ring-[#052941]/20"
                   placeholder="What skills, resources, or value can you offer to potential collaborators?"
                 />
               </div>
@@ -410,22 +432,27 @@ export default function CreateYouthHubPage() {
 
               {/* Proposed Launch Date */}
               <div>
-                <label htmlFor="proposed_launch_date" className="block text-sm font-medium text-black dark:text-white">
-                  Proposed Launch Date *
-                </label>
-                <input
-                  type="date"
-                  id="proposed_launch_date"
+                <Controller
+                  control={control}
                   name="proposed_launch_date"
-                  value={formData.proposed_launch_date}
-                  onChange={handleInputChange}
-                  className={`mt-1 block w-full rounded-lg border px-3 py-2 text-sm focus:border-secondary focus:outline-none focus:ring-1 focus:ring-secondary dark:bg-boxdark-2 dark:text-white ${
-                    errors.proposed_launch_date ? "border-red-500" : "border-gray-300 dark:border-boxdark-2"
-                  }`}
+                  render={({ field }) => (
+                    <CustomDatePicker
+                      control={control}
+                      name="proposed_launch_date"
+                      label="Proposed Launch Date"
+                      placeholder="Select your proposed launch date"
+                      error={errors.proposed_launch_date}
+                      value={formData.proposed_launch_date}
+                      onChange={(date) => {
+                        const formattedDate = date ? new Date(date).toISOString().split('T')[0] : ''
+                        setFormData(prev => ({ ...prev, proposed_launch_date: formattedDate }))
+                        if (errors.proposed_launch_date) {
+                          setErrors(prev => ({ ...prev, proposed_launch_date: "" }))
+                        }
+                      }}
+                    />
+                  )}
                 />
-                {errors.proposed_launch_date && (
-                  <p className="mt-1 text-sm text-red-500">{errors.proposed_launch_date}</p>
-                )}
               </div>
 
                              {/* Submit Button */}

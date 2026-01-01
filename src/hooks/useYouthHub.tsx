@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useCallback, useEffect } from "react"
-import { YouthHubMessage, YouthHubRequest, YouthHubResponse } from "../../state/models/youthHub"
-import { getYouthHubMessage, createYouthHubRequest, getYouthHubRequests } from "../../state/services/youthHub"
+import { YouthHubMessage, YouthHubRequest, YouthHubResponse } from "@/state/models/youthHub"
+import { getYouthHubMessage, createYouthHubRequest, getYouthHubRequests } from "@/state/services/youthHub"
 
 export function useYouthHub() {
   const [youthHubMessage, setYouthHubMessage] = useState<YouthHubMessage | null>(null)

@@ -42,12 +42,9 @@ import {
   Users,
   Menu,
   Star,
-  ThumbsUp,
-  ThumbsDown,
   Clock,
   CheckCircle,
   Award,
-  Flag,
   Send,
   Filter,
   Search,
@@ -55,12 +52,19 @@ import {
   CreditCard,
   FileCheck,
   Shield,
+  ChevronLeft,
+  ChevronRight,
+  AlertCircle,
+  Percent,
 } from "lucide-react";
 import MainLayout from "@/components/Layouts/MainLayout";
 import CustomButton from "@/components/Buttons/CustomButton";
 import TextField from "@/components/FormElements/TextField";
 import { useCompanyData } from "@/hooks/useCompanyData";
 import { useInvestmentData } from "@/hooks/useInvestmentData";
+import CommentsRatingsSection from "@/components/Companies/CommentsRatingsSection";
+import DirectorDetailDrawer from "@/components/Companies/DirectorDetailDrawer";
+import CompanyRequestDrawer from "@/components/Companies/CompanyRequestDrawer";
 
 // Comprehensive dummy data
 const mockCompanyData = {
@@ -224,52 +228,6 @@ const mockCompanyData = {
       organizer: "HR Excellence Institute",
     },
   ],
-  comments_ratings: [
-    {
-      id: 1,
-      user_name: "Investment Analyst",
-      user_type: "Professional",
-      rating: 4.5,
-      comment:
-        "Strong financial performance and excellent market position. The company shows consistent growth and has a solid management team.",
-      date: "2024-03-01",
-      helpful_votes: 15,
-      category: "Financial Analysis",
-    },
-    {
-      id: 2,
-      user_name: "Former Employee",
-      user_type: "Employee",
-      rating: 4.0,
-      comment:
-        "Great company culture and opportunities for growth. Management is supportive and the work environment is collaborative.",
-      date: "2024-02-15",
-      helpful_votes: 8,
-      category: "Work Environment",
-    },
-    {
-      id: 3,
-      user_name: "Industry Expert",
-      user_type: "Expert",
-      rating: 5.0,
-      comment:
-        "Leading player in the beverage industry with innovative products and strong brand recognition. Excellent investment opportunity.",
-      date: "2024-02-28",
-      helpful_votes: 22,
-      category: "Market Analysis",
-    },
-    {
-      id: 4,
-      user_name: "Customer",
-      user_type: "Customer",
-      rating: 4.2,
-      comment:
-        "Love their products and commitment to sustainability. The company has been improving their environmental impact significantly.",
-      date: "2024-03-05",
-      helpful_votes: 6,
-      category: "Product Quality",
-    },
-  ],
 };
 
 function classNames(...classes: string[]) {
@@ -400,6 +358,7 @@ export default function CompanyPage() {
   // Navigation and modal states
   const [activeSection, setActiveSection] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isInvestmentModalOpen, setIsInvestmentModalOpen] = useState(false);
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
@@ -409,8 +368,11 @@ export default function CompanyPage() {
   const [investmentAmount, setInvestmentAmount] = useState("");
   const [investorQuestion, setInvestorQuestion] = useState("");
   const [investorEmail, setInvestorEmail] = useState("");
-  const [newComment, setNewComment] = useState("");
-  const [newRating, setNewRating] = useState(5);
+  const [selectedDirector, setSelectedDirector] = useState<any>(null);
+  const [isDirectorDrawerOpen, setIsDirectorDrawerOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [selectedRequestType, setSelectedRequestType] = useState("");
+  const [isRequestDrawerOpen, setIsRequestDrawerOpen] = useState(false);
 
   const navigationItems = [
     {
@@ -565,34 +527,30 @@ export default function CompanyPage() {
       ]
     : [];
 
-  const renderStarRating = (rating: number, size: "sm" | "md" | "lg" = "sm") => {
-    const sizeClasses = {
-      sm: "h-4 w-4",
-      md: "h-5 w-5",
-      lg: "h-6 w-6",
-    };
-
-    return (
-      <div className="flex items-center">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            className={`${sizeClasses[size]} ${star <= rating ? "fill-current text-yellow-400" : "text-gray-300"}`}
-          />
-        ))}
-        <span className="ml-2 text-sm text-gray-600">
-          ({rating.toFixed(1)})
-        </span>
-      </div>
-    );
-  };
-
   // Helper to get the first valuation safely
   const getFirstValuation = (val: any) => {
     if (!val) return undefined;
     if (Array.isArray(val)) return val[0];
     if (val.valuation && Array.isArray(val.valuation)) return val.valuation[0];
     return undefined;
+  };
+
+  // Helper to get user initials
+  const getInitials = (firstName: string, lastName: string) => {
+    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+  };
+
+  // Handler to open director drawer
+  const handleViewDirector = (director: any) => {
+    setSelectedDirector(director);
+    setIsDirectorDrawerOpen(true);
+  };
+
+  // Handler to open request drawer
+  const handleViewRequest = (request: any, requestType: string) => {
+    setSelectedRequest(request);
+    setSelectedRequestType(requestType);
+    setIsRequestDrawerOpen(true);
   };
 
   const renderContent = () => {
@@ -1141,24 +1099,31 @@ export default function CompanyPage() {
                 {companyDetails?.company_directors?.map((director: any, index: number) => (
                   <div
                     key={index}
-                    className="rounded-lg border border-gray-200 p-6"
+                    className="group cursor-pointer rounded-lg border border-gray-200 p-6 transition-all hover:border-blue-300 hover:shadow-md"
+                    onClick={() => handleViewDirector(director)}
                   >
                     <div className="flex items-start space-x-6">
                       <div className="flex-shrink-0">
-                        <img
-                          src={director.employee_image || "/placeholder.svg"}
-                          alt={director.first_name + " " + director.last_name}
-                          className="h-20 w-20 rounded-full bg-gray-200 object-cover"
-                        />
+                        {director.employee_image ? (
+                          <img
+                            src={director.employee_image}
+                            alt={director.first_name + " " + director.last_name}
+                            className="h-20 w-20 rounded-full border-2 border-gray-200 bg-gray-200 object-cover transition-all group-hover:border-blue-400"
+                          />
+                        ) : (
+                          <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-gray-200 bg-gradient-to-br from-blue-500 to-purple-600 text-2xl font-bold text-white transition-all group-hover:border-blue-400 group-hover:shadow-lg">
+                            {getInitials(director.first_name, director.last_name)}
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1">
                         <div className="flex items-start justify-between">
                           <div>
-                            <h3 className="text-xl font-bold text-gray-900">
+                            <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600">
                               {director.title} {director.first_name} {director.last_name}
                             </h3>
                             <p className="text-lg font-medium text-blue-600">
-                              {director.nationality}
+                              Director
                             </p>
                             <div className="mt-2 flex items-center space-x-4 text-sm text-gray-600">
                               <span className="flex items-center">
@@ -1172,19 +1137,25 @@ export default function CompanyPage() {
                             </div>
                           </div>
                           <div className="flex space-x-2">
-                            <CustomButton type="button" variant="outlined">
+                            <CustomButton 
+                              type="button" 
+                              variant="outlined"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                if (director.email) {
+                                  window.location.href = `mailto:${director.email}`;
+                                }
+                              }}
+                              disabled={!director.email}
+                            >
                               <Mail className="mr-2 h-4 w-4" />
                               Contact
                             </CustomButton>
                           </div>
                         </div>
                         <div className="mt-4">
-                          <h4 className="mb-2 font-semibold text-gray-900">
-                            Experience
-                          </h4>
-                          <p className="leading-relaxed text-gray-700">
-                            {/* No experience field in sample, fallback */}
-                            N/A
+                          <p className="text-sm text-gray-500">
+                            Click to view full details
                           </p>
                         </div>
                       </div>
@@ -1197,74 +1168,373 @@ export default function CompanyPage() {
         );
 
       case "financials":
+        // Calculate total funds raised
+        const totalFundsRaised = (companyDetails?.previous_funds || []).reduce(
+          (sum, fund) => sum + (Number(fund.investment_amount) || 0),
+          0,
+        );
+
+        // Get revenue-based financing details if available
+        const revenueFunding = companyDetails?.requests?.find(
+          (req: any) => req.name === "Revenue-Based Financing"
+        )?.requests?.[0];
+
         return (
           <div className="space-y-6">
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-6 text-2xl font-bold text-gray-900">
-                Financial Valuations
-              </h2>
-
-              {/* Current Valuation */}
-              <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-                <MetricCard
-                  icon={DollarSign}
-                  title="Current Valuation"
-                  value={formatCurrency(
-                    companyDetails?.company_valuation?.[0]?.valuation_amount || 0,
-                  )}
-                  subtitle={`As of ${companyDetails?.company_valuation?.[0]?.valuation_date ? formatDate(companyDetails.company_valuation[0].valuation_date) : "N/A"}`}
-                  color="green"
-                  trend="up"
-                />
-                <MetricCard
-                  icon={TrendingUp}
-                  title="Growth Rate"
-                  value={`${companyDetails?.company_valuation?.[0]?.current_growth_rate || 0}%`}
-                  subtitle="Annual Growth"
-                  color="blue"
-                  trend="up"
-                />
-              </div>
-
-              {/* Valuation History */}
-              <div>
-                <h3 className="mb-4 text-lg font-semibold text-gray-900">
-                  Valuation History
-                </h3>
-                <div className="space-y-4">
-                  {companyDetails?.company_valuation?.map(
-                    (valuation: any, index: number) => (
-                      <div
-                        key={index}
-                        className="rounded-lg border border-gray-200 p-4"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <h4 className="font-semibold text-gray-900">
-                              {valuation.valuation_method}
-                            </h4>
-                            <p className="text-sm text-gray-600">
-                              Financial Year: {valuation.financial_year}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-xl font-bold text-green-600">
-                              {formatCurrency(
-                                valuation.valuation_amount,
-                                valuation.valuation_currency,
-                              )}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              {valuation.valuation_date ? formatDate(valuation.valuation_date) : "N/A"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    ),
-                  )}
+            {/* Financial Overview Header */}
+            <div className="rounded-xl border border-gray-200 bg-gradient-to-br from-[#052941] to-[#041f30] p-6 text-white shadow-lg">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold">Financial Overview</h2>
+                  <p className="mt-1 text-gray-200">
+                    Comprehensive financial metrics and valuations
+                  </p>
+                </div>
+                <div className="rounded-full bg-white/10 p-3">
+                  <BarChart3 className="h-8 w-8" />
                 </div>
               </div>
             </div>
+
+            {/* Key Financial Metrics */}
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <MetricCard
+                icon={DollarSign}
+                title="Current Valuation"
+                value={formatCurrency(
+                  companyDetails?.company_valuation?.[0]?.valuation_amount || 0,
+                  companyDetails?.company_valuation?.[0]?.valuation_currency || "USD"
+                )}
+                subtitle={`As of ${companyDetails?.company_valuation?.[0]?.valuation_date ? formatDate(companyDetails.company_valuation[0].valuation_date) : "N/A"}`}
+                color="green"
+                trend="up"
+              />
+              <MetricCard
+                icon={TrendingUp}
+                title="Growth Rate"
+                value={`${companyDetails?.company_valuation?.[0]?.current_growth_rate || 0}%`}
+                subtitle={`${companyDetails?.company_valuation?.[0]?.financial_period || "Annual"} Growth`}
+                color="blue"
+                trend="up"
+              />
+              <MetricCard
+                icon={Award}
+                title="Total Funds Raised"
+                value={formatCurrency(totalFundsRaised)}
+                subtitle={`From ${companyDetails?.previous_funds?.length || 0} investor(s)`}
+                color="purple"
+                trend="up"
+              />
+              <MetricCard
+                icon={Target}
+                title="Funding Required"
+                value={formatCurrency(
+                  Number(companyDetails?.company_request_details?.total_required_cash) || 0
+                )}
+                subtitle={companyDetails?.company_request?.request_type || "N/A"}
+                color="orange"
+              />
+              <MetricCard
+                icon={CheckCircle}
+                title="Funds Received"
+                value={formatCurrency(
+                  Number(companyDetails?.company_request_details?.total_received_cash) || 0
+                )}
+                subtitle={`${Math.round((Number(companyDetails?.company_request_details?.total_received_cash) / Number(companyDetails?.company_request_details?.total_required_cash)) * 100) || 0}% Complete`}
+                color="green"
+              />
+              <MetricCard
+                icon={AlertCircle}
+                title="Remaining Needed"
+                value={formatCurrency(
+                  Number(companyDetails?.company_request_details?.remaining_cash) || 0
+                )}
+                subtitle="To reach goal"
+                color="red"
+              />
+            </div>
+
+            {/* Revenue-Based Financing Details */}
+            {revenueFunding && (
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="mb-4 flex items-center justify-between">
+                  <h3 className="text-xl font-bold text-gray-900">
+                    Revenue-Based Financing
+                  </h3>
+                  <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+                    Active Request
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <div className="space-y-4">
+                    <div className="rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 p-4">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">
+                          Funding Amount
+                        </span>
+                        <DollarSign className="h-5 w-5 text-blue-600" />
+                      </div>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {formatCurrency(revenueFunding.amount, revenueFunding.currency)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">
+                          Revenue Share
+                        </span>
+                        <Percent className="h-5 w-5 text-purple-600" />
+                      </div>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {revenueFunding.revenue_share}%
+                      </p>
+                      <p className="mt-1 text-xs text-gray-500">
+                        {revenueFunding.payment_frequency || "Monthly"}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 p-4">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">
+                          Projected Revenue
+                        </span>
+                        <TrendingUp className="h-5 w-5 text-green-600" />
+                      </div>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {formatCurrency(revenueFunding.projected_revenue || 0)}
+                      </p>
+                    </div>
+
+                    <div className="rounded-lg bg-gradient-to-br from-orange-50 to-yellow-50 p-4">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-600">
+                          Projected Profit
+                        </span>
+                        <Award className="h-5 w-5 text-orange-600" />
+                      </div>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {formatCurrency(revenueFunding.projected_profit || 0)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Repayment Terms */}
+                <div className="mt-4 rounded-lg bg-gray-50 p-4">
+                  <h4 className="mb-2 flex items-center text-sm font-semibold text-gray-900">
+                    <FileText className="mr-2 h-4 w-4 text-gray-600" />
+                    Repayment Terms
+                  </h4>
+                  <p className="text-sm text-gray-700">
+                    {revenueFunding.repayment_terms || "N/A"}
+                  </p>
+                </div>
+
+                {revenueFunding.description && (
+                  <div className="mt-4 rounded-lg border border-gray-200 bg-white p-4">
+                    <h4 className="mb-2 text-sm font-semibold text-gray-900">
+                      Description
+                    </h4>
+                    <p className="text-sm leading-relaxed text-gray-700">
+                      {revenueFunding.description}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Valuation History */}
+            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+              <h3 className="mb-4 flex items-center text-xl font-bold text-gray-900">
+                <BarChart3 className="mr-2 h-6 w-6 text-[#052941]" />
+                Valuation History
+              </h3>
+              <div className="space-y-4">
+                {companyDetails?.company_valuation?.map(
+                  (valuation: any, index: number) => (
+                    <div
+                      key={index}
+                      className="group rounded-lg border border-gray-200 bg-gradient-to-r from-gray-50 to-white p-5 transition-all hover:border-[#052941] hover:shadow-md"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="mb-2 flex items-center space-x-3">
+                            <div className="rounded-lg bg-gradient-to-br from-[#052941] to-[#041f30] p-2">
+                              <DollarSign className="h-5 w-5 text-white" />
+                            </div>
+                            <div>
+                              <h4 className="text-lg font-bold text-gray-900">
+                                {valuation.valuation_method}
+                              </h4>
+                              <p className="text-sm text-gray-600">
+                                FY {valuation.financial_year} • {valuation.financial_period}
+                              </p>
+                            </div>
+                          </div>
+
+                          {valuation.notes && (
+                            <div className="ml-11 mt-2 rounded-md bg-blue-50 p-3">
+                              <p className="text-sm text-gray-700">
+                                <span className="font-medium text-gray-900">
+                                  Notes:
+                                </span>{" "}
+                                {valuation.notes}
+                              </p>
+                            </div>
+                          )}
+
+                          <div className="ml-11 mt-3 flex items-center space-x-4">
+                            <div className="flex items-center space-x-1 text-sm text-gray-600">
+                              <Calendar className="h-4 w-4" />
+                              <span>
+                                {valuation.valuation_date
+                                  ? formatDate(valuation.valuation_date)
+                                  : "N/A"}
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-1 text-sm text-green-600">
+                              <TrendingUp className="h-4 w-4" />
+                              <span>{valuation.current_growth_rate}% Growth</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <p className="text-3xl font-bold text-[#052941]">
+                            {formatCurrency(
+                              valuation.valuation_amount,
+                              valuation.valuation_currency,
+                            )}
+                          </p>
+                          <p className="mt-1 text-sm text-gray-500">
+                            Valuation Amount
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ),
+                )}
+              </div>
+            </div>
+
+            {/* Investment History */}
+            {companyDetails?.previous_funds && companyDetails.previous_funds.length > 0 && (
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h3 className="mb-4 flex items-center text-xl font-bold text-gray-900">
+                  <Users className="mr-2 h-6 w-6 text-[#052941]" />
+                  Investment History
+                </h3>
+                <div className="space-y-4">
+                  {companyDetails.previous_funds.map((fund: any, index: number) => (
+                    <div
+                      key={fund.id || index}
+                      className="group rounded-lg border border-gray-200 bg-gradient-to-r from-white to-gray-50 p-5 transition-all hover:border-[#052941] hover:shadow-md"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start space-x-4">
+                          <div className="rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 p-3">
+                            <Users className="h-6 w-6 text-white" />
+                          </div>
+                          <div>
+                            <h4 className="text-lg font-bold text-gray-900">
+                              {fund.investor_information || fund.investor_type}
+                            </h4>
+                            <div className="mt-1 flex items-center space-x-3">
+                              <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+                                {fund.investor_type}
+                              </span>
+                              <span className="rounded-full bg-purple-100 px-2 py-1 text-xs font-medium text-purple-800">
+                                {fund.investment_type}
+                              </span>
+                            </div>
+                            <div className="mt-3 grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="text-gray-600">
+                                  Investment Date:
+                                </span>
+                                <p className="font-medium text-gray-900">
+                                  {fund.date_of_funds
+                                    ? formatDate(fund.date_of_funds)
+                                    : "N/A"}
+                                </p>
+                              </div>
+                              <div>
+                                <span className="text-gray-600">
+                                  Company Valuation:
+                                </span>
+                                <p className="font-medium text-gray-900">
+                                  {formatCurrency(
+                                    fund.company_valuation,
+                                    fund.company_valuation_currency,
+                                  )}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-3xl font-bold text-green-600">
+                            {formatCurrency(
+                              fund.investment_amount,
+                              fund.investment_currency,
+                            )}
+                          </p>
+                          <p className="mt-1 text-sm text-gray-500">
+                            Investment Amount
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Total Summary */}
+                <div className="mt-6 rounded-lg bg-gradient-to-r from-[#052941] to-[#041f30] p-4 text-white">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm opacity-90">Total Investments</p>
+                      <p className="text-2xl font-bold">
+                        {companyDetails.previous_funds.length} Round
+                        {companyDetails.previous_funds.length !== 1 ? "s" : ""}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm opacity-90">Total Amount Raised</p>
+                      <p className="text-2xl font-bold">
+                        {formatCurrency(totalFundsRaised)}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Financial Metrics (if available) */}
+            {companyDetails?.financial_metrics && companyDetails.financial_metrics.length > 0 && (
+              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <h3 className="mb-4 flex items-center text-xl font-bold text-gray-900">
+                  <BarChart3 className="mr-2 h-6 w-6 text-[#052941]" />
+                  Financial Metrics
+                </h3>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {companyDetails.financial_metrics.map((metric: any, index: number) => (
+                    <div
+                      key={index}
+                      className="rounded-lg border border-gray-200 bg-gray-50 p-4"
+                    >
+                      <p className="text-sm text-gray-600">{metric.metric_name}</p>
+                      <p className="mt-1 text-xl font-bold text-gray-900">
+                        {metric.metric_value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         );
 
@@ -1358,71 +1628,199 @@ export default function CompanyPage() {
         );
 
       case "company-requests":
+        // Get all requests with their types
+        const allRequests = (companyDetails?.requests || []).map((reqGroup: any) => ({
+          type: reqGroup.name,
+          requests: reqGroup.requests || [],
+        }));
+
         return (
           <div className="space-y-6">
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Company Requests
-                </h2>
-                <div className="flex items-center space-x-2">
-                  <Filter className="h-4 w-4 text-gray-400" />
-                  <select className="rounded-lg border border-gray-300 px-3 py-1 text-sm">
-                    <option>All Status</option>
-                    <option>Active</option>
-                    <option>Completed</option>
-                    <option>Pending</option>
-                  </select>
+            {/* Header */}
+            <div className="rounded-xl border border-gray-200 bg-gradient-to-br from-[#052941] to-[#041f30] p-6 text-white shadow-lg">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-3xl font-bold">Company Requests</h2>
+                  <p className="mt-1 text-gray-200">
+                    Current funding and acquisition requests
+                  </p>
+                </div>
+                <div className="rounded-full bg-white/10 p-3">
+                  <Send className="h-8 w-8" />
                 </div>
               </div>
+              
+              {/* Summary Cards */}
+              <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="rounded-lg bg-white/10 p-4">
+                  <p className="text-sm opacity-90">Total Requests</p>
+                  <p className="text-2xl font-bold">
+                    {allRequests.reduce((sum, group) => sum + group.requests.length, 0)}
+                  </p>
+                </div>
+                <div className="rounded-lg bg-white/10 p-4">
+                  <p className="text-sm opacity-90">Active Type</p>
+                  <p className="text-xl font-bold">
+                    {companyDetails?.company_request?.request_type || "N/A"}
+                  </p>
+                </div>
+                <div className="rounded-lg bg-white/10 p-4">
+                  <p className="text-sm opacity-90">Status</p>
+                  <p className="text-xl font-bold">
+                    {companyDetails?.company_request?.request_status || "N/A"}
+                  </p>
+                </div>
+              </div>
+            </div>
 
-              <div className="space-y-4">
-                {(companyDetails?.company_data?.requests || []).flatMap((req: any) => req.requests || []).map((request: any) => (
-                  <div
-                    key={request.request_id}
-                    className="rounded-lg border border-gray-200 p-6"
-                  >
-                    <div className="mb-4 flex items-start justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="rounded-lg p-3 bg-blue-100">
-                          <Send className="h-5 w-5 text-blue-600" />
+            {/* Requests by Type */}
+            {allRequests.map((reqGroup: any, groupIndex: number) => (
+              <div key={groupIndex} className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div className="mb-6 flex items-center justify-between">
+                  <h3 className="flex items-center text-2xl font-bold text-gray-900">
+                    <Send className="mr-3 h-6 w-6 text-[#052941]" />
+                    {reqGroup.type}
+                  </h3>
+                  <span className="rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+                    {reqGroup.requests.length} Request{reqGroup.requests.length !== 1 ? "s" : ""}
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  {reqGroup.requests.map((request: any, index: number) => (
+                    <div
+                      key={request.request_id || index}
+                      className="group rounded-lg border border-gray-200 bg-gradient-to-r from-white to-gray-50 p-6 transition-all hover:border-[#052941] hover:shadow-md"
+                    >
+                      <div className="mb-4 flex items-start justify-between">
+                        <div className="flex items-start space-x-4">
+                          <div className="rounded-lg bg-gradient-to-br from-[#052941] to-[#041f30] p-3">
+                            {reqGroup.type === "Revenue-Based Financing" ? (
+                              <TrendingUp className="h-6 w-6 text-white" />
+                            ) : reqGroup.type === "Company Acquisitions" ? (
+                              <Award className="h-6 w-6 text-white" />
+                            ) : (
+                              <Send className="h-6 w-6 text-white" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-xl font-bold text-gray-900">
+                              {reqGroup.type}
+                            </h4>
+                            <div className="mt-2 flex flex-wrap gap-2">
+                              <span className="flex items-center rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-800">
+                                <DollarSign className="mr-1 h-4 w-4" />
+                                {formatCurrency(
+                                  request.amount || request.asking_price,
+                                  request.currency
+                                )}
+                              </span>
+                              <span className="rounded-full bg-gray-100 px-3 py-1 text-sm font-medium text-gray-700">
+                                ID: #{request.request_id}
+                              </span>
+                            </div>
+
+                            {/* Quick Info */}
+                            {reqGroup.type === "Revenue-Based Financing" && (
+                              <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
+                                {request.revenue_share && (
+                                  <span className="flex items-center">
+                                    <Percent className="mr-1 h-4 w-4" />
+                                    {request.revenue_share}% Revenue Share
+                                  </span>
+                                )}
+                                {request.payment_frequency && (
+                                  <span className="flex items-center">
+                                    <Clock className="mr-1 h-4 w-4" />
+                                    {request.payment_frequency}
+                                  </span>
+                                )}
+                                {request.projected_revenue && (
+                                  <span className="flex items-center">
+                                    <TrendingUp className="mr-1 h-4 w-4" />
+                                    Projected: {formatCurrency(request.projected_revenue)}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+
+                            {reqGroup.type === "Company Acquisitions" && (
+                              <div className="mt-3 flex flex-wrap gap-4 text-sm text-gray-600">
+                                {request.deal_value && (
+                                  <span className="flex items-center">
+                                    <Award className="mr-1 h-4 w-4" />
+                                    {request.deal_value}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="text-lg font-bold text-gray-900">
-                            {request.name || "Request"}
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            Amount: {formatCurrency(request.amount, request.currency)}
+                        <div className="text-right">
+                          <span
+                            className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
+                              companyDetails?.company_request?.request_status?.toUpperCase() === "ACTIVE"
+                                ? "bg-green-100 text-green-800"
+                                : companyDetails?.company_request?.request_status?.toUpperCase() === "PENDING"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
+                            {companyDetails?.company_request?.request_status?.toUpperCase() || "PENDING"}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Description Preview */}
+                      {request.description && (
+                        <div className="mb-4 rounded-lg bg-gray-50 p-4">
+                          <p className="line-clamp-2 text-sm text-gray-700">
+                            {request.description}
                           </p>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <span className="inline-flex rounded-full px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800">
-                          {companyDetails?.company_request?.request_status?.toUpperCase() || "PENDING"}
-                        </span>
-                      </div>
-                    </div>
+                      )}
 
-                    <p className="mb-4 text-gray-700">{request.description}</p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4 text-sm text-gray-600">
-                        <span className="flex items-center">
-                          <Clock className="mr-1 h-4 w-4" />
-                          Repayment Terms: {request.repayment_terms || "N/A"}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <CustomButton type="button" variant="outlined">
+                      {/* Actions */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-4 text-sm text-gray-600">
+                          {request.repayment_terms && (
+                            <span className="flex items-center">
+                              <Clock className="mr-1 h-4 w-4" />
+                              Has repayment terms
+                            </span>
+                          )}
+                          <span className="flex items-center">
+                            <FileText className="mr-1 h-4 w-4" />
+                            Full details available
+                          </span>
+                        </div>
+                        <CustomButton
+                          type="button"
+                          variant="solid"
+                          onClick={() => handleViewRequest(request, reqGroup.type)}
+                        >
                           <Eye className="mr-2 h-4 w-4" />
                           View Details
                         </CustomButton>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
+            ))}
+
+            {/* Empty State */}
+            {allRequests.length === 0 && (
+              <div className="rounded-xl border border-gray-200 bg-white p-12 text-center shadow-sm">
+                <Send className="mx-auto mb-4 h-12 w-12 text-gray-400" />
+                <h3 className="mb-2 text-lg font-semibold text-gray-900">
+                  No Requests Available
+                </h3>
+                <p className="text-gray-600">
+                  This company hasn't submitted any requests yet.
+                </p>
+              </div>
+            )}
           </div>
         );
 
@@ -1515,188 +1913,7 @@ export default function CompanyPage() {
         );
 
       case "comments-rating":
-        return (
-          <div className="space-y-6">
-            <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-              <div className="mb-6 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">
-                  Comments & Ratings
-                </h2>
-                <CustomButton
-                  type="button"
-                  variant="solid"
-                  onClick={() => setIsQuestionModalOpen(true)}
-                >
-                  <MessageSquare className="mr-2 h-4 w-4" />
-                  Add Review
-                </CustomButton>
-              </div>
-
-              {/* Rating Summary */}
-              <div className="mb-6 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 p-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center space-x-4">
-                      <div className="text-4xl font-bold text-gray-900">
-                        4.4
-                      </div>
-                      <div>
-                        {renderStarRating(4.4, "lg")}
-                        <p className="mt-1 text-sm text-gray-600">
-                          Based on {mockCompanyData.comments_ratings.length}{" "}
-                          reviews
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="space-y-1">
-                      {[5, 4, 3, 2, 1].map((star) => (
-                        <div
-                          key={star}
-                          className="flex items-center space-x-2 text-sm"
-                        >
-                          <span className="w-8">{star}★</span>
-                          <div className="h-2 w-24 rounded-full bg-gray-200">
-                            <div
-                              className="h-2 rounded-full bg-yellow-400"
-                              style={{
-                                width: `${star === 5 ? 60 : star === 4 ? 30 : star === 3 ? 8 : star === 2 ? 2 : 0}%`,
-                              }}
-                            ></div>
-                          </div>
-                          <span className="text-gray-600">
-                            {star === 5
-                              ? "60%"
-                              : star === 4
-                                ? "30%"
-                                : star === 3
-                                  ? "8%"
-                                  : star === 2
-                                    ? "2%"
-                                    : "0%"}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Comments List */}
-              <div className="space-y-6">
-                {mockCompanyData.comments_ratings.map((review) => (
-                  <div
-                    key={review.id}
-                    className="rounded-lg border border-gray-200 p-6"
-                  >
-                    <div className="mb-4 flex items-start justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500">
-                          <span className="font-semibold text-white">
-                            {review.user_name.charAt(0)}
-                          </span>
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-gray-900">
-                            {review.user_name}
-                          </h4>
-                          <div className="flex items-center space-x-3">
-                            {renderStarRating(review.rating)}
-                            <span className="rounded-full bg-blue-100 px-2 py-1 text-xs text-blue-800">
-                              {review.user_type}
-                            </span>
-                            <span className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-800">
-                              {review.category}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-600">
-                          {formatDate(review.date)}
-                        </p>
-                      </div>
-                    </div>
-
-                    <p className="mb-4 leading-relaxed text-gray-700">
-                      {review.comment}
-                    </p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <button className="flex items-center space-x-1 text-sm text-gray-600 hover:text-green-600">
-                          <ThumbsUp className="h-4 w-4" />
-                          <span>Helpful ({review.helpful_votes})</span>
-                        </button>
-                        <button className="flex items-center space-x-1 text-sm text-gray-600 hover:text-red-600">
-                          <ThumbsDown className="h-4 w-4" />
-                          <span>Not Helpful</span>
-                        </button>
-                        <button className="flex items-center space-x-1 text-sm text-gray-600 hover:text-blue-600">
-                          <Flag className="h-4 w-4" />
-                          <span>Report</span>
-                        </button>
-                      </div>
-                      <button className="flex items-center space-x-1 text-sm text-gray-600 hover:text-blue-600">
-                        <MessageSquare className="h-4 w-4" />
-                        <span>Reply</span>
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Add Comment Form */}
-              <div className="border-t pt-6">
-                <h3 className="mb-4 text-lg font-semibold text-gray-900">
-                  Add Your Review
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                      Rating
-                    </label>
-                    <div className="flex items-center space-x-2">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <button
-                          key={star}
-                          onClick={() => setNewRating(star)}
-                          className={`h-8 w-8 ${
-                            star <= newRating
-                              ? "fill-current text-yellow-400"
-                              : "text-gray-300"
-                          } transition-colors hover:text-yellow-400`}
-                        >
-                          <Star className="h-full w-full" />
-                        </button>
-                      ))}
-                      <span className="ml-2 text-sm text-gray-600">
-                        ({newRating}/5)
-                      </span>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="mb-2 block text-sm font-medium text-gray-700">
-                      Your Review
-                    </label>
-                    <textarea
-                      className="w-full rounded-lg border border-gray-300 p-3 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                      rows={4}
-                      placeholder="Share your experience with this company..."
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                    />
-                  </div>
-                  <CustomButton type="button" variant="solid">
-                    <Send className="mr-2 h-4 w-4" />
-                    Submit Review
-                  </CustomButton>
-                </div>
-              </div>
-            </div>
-          </div>
-        );
+        return <CommentsRatingsSection companyId={companyId} />;
 
       default:
         return null;
@@ -1705,16 +1922,128 @@ export default function CompanyPage() {
 
   if (investmentLoading && !investmentDataLoaded) {
     return (
-      <MainLayout>
-        <div className="flex h-screen">
-          <div className="w-64 border-r border-gray-200 bg-white">
-            <LoadingSkeleton className="h-full" />
+      <MainLayout footerVariant="small">
+        <div className="bg-gray-50">
+          {/* Desktop sidebar skeleton */}
+          <div className="fixed bottom-0 left-0 top-20 z-10 hidden w-64 border-r border-gray-200 bg-white lg:block">
+            <div className="flex h-full flex-col py-5">
+              <div className="space-y-2 px-2">
+                {[...Array(11)].map((_, i) => (
+                  <div key={i} className="flex items-center space-x-3 rounded-lg p-3">
+                    <LoadingSkeleton className="h-5 w-5" />
+                    <LoadingSkeleton className="h-4 flex-1" />
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-          <div className="flex-1 p-6">
-            <LoadingSkeleton className="mb-6 h-32 w-full" />
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              <LoadingSkeleton className="h-64" />
-              <LoadingSkeleton className="h-64" />
+
+          {/* Main content skeleton */}
+          <div className="lg:pl-64">
+            <div className="p-6">
+              <div className="space-y-6">
+                {/* Company Header Card Skeleton */}
+                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                  <div className="mb-6 flex items-start justify-between">
+                    <div className="flex-1">
+                      <LoadingSkeleton className="mb-3 h-8 w-2/3" />
+                      <div className="flex items-center space-x-4">
+                        <LoadingSkeleton className="h-4 w-32" />
+                        <LoadingSkeleton className="h-4 w-32" />
+                        <LoadingSkeleton className="h-4 w-24" />
+                      </div>
+                    </div>
+                    <div className="flex space-x-3">
+                      <LoadingSkeleton className="h-8 w-24 rounded-full" />
+                      <LoadingSkeleton className="h-8 w-28 rounded-full" />
+                    </div>
+                  </div>
+
+                  {/* Key Metrics Cards Skeleton */}
+                  <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="rounded-xl border border-gray-200 bg-white p-4">
+                        <div className="mb-3 flex items-center justify-between">
+                          <LoadingSkeleton className="h-9 w-9 rounded-lg" />
+                          <LoadingSkeleton className="h-6 w-6 rounded-lg" />
+                        </div>
+                        <LoadingSkeleton className="mb-2 h-3 w-20" />
+                        <LoadingSkeleton className="mb-2 h-5 w-16" />
+                        <LoadingSkeleton className="h-3 w-24" />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Investment Section Skeleton */}
+                  <div className="rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <LoadingSkeleton className="mb-2 h-5 w-48" />
+                        <LoadingSkeleton className="h-4 w-full max-w-xl" />
+                      </div>
+                      <LoadingSkeleton className="h-10 w-32 rounded-lg" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Charts Section Skeleton */}
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  {/* Company Profile Card Skeleton */}
+                  <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                    <LoadingSkeleton className="mb-4 h-6 w-40" />
+                    <div className="space-y-4">
+                      <div className="rounded-lg bg-gradient-to-r from-purple-500 to-indigo-500 p-4">
+                        <LoadingSkeleton className="mx-auto mb-2 h-6 w-48 bg-white/20" />
+                        <LoadingSkeleton className="mx-auto h-4 w-24 bg-white/20" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="rounded-lg bg-green-50 p-3">
+                          <LoadingSkeleton className="mb-2 h-3 w-28" />
+                          <LoadingSkeleton className="h-4 w-20" />
+                        </div>
+                        <div className="rounded-lg bg-blue-50 p-3">
+                          <LoadingSkeleton className="mb-2 h-3 w-28" />
+                          <LoadingSkeleton className="h-4 w-24" />
+                        </div>
+                      </div>
+                      <div className="border-t pt-4">
+                        <LoadingSkeleton className="mb-3 h-5 w-32" />
+                        <div className="space-y-2">
+                          {[...Array(4)].map((_, i) => (
+                            <div key={i} className="flex items-center space-x-2">
+                              <LoadingSkeleton className="h-4 w-4" />
+                              <LoadingSkeleton className="h-4 flex-1" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pie Chart Card Skeleton */}
+                  <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                    <LoadingSkeleton className="mb-4 h-6 w-40" />
+                    <div className="flex h-64 items-center justify-center">
+                      <LoadingSkeleton className="h-48 w-48 rounded-full" />
+                    </div>
+                    <div className="mt-4 flex justify-center space-x-4">
+                      <LoadingSkeleton className="h-4 w-24" />
+                      <LoadingSkeleton className="h-4 w-28" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Project Description Skeleton */}
+                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                  <LoadingSkeleton className="mb-4 h-6 w-48" />
+                  <div className="space-y-3">
+                    <LoadingSkeleton className="h-4 w-full" />
+                    <LoadingSkeleton className="h-4 w-full" />
+                    <LoadingSkeleton className="h-4 w-3/4" />
+                    <LoadingSkeleton className="mt-4 h-4 w-32" />
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -1723,8 +2052,8 @@ export default function CompanyPage() {
   }
 
   return (
-    <MainLayout>
-      <div className="flex h-screen bg-gray-50">
+    <MainLayout footerVariant="small">
+      <div className="bg-gray-50">
         {/* Mobile sidebar overlay */}
         <Transition show={sidebarOpen} as={Fragment}>
           <Dialog
@@ -1803,41 +2132,61 @@ export default function CompanyPage() {
         </Transition>
 
         {/* Desktop sidebar */}
-        <div className="z-0 hidden lg:fixed  lg:flex lg:w-64 lg:flex-col">
-          <div className="flex flex-grow flex-col border-r border-gray-200 bg-white pb-4 pt-5">
-           
-            <nav className="mt-8 flex-1 space-y-1 px-2">
-              {navigationItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveSection(item.id)}
-                  className={classNames(
-                    activeSection === item.id
-                      ? "border-r-2 border-blue-500 bg-blue-100 text-blue-900"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                    "group flex w-full items-center rounded-l-md px-3 py-2 text-sm font-medium transition-colors",
-                  )}
-                >
-                  <item.icon
+        <div className={`fixed bottom-0 left-0 top-20 z-10 hidden border-r border-gray-200 bg-white transition-all duration-300 lg:block ${
+          sidebarCollapsed ? "w-16" : "w-64"
+        }`}>
+          <div className="flex h-full flex-col">
+            <div className="flex items-center justify-end border-b border-gray-200 px-2 py-3">
+              <button
+                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+                className="rounded-lg p-2 text-gray-600 hover:bg-gray-100"
+                title={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+              >
+                {sidebarCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto py-5">
+              <nav className="space-y-1 px-2">
+                {navigationItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveSection(item.id)}
                     className={classNames(
                       activeSection === item.id
-                        ? "text-blue-500"
-                        : "text-gray-400 group-hover:text-gray-500",
-                      "mr-3 h-5 w-5 flex-shrink-0",
+                        ? "border-r-2 border-blue-500 bg-blue-100 text-blue-900"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                      "group flex w-full items-center rounded-l-md px-3 py-2 text-sm font-medium transition-colors",
+                      sidebarCollapsed ? "justify-center" : "",
                     )}
-                  />
-                  {item.name}
-                  {item.loading && (
-                    <Loader2 className="ml-auto h-4 w-4 animate-spin" />
-                  )}
-                </button>
-              ))}
-            </nav>
+                    title={sidebarCollapsed ? item.name : ""}
+                  >
+                    <item.icon
+                      className={classNames(
+                        activeSection === item.id
+                          ? "text-blue-500"
+                          : "text-gray-400 group-hover:text-gray-500",
+                        sidebarCollapsed ? "h-5 w-5" : "mr-3 h-5 w-5 flex-shrink-0",
+                      )}
+                    />
+                    {!sidebarCollapsed && (
+                      <>
+                        <span className="flex-1 text-left">{item.name}</span>
+                        {item.loading && (
+                          <Loader2 className="ml-auto h-4 w-4 animate-spin" />
+                        )}
+                      </>
+                    )}
+                  </button>
+                ))}
+              </nav>
+            </div>
           </div>
         </div>
 
         {/* Main content */}
-        <div className="flex flex-1 flex-col lg:pl-64">
+        <div className={`transition-all duration-300 ${
+          sidebarCollapsed ? "lg:pl-16" : "lg:pl-64"
+        }`}>
           {/* Mobile header */}
           <div className="sticky top-0 z-10 bg-gray-50 pl-1 pt-1 sm:pl-3 sm:pt-3 lg:hidden">
             <button
@@ -1850,7 +2199,7 @@ export default function CompanyPage() {
           </div>
 
           {/* Page content */}
-          <main className="flex-1 overflow-y-auto">
+          <main>
             <div className="p-6">{renderContent()}</div>
           </main>
         </div>
@@ -2146,6 +2495,22 @@ export default function CompanyPage() {
           </div>
         </Dialog>
       </Transition>
+
+      {/* Director Detail Drawer */}
+      <DirectorDetailDrawer
+        isOpen={isDirectorDrawerOpen}
+        onClose={() => setIsDirectorDrawerOpen(false)}
+        director={selectedDirector}
+      />
+
+      {/* Company Request Drawer */}
+      <CompanyRequestDrawer
+        isOpen={isRequestDrawerOpen}
+        onClose={() => setIsRequestDrawerOpen(false)}
+        request={selectedRequest}
+        requestType={selectedRequestType}
+        requestStatus={companyDetails?.company_request?.request_status || "PENDING"}
+      />
     </MainLayout>
   );
 }

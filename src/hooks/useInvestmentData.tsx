@@ -1,9 +1,9 @@
 "use client"
 
 import { useState, useCallback, useEffect } from "react"
-import { Company, CompanyDetailsResponse, CompanySummary, CompanyValuations, FilterOptions, InvestmentRequest } from "../../state/models/investment"
-import { searchCompanies } from "../../state/services/company"
-import { handleApiError, fetchSectorCompanies, makeInvestment, addToWatchlist, submitInvestorQuestion, fetchCompanyDetails, fetchCompanySummary, fetchCompanyValuations, fetchCompanyDocuments } from "../../state/services/investment"
+import { Company, CompanyDetailsResponse, CompanySummary, CompanyValuations, FilterOptions, InvestmentRequest } from "@/state/models/investment"
+import { searchCompanies } from "@/state/services/company"
+import { handleApiError, fetchSectorCompanies, makeInvestment, addToWatchlist, submitInvestorQuestion, fetchCompanyDetails, fetchCompanySummary, fetchCompanyValuations, fetchCompanyDocuments } from "@/state/services/investment"
 
 
 export function useInvestmentData(companyId: number | null) {

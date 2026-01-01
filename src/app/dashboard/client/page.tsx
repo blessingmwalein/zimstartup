@@ -16,28 +16,29 @@ import {
     Hammer,
     Droplets,
 } from "lucide-react"
-import { useState, useEffect, useRef, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import MainLayout from "@/components/Layouts/MainLayout"
 import SearchInput from "@/components/FormElements/SearchInput/SearchInput"
 import { useDispatch, useSelector } from "react-redux"
-import { fetchIndustryList } from "../../../../state/slices/configSlice"
-import type { AppDispatch } from "../../../../state/store"
+import { fetchIndustryList } from "@/state/slices/configSlice"
+import type { AppDispatch } from "@/state/store"
 import { useCompanySearch } from "@/hooks/useCompanySearch"
-import { CompanySearchResult } from "../../../../state/models/company"
+import { CompanySearchResult } from "@/state/models/company"
 import { useRouter } from "next/navigation"
+import SkeletonLoader from "@/components/common/SkeletonLoader"
 
 interface Sector {
     id: number
     created_at: string
     status: string
     sector: string
-    number_of_sectors: number
+    number_of_companies: number
 }
 
 export default function Dashboard() {
     const [inputValue, setInputValue] = useState(""); // raw input value
     const [query, setQuery] = useState(""); // debounced value
-    const { searchResults, loading, error, search } = useCompanySearch()
+    const { searchResults, loading, error, search, clearResults } = useCompanySearch()
     const { status, error: reduxError, companyList } = useSelector((state: any) => state.companyConfig)
 
     const { industryList, businessStatesList, stockExchangeList } = useSelector((state: any) => state.companyConfig)
@@ -56,8 +57,10 @@ export default function Dashboard() {
     useEffect(() => {
         if (query.trim() !== "") {
             search(query);
+        } else {
+            clearResults();
         }
-    }, [query, search]);
+    }, [query]); // Removed 'search' from dependency array to prevent infinite loops
 
     const handleCompanySelect = (company: CompanySearchResult) => {
         console.log("Selected company:", company)
@@ -123,8 +126,16 @@ export default function Dashboard() {
     //     },
     // ]
 
-    // Use industryList from Redux if available, otherwise use sample data
-    const sectors = industryList?.length ? industryList : [];
+    // Transform API response to match Sector interface
+    const sectors: Sector[] = industryList?.length
+        ? industryList.map((item: any) => ({
+              id: item[0],
+              created_at: item[1],
+              status: item[2],
+              sector: item[3],
+              number_of_companies: item[4],
+          }))
+        : [];
 
     return (
         <MainLayout>
@@ -149,13 +160,15 @@ export default function Dashboard() {
                     <div className="mt-16">
                         <h2 className="text-3xl font-semibold mb-8">Explore Sectors</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
-                            {sectors.map((sector: any) => (
+                            {status === "loading" ? (
+                                <SkeletonLoader variant="sector-card" count={8} />
+                            ) : sectors.map((sector) => (
                                 <Link href={`/sectors/${sector.sector}`} key={sector.id} className="group">
                                     <div className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg hover:translate-y-[-5px] h-full">
                                         <div className="p-6 flex flex-col items-center">
                                             <div className="bg-gray-50 p-4 rounded-full mb-4 text-secondary group-hover:bg-secondary group-hover:text-white transition-colors duration-300">
                                                 {getSectorIcon(sector.sector)}
-                                            </div>
+                                            </div>companie
                                             <h3 className="text-xl font-semibold mb-2">{sector.sector}</h3>
                                             <p className="text-gray-500 mb-4">{sector.number_of_sectors} companies</p>
                                             <div className="mt-auto flex items-center text-secondary font-medium">
