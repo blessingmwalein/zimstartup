@@ -42,8 +42,15 @@ export interface UpdateFundingOpportunityRequest {
 }
 
 // Get all funding opportunities
-export const getAllFundingOpportunities = async (activeOnly: boolean = false): Promise<FundingOpportunity[]> => {
-  const response = await api.get<FundingOpportunity[]>(`funding-opportunities/?active_only=${activeOnly}`);
+export const getAllFundingOpportunities = async (
+  activeOnly: boolean = false,
+  sector?: string,
+  location?: string
+): Promise<FundingOpportunity[]> => {
+  let url = `funding-opportunities/?active_only=${activeOnly}`;
+  if (sector) url += `&sector=${encodeURIComponent(sector)}`;
+  if (location) url += `&location=${encodeURIComponent(location)}`;
+  const response = await api.get<FundingOpportunity[]>(url);
   return response.data;
 };
 

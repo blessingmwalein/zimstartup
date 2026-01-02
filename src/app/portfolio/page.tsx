@@ -25,10 +25,36 @@ import {
   BarChart3,
   Droplets,
   AlertCircle,
+  X,
+  Eye,
+  CheckCircle,
+  Clock,
 } from "lucide-react";
 import SkeletonLoader from "@/components/common/SkeletonLoader";
 
 type TabType = "diversity" | "companies" | "equity" | "projects" | "revenue" | "payments";
+
+interface Payment {
+  payment_date: string;
+  amount: number;
+  currency: string;
+  payment_type: string;
+  description: string | null;
+  status: string;
+}
+
+interface RevenueInvestment {
+  investment_id: number;
+  company_id: number;
+  company_name: string;
+  repayment_terms: string;
+  revenue_share_percentage: number;
+  amount_invested: number;
+  currency: string;
+  investment_date: string;
+  description: string;
+  payments?: Payment[];
+}
 
 export default function PortfolioPage() {
   const dispatch = useDispatch<AppDispatch>();
@@ -45,6 +71,18 @@ export default function PortfolioPage() {
   } = useSelector((state: RootState) => state.portfolio);
 
   const [activeTab, setActiveTab] = useState<TabType>("diversity");
+  const [paymentsDrawerOpen, setPaymentsDrawerOpen] = useState(false);
+  const [selectedInvestment, setSelectedInvestment] = useState<RevenueInvestment | null>(null);
+
+  const openPaymentsDrawer = (investment: RevenueInvestment) => {
+    setSelectedInvestment(investment);
+    setPaymentsDrawerOpen(true);
+  };
+
+  const closePaymentsDrawer = () => {
+    setPaymentsDrawerOpen(false);
+    setSelectedInvestment(null);
+  };
 
   useEffect(() => {
     if (user?.national_id) {
@@ -634,30 +672,28 @@ export default function PortfolioPage() {
                             </div>
                           </div>
                           {investment.payments && investment.payments.length > 0 && (
-                            <div className="mt-3">
-                              <p className="mb-2 text-sm font-medium">Payments</p>
-                              <div className="space-y-2">
-                                {investment.payments.map((payment, pIndex) => (
-                                  <div
-                                    key={pIndex}
-                                    className="flex items-center justify-between rounded bg-gray-100 p-2 text-sm dark:bg-meta-4"
-                                  >
-                                    <span>{formatDate(payment.payment_date)}</span>
-                                    <span className="font-semibold">
-                                      {formatCurrency(payment.amount, investment.currency)}
-                                    </span>
-                                    <span
-                                      className={`rounded px-2 py-1 text-xs ${
-                                        payment.status === "PAID"
-                                          ? "bg-success text-white"
-                                          : "bg-warning text-white"
-                                      }`}
-                                    >
-                                      {payment.status}
-                                    </span>
-                                  </div>
-                                ))}
+                            <div className="mt-4 flex items-center justify-between rounded-lg border border-stroke bg-gray-50 p-3 dark:border-strokedark dark:bg-meta-4">
+                              <div className="flex items-center gap-2">
+                                <Calendar className="h-5 w-5 text-primary" />
+                                <div>
+                                  <p className="text-sm font-medium text-black dark:text-white">
+                                    {investment.payments.length} Payment{investment.payments.length > 1 ? 's' : ''} Scheduled
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    Total: {formatCurrency(
+                                      investment.payments.reduce((sum, p) => sum + p.amount, 0),
+                                      investment.currency
+                                    )}
+                                  </p>
+                                </div>
                               </div>
+                              <button
+                                onClick={() => openPaymentsDrawer(investment)}
+                                className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-all hover:bg-primary/90"
+                              >
+                                <Eye className="h-4 w-4" />
+                                View Payments
+                              </button>
                             </div>
                           )}
                         </div>
@@ -774,6 +810,181 @@ export default function PortfolioPage() {
           <div className="mb-6 space-y-4">
             <SkeletonLoader variant="card" count={3} />
           </div>
+        )}
+
+        {/* Payments Drawer */}
+        {paymentsDrawerOpen && selectedInvestment && (
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm transition-opacity"
+              onClick={closePaymentsDrawer}
+            />
+            
+            {/* Drawer */}
+            <div className="fixed right-0 top-0 z-50 h-full w-full overflow-y-auto bg-white shadow-xl transition-transform dark:bg-boxdark md:w-[600px]">
+              {/* Header */}
+              <div className="sticky top-0 z-10 border-b border-stroke bg-white p-6 dark:border-strokedark dark:bg-boxdark">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-black dark:text-white">
+                      Payment Records
+                    </h3>
+                    <p className="mt-1 text-sm text-gray-500">
+                      {selectedInvestment.company_name}
+                    </p>
+                  </div>
+                  <button
+                    onClick={closePaymentsDrawer}
+                    className="flex h-10 w-10 items-center justify-center rounded-lg border border-stroke text-gray-500 transition-all hover:bg-gray-100 dark:border-strokedark dark:hover:bg-meta-4"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                {/* Investment Summary */}
+                <div className="mb-6 rounded-lg border border-stroke bg-gray-50 p-4 dark:border-strokedark dark:bg-meta-4">
+                  <h4 className="mb-3 font-semibold text-black dark:text-white">
+                    Investment Details
+                  </h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-sm text-gray-500">Amount Invested</p>
+                      <p className="font-semibold text-black dark:text-white">
+                        {formatCurrency(selectedInvestment.amount_invested, selectedInvestment.currency)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Revenue Share</p>
+                      <p className="font-semibold text-success">
+                        {selectedInvestment.revenue_share_percentage}%
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Investment Date</p>
+                      <p className="font-medium">
+                        {formatDate(selectedInvestment.investment_date)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500">Repayment Terms</p>
+                      <p className="font-medium">{selectedInvestment.repayment_terms}</p>
+                    </div>
+                  </div>
+                  {selectedInvestment.description && (
+                    <div className="mt-3 pt-3 border-t border-stroke dark:border-strokedark">
+                      <p className="text-sm text-gray-500">Description</p>
+                      <p className="text-sm">{selectedInvestment.description}</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Payment Statistics */}
+                {selectedInvestment.payments && selectedInvestment.payments.length > 0 && (
+                  <div className="mb-6 grid grid-cols-3 gap-4">
+                    <div className="rounded-lg border border-stroke bg-white p-4 dark:border-strokedark dark:bg-boxdark">
+                      <p className="text-sm text-gray-500">Total Payments</p>
+                      <p className="text-xl font-bold text-black dark:text-white">
+                        {selectedInvestment.payments.length}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-stroke bg-white p-4 dark:border-strokedark dark:bg-boxdark">
+                      <p className="text-sm text-gray-500">Total Amount</p>
+                      <p className="text-xl font-bold text-success">
+                        {formatCurrency(
+                          selectedInvestment.payments.reduce((sum, p) => sum + p.amount, 0),
+                          selectedInvestment.currency
+                        )}
+                      </p>
+                    </div>
+                    <div className="rounded-lg border border-stroke bg-white p-4 dark:border-strokedark dark:bg-boxdark">
+                      <p className="text-sm text-gray-500">Paid</p>
+                      <p className="text-xl font-bold text-primary">
+                        {selectedInvestment.payments.filter(p => p.status === 'PAID').length}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Payments List */}
+                <div>
+                  <h4 className="mb-4 font-semibold text-black dark:text-white">
+                    Payment History
+                  </h4>
+                  {selectedInvestment.payments && selectedInvestment.payments.length > 0 ? (
+                    <div className="space-y-3">
+                      {selectedInvestment.payments
+                        .sort((a, b) => new Date(b.payment_date).getTime() - new Date(a.payment_date).getTime())
+                        .map((payment, index) => (
+                        <div
+                          key={index}
+                          className="rounded-lg border border-stroke bg-white p-4 transition-all hover:shadow-md dark:border-strokedark dark:bg-boxdark"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-start gap-3">
+                              <div
+                                className={`mt-1 flex h-10 w-10 items-center justify-center rounded-full ${
+                                  payment.status === 'PAID'
+                                    ? 'bg-success bg-opacity-10'
+                                    : payment.status === 'PENDING'
+                                    ? 'bg-warning bg-opacity-10'
+                                    : 'bg-danger bg-opacity-10'
+                                }`}
+                              >
+                                {payment.status === 'PAID' ? (
+                                  <CheckCircle className="h-5 w-5 text-success" />
+                                ) : (
+                                  <Clock className="h-5 w-5 text-warning" />
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center gap-2">
+                                  <p className="font-semibold text-black dark:text-white">
+                                    {formatCurrency(payment.amount, payment.currency)}
+                                  </p>
+                                  <span
+                                    className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                                      payment.status === 'PAID'
+                                        ? 'bg-success bg-opacity-10 text-success'
+                                        : payment.status === 'PENDING'
+                                        ? 'bg-warning bg-opacity-10 text-warning'
+                                        : 'bg-danger bg-opacity-10 text-danger'
+                                    }`}
+                                  >
+                                    {payment.status}
+                                  </span>
+                                </div>
+                                <p className="mt-1 flex items-center text-sm text-gray-500">
+                                  <Calendar className="mr-1 h-4 w-4" />
+                                  {formatDate(payment.payment_date)}
+                                </p>
+                                <p className="mt-1 text-sm text-gray-500">
+                                  Type: {payment.payment_type.replace(/_/g, ' ')}
+                                </p>
+                                {payment.description && (
+                                  <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                                    {payment.description}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center py-8 text-center">
+                      <Calendar className="mb-3 h-12 w-12 text-gray-400" />
+                      <p className="text-gray-500">No payment records available</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </DefaultLayout>

@@ -12,7 +12,8 @@ export function middleware(request: NextRequest) {
     path.startsWith("/auth/forgot-password") ||
     path.startsWith("/auth/reset-password")||
     path.startsWith("/about") ||
-    path.startsWith("/youth-hub");
+    path.startsWith("/youth-hub")||
+    path.startsWith("/funding-opportunities");
   
   const isAuthPath = path.startsWith("/auth/signin") || path.startsWith("/auth/signup")
 

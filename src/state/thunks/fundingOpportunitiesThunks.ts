@@ -19,10 +19,14 @@ import {
   UpdateFundingOpportunityRequest,
 } from "../services/fundingOpportunities";
 
-export const fetchFundingOpportunities = (activeOnly: boolean = false) => async (dispatch: AppDispatch) => {
+export const fetchFundingOpportunities = (
+  activeOnly: boolean = false,
+  sector?: string,
+  location?: string
+) => async (dispatch: AppDispatch) => {
   try {
     dispatch(setLoading(true));
-    const data = await getAllFundingOpportunities(activeOnly);
+    const data = await getAllFundingOpportunities(activeOnly, sector, location);
     dispatch(setOpportunities(data));
   } catch (error: any) {
     dispatch(setError(error?.response?.data?.message || "Failed to fetch funding opportunities"));

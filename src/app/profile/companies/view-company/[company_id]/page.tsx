@@ -14,6 +14,8 @@ import {
   MapPin,
   DollarSign,
   TrendingUp,
+  AlertCircle,
+  Briefcase,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -228,8 +230,7 @@ export default function CompanyView() {
     { name: "Stock Market", icon: <BarChart4 className="h-5 w-5" /> },
     { name: "Funds & Valuation", icon: <DollarSign className="h-5 w-5" /> },
     { name: "Financial Metrics", icon: <TrendingUp className="h-5 w-5" /> },
-    { name: "Company Requests", icon: <TrendingUp className="h-5 w-5" /> },
-
+    { name: "Company Requests", icon: <Briefcase className="h-5 w-5" /> },
     { name: "Updates", icon: <Bell className="h-5 w-5" /> },
     { name: "Documents", icon: <FileText className="h-5 w-5" /> },
   ];
@@ -284,104 +285,156 @@ export default function CompanyView() {
           </div>
         </div>
       ) : (
-        <div className="container mx-auto px-4 py-6">
-          {/* Header */}
-          <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight md:text-3xl">
-                Company View
-              </h1>
-              <p className="text-gray-500">
-                View and manage company information
-              </p>
-            </div>
-            <div className="mt-4 flex items-center gap-2 md:mt-0">
-              <CustomButton
-                type="button"
-                variant="outlined"
-                icon={<FileText className="h-4 w-4" />}
-                onClick={() => console.log("Export")}
-              >
-                Export
-              </CustomButton>
-              <CustomButton
-                type="button"
-                variant="solid"
-                icon={<Edit className="h-4 w-4" />}
-                onClick={() => setEditCompanyDialogOpen(true)}
-              >
-                Edit Company
-              </CustomButton>
-            </div>
-          </div>
-
-          {/* Company Header Card */}
-          <div className="mb-6 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="mx-auto max-w-full p-4">
+          {/* Page Header with Gradient */}
+          <div className="mb-6 rounded-lg bg-gradient-to-r from-primary to-blue-600 p-6 text-white shadow-lg">
             <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
               <div className="flex gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#001f3f]/10 text-xl font-bold text-[#001f3f]">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-xl font-bold text-white backdrop-blur-sm">
                   {companyData.company_data.company_abbreviations}
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold">
+                  <h1 className="text-2xl font-bold md:text-3xl">
                     {companyData.company_data.company_name}
-                  </h2>
-                  <p className="text-gray-500">
+                  </h1>
+                  <p className="mt-1 text-sm opacity-90">
                     {companyData.company_data.company_short_description}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2">
-                    <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
+                    <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-sm">
                       {companyData.company_data.status}
                     </span>
-                    <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700">
+                    <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-sm">
                       {companyData.company_data.sector}
                     </span>
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col items-start gap-2 md:items-end">
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Calendar className="h-4 w-4" />
-                  <span>
-                    Started:{" "}
-                    {new Date(
-                      companyData.company_data.company_start_date,
-                    ).toLocaleDateString()}
-                  </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => console.log("Export")}
+                  className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm transition-all hover:bg-white/20"
+                >
+                  <FileText className="h-4 w-4" />
+                  Export
+                </button>
+                <button
+                  onClick={() => setEditCompanyDialogOpen(true)}
+                  className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-primary shadow-lg transition-all hover:shadow-xl"
+                >
+                  <Edit className="h-4 w-4" />
+                  Edit Company
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Summary Stats Cards */}
+          <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
+            {/* Employees Card */}
+            <div className="group rounded-lg border border-stroke bg-white p-6 shadow-default transition-all hover:shadow-xl dark:border-strokedark dark:bg-boxdark">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-title-md font-bold text-black dark:text-white">
+                    {companyData.company_data.employees}
+                  </h4>
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Employees</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <Users className="h-4 w-4" />
-                  <span>{companyData.company_data.employees} Employees</span>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-blue-500 shadow-lg group-hover:scale-110 transition-transform">
+                  <Users className="h-6 w-6 text-white" />
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <MapPin className="h-4 w-4" />
-                  <span>{companyData.company_data.location}</span>
+              </div>
+            </div>
+
+            {/* Directors Card */}
+            <div className="group rounded-lg border border-stroke bg-white p-6 shadow-default transition-all hover:shadow-xl dark:border-strokedark dark:bg-boxdark">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-title-md font-bold text-black dark:text-white">
+                    {directors?.length || 0}
+                  </h4>
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Directors</span>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-success to-green-500 shadow-lg group-hover:scale-110 transition-transform">
+                  <Users className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Documents Card */}
+            <div className="group rounded-lg border border-stroke bg-white p-6 shadow-default transition-all hover:shadow-xl dark:border-strokedark dark:bg-boxdark">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-title-md font-bold text-black dark:text-white">
+                    {companyDocuments?.documents?.length || 0}
+                  </h4>
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Documents</span>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-500 shadow-lg group-hover:scale-110 transition-transform">
+                  <FileText className="h-6 w-6 text-white" />
+                </div>
+              </div>
+            </div>
+
+            {/* Location Card */}
+            <div className="group rounded-lg border border-stroke bg-white p-6 shadow-default transition-all hover:shadow-xl dark:border-strokedark dark:bg-boxdark">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-title-md font-bold text-black dark:text-white line-clamp-1">
+                    {companyData.company_data.location}
+                  </h4>
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Location</span>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {new Date(companyData.company_data.company_start_date).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg group-hover:scale-110 transition-transform">
+                  <MapPin className="h-6 w-6 text-white" />
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Tabs */}
-          <Tab.Group
-            selectedIndex={selectedTabIndex}
-            onChange={setSelectedTabIndex}
-          >
-            <Tab.List className="mb-6 flex space-x-1 overflow-x-auto rounded-lg bg-gray-100 p-1">
-              {tabItems.map((item, index) => (
-                <Tab
-                  key={index}
-                  className={({ selected }) =>
-                    `flex flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-md px-4 py-3 text-sm font-medium leading-5 transition-all
-${selected ? "bg-white text-[#001f3f] shadow" : "text-gray-600 hover:bg-white/[0.12] hover:text-[#001f3f]"}`
-                  }
-                >
-                  {item.icon}
-                  {item.name}
-                </Tab>
-              ))}
-            </Tab.List>
+          {/* Tabs Navigation */}
+          <div className="rounded-lg border border-stroke bg-white shadow-lg dark:border-strokedark dark:bg-boxdark">
+            <Tab.Group
+              selectedIndex={selectedTabIndex}
+              onChange={setSelectedTabIndex}
+            >
+              <div className="p-4">
+                <Tab.List className="grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-8">
+                  {tabItems.map((item, index) => (
+                    <Tab
+                      key={index}
+                      className={({ selected }) =>
+                        `flex flex-col items-center gap-2 rounded-lg px-3 py-4 font-medium transition-all ${
+                          selected
+                            ? "bg-primary text-white shadow-md"
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-meta-4 dark:text-gray-400 dark:hover:bg-opacity-80"
+                        }`
+                      }
+                    >
+                      {({ selected }) => (
+                        <>
+                          <div
+                            className={`flex h-10 w-10 items-center justify-center rounded-full transition-transform ${
+                              selected
+                                ? "bg-white/20 text-white"
+                                : "bg-primary/10 text-primary"
+                            }`}
+                          >
+                            {item.icon}
+                          </div>
+                          <span className="text-center text-xs leading-tight">{item.name}</span>
+                        </>
+                      )}
+                    </Tab>
+                  ))}
+                </Tab.List>
+              </div>
 
-            <Tab.Panels className="mt-2">
+              {/* Tab Content */}
+              <Tab.Panels className="border-t border-stroke p-6 dark:border-strokedark">
               <Tab.Panel>
                 <CompanyDashboard
                   companyData={companyData.company_data}
@@ -429,9 +482,12 @@ ${selected ? "bg-white text-[#001f3f] shadow" : "text-gray-600 hover:bg-white/[0
 
               {/* Company Requests Tab */}
               <Tab.Panel>
-                <div className="space-y-4">
-                  <div className="mb-4 flex items-center justify-between">
-                    <h2 className="text-xl font-semibold">Company Requests</h2>
+                <div className="space-y-6">
+                  <div className="mb-6 flex items-center justify-between rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 p-4 dark:from-meta-4 dark:to-boxdark">
+                    <div>
+                      <h2 className="text-xl font-bold text-black dark:text-white">Company Requests</h2>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">Manage all funding and investment requests</p>
+                    </div>
                     <CustomButton
                       type="button"
                       variant="solid"
@@ -445,146 +501,142 @@ ${selected ? "bg-white text-[#001f3f] shadow" : "text-gray-600 hover:bg-white/[0
                       {Object.entries(groupRequestsByType(companyRequests)).map(
                         ([label, requests]) =>
                           requests.length > 0 ? (
-                            <div key={label}>
-                              <h3 className="mb-2 text-lg font-semibold">
+                            <div key={label} className="rounded-lg border border-stroke bg-white p-4 shadow-default dark:border-strokedark dark:bg-boxdark">
+                              <h3 className="mb-4 text-lg font-semibold text-black dark:text-white">
                                 {label}
                               </h3>
-                              <div className="overflow-x-auto rounded-lg border border-gray-200">
-                                <table className="min-w-full divide-y divide-gray-200">
-                                  <thead className="bg-gray-50">
+                              <div className="overflow-x-auto rounded-lg border border-stroke bg-white dark:border-strokedark dark:bg-boxdark-2">
+                                <table className="min-w-full divide-y divide-stroke dark:divide-strokedark">
+                                  <thead className="bg-gray-50 dark:bg-meta-4">
                                     {label === "Company Acquisitions" && (
                                       <tr>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Description
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Asking Price
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Deal Value
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Currency
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Actions
                                         </th>
                                       </tr>
                                     )}
                                     {label === "Equity Financing" && (
                                       <tr>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Description
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Amount
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Equity Offered
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Funding Round
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Currency
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Actions
                                         </th>
                                       </tr>
                                     )}
                                     {label === "Revenue-Based Financing" && (
                                       <tr>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Description
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Amount
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Revenue Share
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Repayment Terms
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Payment Frequency
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Status
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Actions
                                         </th>
                                       </tr>
                                     )}
                                     {label === "Project Financing" && (
                                       <tr>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Project Name
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Amount
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Currency
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Stage
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Sector
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Status
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Actions
                                         </th>
                                       </tr>
                                     )}
                                     {label === "Other" && (
                                       <tr>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Request ID
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Description
                                         </th>
-                                        <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">
+                                        <th className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                           Actions
                                         </th>
                                       </tr>
                                     )}
                                   </thead>
-                                  <tbody className="divide-y divide-gray-200 bg-white">
+                                  <tbody className="divide-y divide-stroke bg-white dark:divide-strokedark dark:bg-boxdark">
                                     {requests.map((req: any, idx: number) => (
                                       <tr
                                         key={req.request_id}
-                                        className={
-                                          idx % 2 === 0
-                                            ? "bg-white"
-                                            : "bg-gray-50"
-                                        }
+                                        className="transition-colors hover:bg-gray-50 dark:hover:bg-meta-4"
                                       >
                                         {/* Company Acquisitions */}
                                         {label === "Company Acquisitions" && (
                                           <>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                               {req.description}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
                                               <MoneyDisplay
                                                 amount={req.asking_price}
                                               />
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                               {req.deal_value}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                                               {req.currency}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm">
                                               <CustomButton
                                                 type="button"
                                                 variant="outlined"
@@ -598,24 +650,24 @@ ${selected ? "bg-white text-[#001f3f] shadow" : "text-gray-600 hover:bg-white/[0
                                         {/* Equity Financing */}
                                         {label === "Equity Financing" && (
                                           <>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                               {req.description}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
                                               <MoneyDisplay
                                                 amount={req.amount}
                                               />
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                               {req.equity_offered}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                               {req.funding_round}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                                               {req.currency}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm">
                                               <CustomButton
                                                 type="button"
                                                 variant="outlined"
@@ -630,37 +682,37 @@ ${selected ? "bg-white text-[#001f3f] shadow" : "text-gray-600 hover:bg-white/[0
                                         {label ===
                                           "Revenue-Based Financing" && (
                                           <>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                               {req.description}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
                                               <MoneyDisplay
                                                 amount={req.amount}
                                               />
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                               {req.revenue_share}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                               {req.repayment_terms}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                               {req.payment_frequency}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm">
                                               <span
-                                                className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold leading-5 ${
+                                                className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                                                   req.status === "approved"
-                                                    ? "bg-green-100 text-green-800"
+                                                    ? "bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400"
                                                     : req.status === "pending"
-                                                      ? "bg-yellow-100 text-yellow-800"
-                                                      : "bg-red-100 text-red-800"
+                                                      ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-400"
+                                                      : "bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400"
                                                 }`}
                                               >
                                                 {req.status}
                                               </span>
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm">
                                               <CustomButton
                                                 type="button"
                                                 variant="outlined"
@@ -679,37 +731,37 @@ ${selected ? "bg-white text-[#001f3f] shadow" : "text-gray-600 hover:bg-white/[0
                                         {/* Project Financing */}
                                         {label === "Project Financing" && (
                                           <>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
                                               {req.project_name}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
                                               <MoneyDisplay
                                                 amount={req.amount}
                                               />
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-600 dark:text-gray-400">
                                               {req.currency}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                               {req.current_project_stage}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                               {req.project_sector}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm">
                                               <span
-                                                className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold leading-5 ${
+                                                className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
                                                   req.status === "approved"
-                                                    ? "bg-green-100 text-green-800"
+                                                    ? "bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-400"
                                                     : req.status === "pending"
-                                                      ? "bg-yellow-100 text-yellow-800"
-                                                      : "bg-red-100 text-red-800"
+                                                      ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-400"
+                                                      : "bg-red-100 text-red-800 dark:bg-red-800/20 dark:text-red-400"
                                                 }`}
                                               >
                                                 {req.status}
                                               </span>
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm">
                                               <CustomButton
                                                 type="button"
                                                 variant="outlined"
@@ -728,13 +780,13 @@ ${selected ? "bg-white text-[#001f3f] shadow" : "text-gray-600 hover:bg-white/[0
                                         {/* Other */}
                                         {label === "Other" && (
                                           <>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
                                               {req.request_id}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
                                               {req.description || "-"}
                                             </td>
-                                            <td className="whitespace-nowrap px-4 py-2">
+                                            <td className="whitespace-nowrap px-6 py-4 text-sm">
                                               <CustomButton
                                                 type="button"
                                                 variant="outlined"
@@ -755,8 +807,12 @@ ${selected ? "bg-white text-[#001f3f] shadow" : "text-gray-600 hover:bg-white/[0
                       )}
                     </div>
                   ) : (
-                    <div className="text-gray-500">
-                      No company requests found.
+                    <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-stroke bg-gray-50 p-12 dark:border-strokedark dark:bg-meta-4">
+                      <AlertCircle className="mb-4 h-12 w-12 text-gray-400" />
+                      <p className="text-center text-lg font-medium text-gray-900 dark:text-gray-100">No company requests found</p>
+                      <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+                        Get started by creating your first funding request
+                      </p>
                     </div>
                   )}
                   <AddCompanyRequestDialog
@@ -782,7 +838,8 @@ ${selected ? "bg-white text-[#001f3f] shadow" : "text-gray-600 hover:bg-white/[0
                 />
               </Tab.Panel>
             </Tab.Panels>
-          </Tab.Group>
+            </Tab.Group>
+          </div>
 
           {/* Dialogs */}
           <EditCompanyDialog

@@ -1,26 +1,86 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAppDispatch, useAppSelector } from '@/state/store';
 import { fetchFundingOpportunities, createOpportunity, updateOpportunity, deleteOpportunity } from '@/state/thunks/fundingOpportunitiesThunks';
 import FundingOpportunityModal from '@/components/FundingOpportunities/FundingOpportunityModal';
-import { Briefcase, Calendar, MapPin, ExternalLink, Plus, Edit, Trash2, Search } from 'lucide-react';
+import { Briefcase, Calendar, MapPin, ExternalLink, Plus, Edit, Trash2, Search, ChevronDown, X } from 'lucide-react';
 import AuthLayout from '@/components/Layouts/AuthLayout';
 import MainLayout from '@/components/Layouts/MainLayout';
+import { fetchIndustryList } from '@/state/slices/configSlice';
+import type { AppDispatch } from '@/state/store';
+
+interface Sector {
+  id: number;
+  created_at: string;
+  status: string;
+  sector: string;
+  number_of_companies: number;
+}
 
 export default function FundingOpportunitiesPage() {
   const dispatch = useAppDispatch();
   const { opportunities, loading, error } = useAppSelector((state) => state.fundingOpportunities);
   const { isAuthenticated, user } = useAppSelector((state) => state.auth);
+  const { industryList } = useAppSelector((state: any) => state.companyConfig);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'closed'>('all');
+  const [locationFilter, setLocationFilter] = useState('');
+  const [sectorFilter, setSectorFilter] = useState('');
+  const [sectorSearchOpen, setSectorSearchOpen] = useState(false);
+  const [sectorSearchTerm, setSectorSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingOpportunity, setEditingOpportunity] = useState<any>(null);
 
+  const sectorDropdownRef = useRef<HTMLDivElement>(null);
+  const isFetched = useRef(false);
+
+  // Fetch industry list on mount
   useEffect(() => {
-    dispatch(fetchFundingOpportunities(false));
+    if (!isFetched.current) {
+      dispatch(fetchIndustryList());
+      isFetched.current = true;
+    }
   }, [dispatch]);
+
+  // Fetch opportunities when filters change
+  useEffect(() => {
+    const activeOnly = statusFilter === 'active';
+    dispatch(fetchFundingOpportunities(
+      activeOnly,
+      sectorFilter || undefined,
+      locationFilter || undefined
+    ));
+  }, [dispatch, statusFilter, sectorFilter, locationFilter]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (sectorDropdownRef.current && !sectorDropdownRef.current.contains(event.target as Node)) {
+        setSectorSearchOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Transform API response to match Sector interface
+  const sectors: Sector[] = industryList?.length
+    ? industryList.map((item: any) => ({
+        id: item.id,
+        created_at: item.created_at,
+        status: item.status,
+        sector: item.sector,
+        number_of_companies: item.number_of_sectors,
+      }))
+    : [];
+
+  // Filter sectors based on search term
+  const filteredSectors = sectors.filter((sector) =>
+    sector?.sector?.toLowerCase().includes(sectorSearchTerm.toLowerCase())
+  );
 
   const filteredOpportunities = opportunities.filter((opp) => {
     const matchesSearch =
@@ -57,7 +117,7 @@ export default function FundingOpportunitiesPage() {
   const handleUpdate = async (data: any) => {
     if (editingOpportunity) {
       try {
-        const result = await dispatch(updateOpportunity({ id: editingOpportunity.id, data })).unwrap();
+        const result = await dispatch(updateOpportunity(editingOpportunity.id, data)).unwrap();
         if (result.success) {
           setIsModalOpen(false);
           setEditingOpportunity(null);
@@ -148,8 +208,9 @@ export default function FundingOpportunitiesPage() {
         </div>
 
         {/* Filters and Search */}
-        <div className="mb-6 flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
+        <div className="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Search Input */}
+          <div className="relative">
             <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
             <input
               type="text"
@@ -159,16 +220,142 @@ export default function FundingOpportunitiesPage() {
               className="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-4 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
+
+          {/* Location Input */}
+          <div className="relative">
+            <MapPin className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Filter by location..."
+              value={locationFilter}
+              onChange={(e) => setLocationFilter(e.target.value)}
+              className="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-10 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            {locationFilter && (
+              <button
+                onClick={() => setLocationFilter('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+
+          {/* Sector Dropdown with Search */}
+          <div className="relative" ref={sectorDropdownRef}>
+            <button
+              onClick={() => setSectorSearchOpen(!sectorSearchOpen)}
+              className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-left focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-between"
+            >
+              <span className={sectorFilter ? "text-gray-900" : "text-gray-500"}>
+                {sectorFilter || "Select sector..."}
+              </span>
+              <ChevronDown className={`h-5 w-5 text-gray-400 transition-transform ${sectorSearchOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {sectorSearchOpen && (
+              <div className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg">
+                <div className="p-2">
+                  <input
+                    type="text"
+                    placeholder="Search sectors..."
+                    value={sectorSearchTerm}
+                    onChange={(e) => setSectorSearchTerm(e.target.value)}
+                    className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+                <div className="max-h-60 overflow-y-auto">
+                  <button
+                    onClick={() => {
+                      setSectorFilter('');
+                      setSectorSearchOpen(false);
+                      setSectorSearchTerm('');
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-100 text-gray-700"
+                  >
+                    All Sectors
+                  </button>
+                  {filteredSectors.length > 0 ? (
+                    filteredSectors.map((sector) => (
+                      <button
+                        key={sector.id}
+                        onClick={() => {
+                          setSectorFilter(sector.sector);
+                          setSectorSearchOpen(false);
+                          setSectorSearchTerm('');
+                        }}
+                        className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-100 ${
+                          sectorFilter === sector.sector ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                        }`}
+                      >
+                        {sector.sector}
+                        <span className="ml-2 text-xs text-gray-500">
+                          ({sector.number_of_companies})
+                        </span>
+                      </button>
+                    ))
+                  ) : (
+                    <div className="px-4 py-2 text-sm text-gray-500">
+                      No sectors found
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Status Filter */}
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as any)}
             className="rounded-lg border border-gray-300 px-4 py-2.5 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="all">All</option>
+            <option value="all">All Status</option>
             <option value="active">Active</option>
             <option value="closed">Closed</option>
           </select>
         </div>
+
+        {/* Active Filters Display */}
+        {(locationFilter || sectorFilter) && (
+          <div className="mb-6 flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium text-gray-700">Active Filters:</span>
+            {locationFilter && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-3 py-1 text-sm font-medium text-blue-700">
+                <MapPin className="h-3 w-3" />
+                Location: {locationFilter}
+                <button
+                  onClick={() => setLocationFilter('')}
+                  className="ml-1 hover:text-blue-900"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            {sectorFilter && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
+                <Briefcase className="h-3 w-3" />
+                Sector: {sectorFilter}
+                <button
+                  onClick={() => setSectorFilter('')}
+                  className="ml-1 hover:text-green-900"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </span>
+            )}
+            <button
+              onClick={() => {
+                setLocationFilter('');
+                setSectorFilter('');
+              }}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Clear All
+            </button>
+          </div>
+        )}
 
         {/* Opportunities Grid */}
         {loading ? (
