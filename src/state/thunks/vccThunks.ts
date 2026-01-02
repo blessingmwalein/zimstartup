@@ -23,24 +23,8 @@ export const fetchAllVCCs = () => async (dispatch: AppDispatch) => {
     dispatch(setLoading(true));
     const response = await getAllVCCCompetitions();
     
-    // Transform the array data to proper VCC format
-    const transformedVCCs = response.data.map((vcc: any[]) => ({
-      vcc_id: vcc[0],
-      vcc_abbreviations: vcc[1],
-      vcc_name: vcc[2],
-      vcc_status: vcc[3],
-      banner_url: vcc[4],
-      title: vcc[5],
-      description: vcc[6],
-      start_date: vcc[7],
-      end_date: vcc[8],
-      status: vcc[9],
-      logo_path: vcc[10],
-      is_featured: vcc[11],
-      region: vcc[12],
-    }));
-    
-    dispatch(setVCCList(transformedVCCs));
+    // The API now returns the data in the correct format with a data array
+    dispatch(setVCCList(response.data || []));
   } catch (error: any) {
     dispatch(setError(error?.response?.data?.message || "Failed to fetch VCC competitions"));
   }

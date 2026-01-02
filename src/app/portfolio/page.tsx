@@ -75,181 +75,218 @@ export default function PortfolioPage() {
   };
 
   // Parse summary data
-  const totalInvestments = summary?.totals?.[0]?.[0] || 0;
-  const totalAmount = summary?.totals?.[0]?.[1] || 0;
-  const currency = summary?.totals?.[0]?.[2] || "USD";
+  const totalInvestments = summary?.totals?.[0]?.total_investments || 0;
+  const totalAmount = summary?.totals?.[0]?.total_value || 0;
+  const currency = summary?.totals?.[0]?.currency || "USD";
   
-  const liquidAssets = summary?.liquidity?.[0] || 0;
-  const illiquidAssets = summary?.liquidity?.[1] || 0;
-  const totalInvestmentCount = summary?.liquidity?.[2] || 0;
+  const tradableCount = summary?.liquidity?.tradable_count || 0;
+  const tradableValue = summary?.liquidity?.tradable_value || 0;
+  const totalCount = summary?.liquidity?.total_count || 0;
 
   return (
     <DefaultLayout>
       <div className="mx-auto max-w-full p-4">
-        <Breadcrumb pageName="Portfolio" />
+        {/* Page Header with Gradient */}
+        <div className="mb-6 rounded-lg bg-gradient-to-r from-primary to-blue-600 p-6 text-white shadow-lg">
+          <h1 className="mb-2 text-3xl font-bold">Investment Portfolio</h1>
+          <p className="text-sm opacity-90">Track and manage all your investments in one place</p>
+        </div>
 
         {/* Summary Stats Cards */}
         <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
           {/* Total Investments Card */}
-          <div className="rounded-lg border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
+          <div className="group rounded-lg border border-stroke bg-white p-6 shadow-default transition-all hover:shadow-xl dark:border-strokedark dark:bg-boxdark">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-title-md font-bold text-black dark:text-white">
                   {totalInvestments}
                 </h4>
-                <span className="text-sm font-medium">Total Investments</span>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Investments</span>
               </div>
-              <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
-                <Briefcase className="h-5 w-5 text-primary" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-blue-500 shadow-lg group-hover:scale-110 transition-transform">
+                <TrendingUp className="h-6 w-6 text-white" />
               </div>
             </div>
           </div>
 
           {/* Total Value Card */}
-          <div className="rounded-lg border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
+          <div className="group rounded-lg border border-stroke bg-white p-6 shadow-default transition-all hover:shadow-xl dark:border-strokedark dark:bg-boxdark">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-title-md font-bold text-black dark:text-white">
                   {formatCurrency(totalAmount, currency)}
                 </h4>
-                <span className="text-sm font-medium">Portfolio Value</span>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Portfolio Value</span>
               </div>
-              <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
-                <TrendingUp className="h-5 w-5 text-success" />
-              </div>
-            </div>
-          </div>
-
-          {/* Liquid Assets Card */}
-          <div className="rounded-lg border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="text-title-md font-bold text-black dark:text-white">
-                  {liquidAssets}
-                </h4>
-                <span className="text-sm font-medium">Liquid Assets</span>
-              </div>
-              <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
-                <Droplets className="h-5 w-5 text-blue-500" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-success to-green-500 shadow-lg group-hover:scale-110 transition-transform">
+                <DollarSign className="h-6 w-6 text-white" />
               </div>
             </div>
           </div>
 
-          {/* Illiquid Assets Card */}
-          <div className="rounded-lg border border-stroke bg-white p-6 shadow-default dark:border-strokedark dark:bg-boxdark">
+          {/* Tradable Assets Card */}
+          <div className="group rounded-lg border border-stroke bg-white p-6 shadow-default transition-all hover:shadow-xl dark:border-strokedark dark:bg-boxdark">
             <div className="flex items-center justify-between">
               <div>
                 <h4 className="text-title-md font-bold text-black dark:text-white">
-                  {illiquidAssets}
+                  {tradableCount}
                 </h4>
-                <span className="text-sm font-medium">Illiquid Assets</span>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Tradable Assets</span>
+                <p className="mt-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                  {formatCurrency(tradableValue, currency)}
+                </p>
               </div>
-              <div className="flex h-11.5 w-11.5 items-center justify-center rounded-full bg-meta-2 dark:bg-meta-4">
-                <BarChart3 className="h-5 w-5 text-orange-500" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg group-hover:scale-110 transition-transform">
+                <Droplets className="h-6 w-6 text-white" />
+              </div>
+            </div>
+          </div>
+
+          {/* Total Count Card */}
+          <div className="group rounded-lg border border-stroke bg-white p-6 shadow-default transition-all hover:shadow-xl dark:border-strokedark dark:bg-boxdark">
+            <div className="flex items-center justify-between">
+              <div>
+                <h4 className="text-title-md font-bold text-black dark:text-white">
+                  {totalCount}
+                </h4>
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Holdings</span>
+              </div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-500 shadow-lg group-hover:scale-110 transition-transform">
+                <BarChart3 className="h-6 w-6 text-white" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Tabs Navigation */}
-        <div className="mb-6 rounded-lg border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-          <div className="border-b border-stroke p-4 dark:border-strokedark">
-            <div className="flex flex-wrap gap-2">
+        <div className="mb-6 rounded-lg border border-stroke bg-white shadow-lg dark:border-strokedark dark:bg-boxdark">
+          <div className="p-4">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
               <button
                 onClick={() => setActiveTab("diversity")}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors ${
+                className={`flex flex-col items-center gap-2 rounded-lg px-4 py-4 font-medium transition-all ${
                   activeTab === "diversity"
-                    ? "bg-primary text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-meta-4 dark:text-white dark:hover:bg-meta-4/80"
+                    ? "bg-primary text-white shadow-md"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-meta-4 dark:text-gray-400 dark:hover:bg-opacity-80"
                 }`}
               >
-                <PieChart className="h-4 w-4" />
-                Portfolio Diversity
                 {summary?.diversity && (
-                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">
+                  <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
+                    activeTab === "diversity" 
+                      ? "bg-white/20 text-white" 
+                      : "bg-primary/10 text-primary"
+                  }`}>
                     {summary.diversity.length}
                   </span>
                 )}
+                <span className="text-sm">
+                  Portfolio Diversity
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab("companies")}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors ${
+                className={`flex flex-col items-center gap-2 rounded-lg px-4 py-4 font-medium transition-all ${
                   activeTab === "companies"
-                    ? "bg-primary text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-meta-4 dark:text-white dark:hover:bg-meta-4/80"
+                    ? "bg-primary text-white shadow-md"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-meta-4 dark:text-gray-400 dark:hover:bg-opacity-80"
                 }`}
               >
-                <Building2 className="h-4 w-4" />
-                Companies Owned
                 {companiesOwned?.companies_owned && (
-                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">
+                  <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
+                    activeTab === "companies" 
+                      ? "bg-white/20 text-white" 
+                      : "bg-success/10 text-success"
+                  }`}>
                     {companiesOwned.companies_owned.length}
                   </span>
                 )}
+                <span className="text-sm">
+                  Companies Owned
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab("equity")}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors ${
+                className={`flex flex-col items-center gap-2 rounded-lg px-4 py-4 font-medium transition-all ${
                   activeTab === "equity"
-                    ? "bg-primary text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-meta-4 dark:text-white dark:hover:bg-meta-4/80"
+                    ? "bg-primary text-white shadow-md"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-meta-4 dark:text-gray-400 dark:hover:bg-opacity-80"
                 }`}
               >
-                <BarChart3 className="h-4 w-4" />
-                Equity Investments
                 {equityInvestments?.equity_investments && (
-                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">
+                  <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
+                    activeTab === "equity" 
+                      ? "bg-white/20 text-white" 
+                      : "bg-warning/10 text-warning"
+                  }`}>
                     {equityInvestments.equity_investments.length}
                   </span>
                 )}
+                <span className="text-sm">
+                  Equity Investments
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab("projects")}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors ${
+                className={`flex flex-col items-center gap-2 rounded-lg px-4 py-4 font-medium transition-all ${
                   activeTab === "projects"
-                    ? "bg-primary text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-meta-4 dark:text-white dark:hover:bg-meta-4/80"
+                    ? "bg-primary text-white shadow-md"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-meta-4 dark:text-gray-400 dark:hover:bg-opacity-80"
                 }`}
               >
-                <Briefcase className="h-4 w-4" />
-                Project Financing
                 {projectFinancing?.project_investments && (
-                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">
+                  <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
+                    activeTab === "projects" 
+                      ? "bg-white/20 text-white" 
+                      : "bg-blue-500/10 text-blue-600"
+                  }`}>
                     {projectFinancing.project_investments.length}
                   </span>
                 )}
+                <span className="text-sm">
+                  Project Financing
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab("revenue")}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors ${
+                className={`flex flex-col items-center gap-2 rounded-lg px-4 py-4 font-medium transition-all ${
                   activeTab === "revenue"
-                    ? "bg-primary text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-meta-4 dark:text-white dark:hover:bg-meta-4/80"
+                    ? "bg-primary text-white shadow-md"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-meta-4 dark:text-gray-400 dark:hover:bg-opacity-80"
                 }`}
               >
-                <DollarSign className="h-4 w-4" />
-                Revenue-Based
                 {revenueInvestments?.revenue_investments && (
-                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">
+                  <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
+                    activeTab === "revenue" 
+                      ? "bg-white/20 text-white" 
+                      : "bg-green-500/10 text-green-600"
+                  }`}>
                     {revenueInvestments.revenue_investments.length}
                   </span>
                 )}
+                <span className="text-sm">
+                  Revenue-Based
+                </span>
               </button>
               <button
                 onClick={() => setActiveTab("payments")}
-                className={`flex items-center gap-2 rounded-lg px-4 py-2 font-medium transition-colors ${
+                className={`flex flex-col items-center gap-2 rounded-lg px-4 py-4 font-medium transition-all ${
                   activeTab === "payments"
-                    ? "bg-primary text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-meta-4 dark:text-white dark:hover:bg-meta-4/80"
+                    ? "bg-primary text-white shadow-md"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-meta-4 dark:text-gray-400 dark:hover:bg-opacity-80"
                 }`}
               >
-                <Calendar className="h-4 w-4" />
-                Upcoming Payments
                 {upcomingPayments?.upcoming_payments && (
-                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs">
+                  <span className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
+                    activeTab === "payments" 
+                      ? "bg-white/20 text-white" 
+                      : "bg-purple-500/10 text-purple-600"
+                  }`}>
                     {upcomingPayments.upcoming_payments.length}
                   </span>
                 )}
+                <span className="text-sm">
+                  Upcoming Payments
+                </span>
               </button>
             </div>
           </div>
@@ -288,20 +325,20 @@ export default function PortfolioPage() {
                             <tr key={index} className="border-b border-stroke dark:border-strokedark">
                               <td className="px-4 py-4">
                                 <span className="font-medium text-black dark:text-white">
-                                  {item[0]}
+                                  {item.sector}
                                 </span>
                               </td>
                               <td className="px-4 py-4">
-                                <span className="text-sm">{item[1]}</span>
+                                <span className="text-sm">{item.investment_type}</span>
                               </td>
                               <td className="px-4 py-4">
                                 <span className="inline-flex rounded-full bg-success bg-opacity-10 px-3 py-1 text-sm font-medium text-success">
-                                  {item[2]}
+                                  {item.count}
                                 </span>
                               </td>
                               <td className="px-4 py-4">
                                 <span className="font-semibold text-black dark:text-white">
-                                  {formatCurrency(item[3], currency)}
+                                  {formatCurrency(item.total_value, currency)}
                                 </span>
                               </td>
                             </tr>
@@ -346,7 +383,7 @@ export default function PortfolioPage() {
                               Location
                             </th>
                             <th className="px-4 py-4 font-medium text-black dark:text-white">
-                              Shares
+                              Ownership %
                             </th>
                             <th className="px-4 py-4 font-medium text-black dark:text-white">
                               Amount Invested
@@ -365,39 +402,39 @@ export default function PortfolioPage() {
                               <td className="px-4 py-4">
                                 <div>
                                   <p className="font-medium text-black dark:text-white">
-                                    {company[1]}
+                                    {company.company_name}
                                   </p>
-                                  {company[2] && (
-                                    <p className="text-sm text-gray-500">{company[2]}</p>
+                                  {company.company_short_description && (
+                                    <p className="text-sm text-gray-500">{company.company_short_description}</p>
                                   )}
                                 </div>
                               </td>
                               <td className="px-4 py-4">
                                 <span className="inline-flex rounded-full bg-primary bg-opacity-10 px-3 py-1 text-sm font-medium text-primary">
-                                  {company[5]}
+                                  {company.sector}
                                 </span>
                               </td>
                               <td className="px-4 py-4">
                                 <span className="flex items-center text-sm">
                                   <MapPin className="mr-1 h-4 w-4" />
-                                  {company[3]}
+                                  {company.location}
                                 </span>
                               </td>
                               <td className="px-4 py-4">
-                                <span className="font-semibold">{company[8]}</span>
+                                <span className="font-semibold text-success">{company.acquisition_percentage}%</span>
                               </td>
                               <td className="px-4 py-4">
-                                <span className="font-semibold text-success">
-                                  {formatCurrency(company[6], company[7])}
+                                <span className="font-semibold text-black dark:text-white">
+                                  {formatCurrency(company.amount_invested, company.currency)}
                                 </span>
                               </td>
                               <td className="px-4 py-4">
-                                <span className="text-sm">{formatDate(company[9])}</span>
+                                <span className="text-sm">{formatDate(company.investment_date)}</span>
                               </td>
                               <td className="px-4 py-4">
-                                {company[4] && (
+                                {company.website && (
                                   <a
-                                    href={company[4]}
+                                    href={company.website.startsWith('http') ? company.website : `https://${company.website}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="flex items-center text-sm text-primary hover:underline"
@@ -466,7 +503,7 @@ export default function PortfolioPage() {
                         <thead>
                           <tr className="bg-gray-2 text-left dark:bg-meta-4">
                             <th className="px-4 py-4 font-medium text-black dark:text-white">
-                              Company / Project
+                              Project / Company
                             </th>
                             <th className="px-4 py-4 font-medium text-black dark:text-white">
                               Location
@@ -478,13 +515,13 @@ export default function PortfolioPage() {
                               Stage
                             </th>
                             <th className="px-4 py-4 font-medium text-black dark:text-white">
-                              Shares
+                              Share %
                             </th>
                             <th className="px-4 py-4 font-medium text-black dark:text-white">
                               Amount Invested
                             </th>
                             <th className="px-4 py-4 font-medium text-black dark:text-white">
-                              Completion Cost
+                              Projected Returns
                             </th>
                           </tr>
                         </thead>
@@ -494,40 +531,40 @@ export default function PortfolioPage() {
                               <td className="px-4 py-4">
                                 <div>
                                   <p className="font-medium text-black dark:text-white">
-                                    {project[1]}
+                                    {project.project_name}
                                   </p>
-                                  <p className="text-sm text-gray-500">{project[2]}</p>
+                                  <p className="text-sm text-gray-500">{project.company_name}</p>
                                 </div>
                               </td>
                               <td className="px-4 py-4">
                                 <span className="flex items-center text-sm">
                                   <MapPin className="mr-1 h-4 w-4" />
-                                  {project[3]}
+                                  {project.project_location}
                                 </span>
                               </td>
                               <td className="px-4 py-4">
                                 <span className="inline-flex rounded-full bg-warning bg-opacity-10 px-3 py-1 text-sm font-medium text-warning">
-                                  {project[4]}
+                                  {project.project_sector}
                                 </span>
                               </td>
                               <td className="px-4 py-4">
-                                <span className="text-sm">{project[6]}</span>
+                                <span className="text-sm">{project.current_project_stage}</span>
                               </td>
                               <td className="px-4 py-4">
-                                <span className="font-semibold">{project[9]}</span>
+                                <span className="font-semibold text-success">{project.project_share}%</span>
                               </td>
                               <td className="px-4 py-4">
-                                <span className="font-semibold text-success">
-                                  {formatCurrency(project[7], project[8])}
+                                <span className="font-semibold text-black dark:text-white">
+                                  {formatCurrency(project.amount_invested, project.currency)}
                                 </span>
                               </td>
                               <td className="px-4 py-4">
                                 <div className="text-sm">
-                                  <p>
-                                    Est: {formatCurrency(project[10], project[8])}
+                                  <p className="font-medium text-success">
+                                    Revenue: {formatCurrency(project.projected_revenue, project.currency)}
                                   </p>
                                   <p className="text-gray-500">
-                                    Current: {formatCurrency(project[11], project[8])}
+                                    Profit: {formatCurrency(project.projected_profit, project.currency)}
                                   </p>
                                 </div>
                               </td>

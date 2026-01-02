@@ -64,7 +64,7 @@ const SignIn: React.FC = () => {
         {/* Banner Section - Hidden on mobile */}
         <div className="hidden md:block md:w-2/3 relative overflow-hidden">
           <Image
-            src="/backgrounds/wallpaper.webp"
+            src="/backgrounds/login_back.png"
             alt="Banner"
             fill
             className="object-cover"

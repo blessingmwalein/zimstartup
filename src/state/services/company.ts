@@ -375,7 +375,7 @@ export const registerCompanyRequestDetails = async (
 
 //get watchlist
 export const getWatchList = async (national_id: string): Promise<any> => {
-  const response = await api.get<any>(`get-user-watchlist/${national_id}`);
+  const response = await api.get<any>(`watchlist/${national_id}`);
   return response.data;
 };
 

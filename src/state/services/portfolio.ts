@@ -3,47 +3,41 @@ import { createAxiosInstance } from "./axios";
 const api = createAxiosInstance();
 
 // Portfolio Summary Types
-export interface PortfolioTotal {
-  count: number;
-  amount: number;
-  currency: string;
-}
-
-export interface PortfolioDiversity {
-  sector: string;
-  request_type: string;
-  count: number;
-  amount: number;
-}
-
-export interface PortfolioLiquidity {
-  liquid_assets: number;
-  illiquid_assets: number;
-  total_investments: number;
-}
-
 export interface PortfolioSummaryResponse {
-  totals: [number, number, string][];
-  diversity: [string, string, number, number][];
-  liquidity: [number, number, number];
+  totals: {
+    total_investments: number;
+    total_value: number;
+    currency: string;
+  }[];
+  diversity: {
+    sector: string;
+    investment_type: string;
+    count: number;
+    total_value: number;
+  }[];
+  liquidity: {
+    tradable_count: number;
+    tradable_value: number;
+    total_count: number;
+  };
 }
 
 // Companies Owned Types
 export interface CompanyOwned {
   company_id: number;
   company_name: string;
-  company_abbreviations: string | null;
+  company_short_description: string | null;
   location: string;
   website: string;
   sector: string;
   amount_invested: number;
   currency: string;
-  quantity: number;
+  acquisition_percentage: number;
   investment_date: string;
 }
 
 export interface CompaniesOwnedResponse {
-  companies_owned: [number, string, string | null, string, string, string, number, string, number, string][];
+  companies_owned: CompanyOwned[];
 }
 
 // Equity Investments Types
@@ -69,18 +63,18 @@ export interface ProjectInvestment {
   project_name: string;
   project_location: string;
   project_sector: string;
-  start_date: string;
-  project_stage: string;
+  expected_completion_date: string;
+  current_project_stage: string;
   amount_invested: number;
   currency: string;
-  quantity: number;
-  estimated_completion_cost: number;
-  current_completion_cost: number;
+  project_share: number;
+  projected_revenue: number;
+  projected_profit: number;
   investment_date: string;
 }
 
 export interface ProjectFinancingResponse {
-  project_investments: [number, string, string, string, string, string, string, number, string, number, number, number, string][];
+  project_investments: ProjectInvestment[];
 }
 
 // Revenue-Based Financing Types

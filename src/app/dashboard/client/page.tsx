@@ -129,11 +129,11 @@ export default function Dashboard() {
     // Transform API response to match Sector interface
     const sectors: Sector[] = industryList?.length
         ? industryList.map((item: any) => ({
-              id: item[0],
-              created_at: item[1],
-              status: item[2],
-              sector: item[3],
-              number_of_companies: item[4],
+              id: item.id,
+              created_at: item.created_at,
+              status: item.status,
+              sector: item.sector,
+              number_of_companies: item.number_of_sectors,
           }))
         : [];
 
@@ -168,9 +168,9 @@ export default function Dashboard() {
                                         <div className="p-6 flex flex-col items-center">
                                             <div className="bg-gray-50 p-4 rounded-full mb-4 text-secondary group-hover:bg-secondary group-hover:text-white transition-colors duration-300">
                                                 {getSectorIcon(sector.sector)}
-                                            </div>companie
+                                            </div>
                                             <h3 className="text-xl font-semibold mb-2">{sector.sector}</h3>
-                                            <p className="text-gray-500 mb-4">{sector.number_of_sectors} companies</p>
+                                            <p className="text-gray-500 mb-4">{sector.number_of_companies} companies</p>
                                             <div className="mt-auto flex items-center text-secondary font-medium">
                                                 Explore
                                                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
