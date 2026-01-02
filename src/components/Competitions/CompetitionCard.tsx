@@ -28,6 +28,14 @@ const CompetitionCard: React.FC<CompetitionCardProps> = ({
   } = competition;
 
   const getStatusChip = (status: string) => {
+    if (!status) {
+      return (
+        <span className="absolute right-4 top-4 rounded-full bg-gray-500 px-3 py-1 text-xs font-bold text-white">
+          DRAFT
+        </span>
+      );
+    }
+
     switch (status.toUpperCase()) {
       case "OPEN":
         return (
@@ -89,7 +97,7 @@ const CompetitionCard: React.FC<CompetitionCardProps> = ({
         </div>
         <div className="mb-4 flex items-center text-sm text-gray-500">
           <MapPin className="mr-2 h-4 w-4" />
-          <span>{target_location}</span>
+          <span>{target_location || "Location TBD"}</span>
         </div>
 
         <div className="mt-6 flex items-center justify-between">
@@ -104,7 +112,7 @@ const CompetitionCard: React.FC<CompetitionCardProps> = ({
             variant="solid"
             onClick={() => onJoin(competition)}
             isLoading={status === "loading"}
-            isDisabled={status.toUpperCase() !== "OPEN"}
+            isDisabled={!status || status.toUpperCase() !== "OPEN"}
           >
             Join Competition
           </CustomButton>

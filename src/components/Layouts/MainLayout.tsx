@@ -60,6 +60,8 @@ export default function MainLayout({
                                 <nav className="hidden md:flex items-center space-x-10">
                                     <Link href="/dashboard/client" className="text-white text-sm font-medium">Companies</Link>
                                     <Link href="/competitions" className="text-white text-sm font-medium">Competitions</Link>
+                                    <Link href="/vcc" className="text-white text-sm font-medium">VCC</Link>
+                                    <Link href="/funding-opportunities" className="text-white text-sm font-medium">Funding</Link>
                                     <Link href="/youth-hub" className="text-white text-sm font-medium">Youth Hub</Link>
 
                                     <Link href="/about" className="text-white text-sm hover:text-white-200 transition-colors">About</Link>
@@ -67,6 +69,7 @@ export default function MainLayout({
                                 </nav>
                             ) : (<nav className="hidden md:flex items-center space-x-10">
                                 <Link href="/" className="text-white text-sm font-medium">Home</Link>
+                                <Link href="/funding-opportunities" className="text-white text-sm font-medium">Funding</Link>
                                 <Link href="/about" className="text-white text-sm hover:text-white-200 transition-colors">About</Link>
                                 <Link href="/helpdesk" className="text-white text-sm hover:text-white-200 transition-colors">HelpDesk</Link>
                             </nav>)
@@ -279,6 +282,18 @@ export default function MainLayout({
                     </div>
                 </footer>
             )}
+            <ToastContainer 
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     );
 }

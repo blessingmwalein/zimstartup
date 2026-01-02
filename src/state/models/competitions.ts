@@ -2,7 +2,7 @@ export interface Competition {
     competition_id: number
     vcc_name: string
     competition_category: string
-    status: string
+    status: string | null
     featured_image_url: string
     name: string
     short_description: string
@@ -10,7 +10,7 @@ export interface Competition {
     end_date: string
     vcc_logo: string
     is_active: boolean
-    target_location: string
+    target_location: string | null
 }
 
 export interface CompetitionQuestion {

@@ -35,6 +35,7 @@ export default function AuthLayout({
               {/* Desktop Navigation */}
               <div className="hidden md:flex space-x-6 text-sm font-medium">
                 <Link href="/" className="hover:text-lime-600 transition-colors">Home</Link>
+                <Link href="/funding-opportunities" className="hover:text-lime-600 transition-colors">Funding</Link>
                 <Link href="/youth-hub" className="hover:text-lime-600 transition-colors">HelpDesk</Link>
                 <Link href="/about" className="hover:text-lime-600 transition-colors">About</Link>
               </div>
@@ -59,6 +60,13 @@ export default function AuthLayout({
                     className="hover:text-lime-600 transition-colors py-2"
                   >
                     Home
+                  </Link>
+                  <Link
+                    href="/funding-opportunities"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="hover:text-lime-600 transition-colors py-2"
+                  >
+                    Funding
                   </Link>
                   <Link
                     href="/youth-hub"

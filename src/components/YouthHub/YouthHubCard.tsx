@@ -12,6 +12,8 @@ interface YouthHubCardProps {
 
 const YouthHubCard: React.FC<YouthHubCardProps> = ({ youthHub, onViewDetails }) => {
   const getStatusColor = (status: string) => {
+    if (!status) return "bg-gray-100 text-gray-800";
+    
     switch (status.toUpperCase()) {
       case "OPEN":
         return "bg-green-100 text-green-800"
@@ -25,6 +27,8 @@ const YouthHubCard: React.FC<YouthHubCardProps> = ({ youthHub, onViewDetails }) 
   }
 
   const getSectorIcon = (sector: string) => {
+    if (!sector) return "🚀";
+    
     switch (sector.toLowerCase()) {
       case "health":
         return "🏥"

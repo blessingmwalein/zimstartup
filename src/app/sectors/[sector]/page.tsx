@@ -3,12 +3,15 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Image from "next/image";
-import { Building2, MapPin, Users, TrendingUp, DollarSign, Calendar, X } from "lucide-react";
+import { Building2, MapPin, Users, TrendingUp, DollarSign, Calendar, X, Heart } from "lucide-react";
 import { FilterOptions, useInvestmentData } from "@/hooks/useInvestmentData";
 import MainLayout from "@/components/Layouts/MainLayout";
 import CustomButton from "@/components/Companies/ui/custom-button";
 import SelectDropdown from "@/components/FormElements/SelectDropdown";
 import SkeletonLoader from "@/components/common/SkeletonLoader";
+import { addToWatchlist } from "@/state/services/watchlist";
+import { useAppSelector } from "@/state/store";
+import { toast } from "react-toastify";
 
 const COMPANY_STATUS_OPTIONS = [
   { value: "PENDING CHECK", label: "Pending Check" },
@@ -45,10 +48,12 @@ export default function SectorPage() {
   const router = useRouter();
   const sector = params.sector as string;
   const { companies, loading, error, getSectorCompanies } = useInvestmentData(null);
+  const { user } = useAppSelector((state) => state.auth);
 
   const [filters, setFilters] = useState<FilterOptions>({});
   const [totalCompanies, setTotalCompanies] = useState(0);
   const [imageErrors, setImageErrors] = useState<Set<number>>(new Set());
+  const [addingToWatchlist, setAddingToWatchlist] = useState<number | null>(null);
 
   useEffect(() => {
     const loadCompanies = async () => {
@@ -61,10 +66,38 @@ export default function SectorPage() {
     };
 
     loadCompanies();
-  }, [sector, filters]);
+  }, [sector, filters, getSectorCompanies]);
 
   const handleInvestNowClick = (companyId: number) => {
     router.push(`/companies/${encodeURIComponent(companyId)}`);
+  };
+
+  const handleAddToWatchlist = async (companyId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    if (!user?.national_id) {
+      toast.error("Please log in to add companies to your watchlist");
+      return;
+    }
+
+    setAddingToWatchlist(companyId);
+    
+    try {
+      const result = await addToWatchlist({
+        national_id: user.national_id,
+        company_id: companyId,
+        watchlist_status: true,
+      });
+
+      if (result.watchlist_item) {
+        toast.success("Company added to your watchlist!");
+      }
+    } catch (error: any) {
+      console.error("Error adding to watchlist:", error);
+      toast.error(error.response?.data?.detail || "Failed to add to watchlist");
+    } finally {
+      setAddingToWatchlist(null);
+    }
   };
 
   const handleFilterChange = (key: keyof FilterOptions, value: string) => {
@@ -388,15 +421,29 @@ export default function SectorPage() {
                               </div>
                             </div>
 
-                            {/* Action Button */}
-                            <CustomButton
-                              variant="solid"
-                              color="#10b981"
-                              type="button"
-                              onClick={() => handleInvestNowClick(company.company_id)}
-                            >
-                              View Details
-                            </CustomButton>
+                            {/* Action Buttons */}
+                            <div className="flex gap-2">
+                              <button
+                                onClick={(e) => handleAddToWatchlist(company.company_id, e)}
+                                disabled={addingToWatchlist === company.company_id}
+                                className="rounded-lg border border-gray-300 p-3 text-gray-600 transition-colors hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 disabled:opacity-50"
+                                title="Add to Watchlist"
+                              >
+                                {addingToWatchlist === company.company_id ? (
+                                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent" />
+                                ) : (
+                                  <Heart className="h-5 w-5" />
+                                )}
+                              </button>
+                              <CustomButton
+                                variant="solid"
+                                color="#10b981"
+                                type="button"
+                                onClick={() => handleInvestNowClick(company.company_id)}
+                              >
+                                View Details
+                              </CustomButton>
+                            </div>
                           </div>
                         </div>
                       </div>

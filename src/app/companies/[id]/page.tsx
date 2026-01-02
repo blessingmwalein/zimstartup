@@ -58,6 +58,7 @@ import {
   Percent,
   Instagram,
   Twitter,
+  Heart,
 } from "lucide-react";
 import MainLayout from "@/components/Layouts/MainLayout";
 import CustomButton from "@/components/Buttons/CustomButton";
@@ -67,6 +68,10 @@ import { useInvestmentData } from "@/hooks/useInvestmentData";
 import CommentsRatingsSection from "@/components/Companies/CommentsRatingsSection";
 import DirectorDetailDrawer from "@/components/Companies/DirectorDetailDrawer";
 import CompanyRequestDrawer from "@/components/Companies/CompanyRequestDrawer";
+import BuyStockModal from "@/components/Companies/BuyStockModal";
+import { addToWatchlist } from "@/state/services/watchlist";
+import { useAppSelector } from "@/state/store";
+import { toast } from "react-toastify";
 
 // Comprehensive dummy data
 const mockCompanyData = {
@@ -319,6 +324,7 @@ const MetricCard = ({
 export default function CompanyPage() {
   const params = useParams();
   const companyId = Number.parseInt(params.id as string);
+  const { user } = useAppSelector((state) => state.auth);
 
   // Use real hooks
   // const {
@@ -365,6 +371,7 @@ export default function CompanyPage() {
   const [isDocumentModalOpen, setIsDocumentModalOpen] = useState(false);
   const [isQuestionModalOpen, setIsQuestionModalOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
+  const [addingToWatchlist, setAddingToWatchlist] = useState(false);
 
   // Form states
   const [investmentAmount, setInvestmentAmount] = useState("");
@@ -508,6 +515,32 @@ export default function CompanyPage() {
     // }
   };
 
+  const handleAddToWatchlist = async () => {
+    if (!user?.national_id) {
+      toast.error("Please log in to add companies to your watchlist");
+      return;
+    }
+
+    setAddingToWatchlist(true);
+    
+    try {
+      const result = await addToWatchlist({
+        national_id: user.national_id,
+        company_id: companyId,
+        watchlist_status: true,
+      });
+
+      if (result.watchlist_item) {
+        toast.success("Company added to your watchlist!");
+      }
+    } catch (error: any) {
+      console.error("Error adding to watchlist:", error);
+      toast.error(error.response?.data?.detail || "Failed to add to watchlist");
+    } finally {
+      setAddingToWatchlist(false);
+    }
+  };
+
   const openDocumentModal = (document: any) => {
     setSelectedDocument(document);
     setIsDocumentModalOpen(true);
@@ -598,6 +631,21 @@ export default function CompanyPage() {
                   <span className="rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-800">
                     {companyDetails?.company_score?.completeness_score || 0}% Complete
                   </span>
+                  {/* Add to Watchlist Button */}
+                  <button
+                    onClick={handleAddToWatchlist}
+                    disabled={addingToWatchlist}
+                    className="flex items-center space-x-2 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 transition-colors hover:border-emerald-500 hover:bg-emerald-50 hover:text-emerald-600 disabled:opacity-50"
+                  >
+                    {addingToWatchlist ? (
+                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-emerald-600 border-t-transparent" />
+                    ) : (
+                      <Heart className="h-5 w-5" />
+                    )}
+                    <span className="font-medium">
+                      {addingToWatchlist ? "Adding..." : "Add to Watchlist"}
+                    </span>
+                  </button>
                 </div>
               </div>
 
@@ -650,7 +698,13 @@ export default function CompanyPage() {
                   <CustomButton
                     type="button"
                     variant="solid"
-                    onClick={() => setIsInvestmentModalOpen(true)}
+                    onClick={() => {
+                      if (!user?.national_id) {
+                        toast.error("Please log in to invest in companies");
+                        return;
+                      }
+                      setIsInvestmentModalOpen(true);
+                    }}
                   >
                     Invest Now
                   </CustomButton>
@@ -2239,121 +2293,15 @@ export default function CompanyPage() {
         </div>
       </div>
 
-      {/* All modals remain the same as in the previous version */}
-      {/* Investment Modal */}
-      <Transition appear show={isInvestmentModalOpen} as={Fragment}>
-        <Dialog
-          as="div"
-          className="relative z-50"
-          onClose={setIsInvestmentModalOpen}
-        >
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white shadow-2xl transition-all">
-                  <div className="bg-gradient-to-r from-emerald-500 to-blue-500 px-6 py-4">
-                    <Dialog.Title
-                      as="h3"
-                      className="text-xl font-bold text-white"
-                    >
-                      Invest in{" "}
-                      {companySummary?.company_details?.company_name ||
-                        "Company"}
-                    </Dialog.Title>
-                    <p className="mt-1 text-emerald-100">
-                      Join the investment opportunity
-                    </p>
-                  </div>
-
-                  <div className="p-6">
-                    <div className="space-y-4">
-                      <TextField
-                        label="Investment Amount (USD)"
-                        type="number"
-                        placeholder="Enter amount"
-                        value={investmentAmount}
-                        onChange={(e) => setInvestmentAmount(e.target.value)}
-                        icon={<DollarSign className="h-5 w-5" />}
-                      />
-
-                      <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
-                        <h4 className="mb-3 font-semibold text-gray-900">
-                          Investment Details
-                        </h4>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Available:</span>
-                            <span className="font-semibold text-emerald-600">
-                              {formatCurrency(
-                                companySummary?.pie_chart_payment_summary
-                                  ?.remaining || 0,
-                              )}
-                            </span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">
-                              Minimum Investment:
-                            </span>
-                            <span className="font-semibold">$1,000</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">
-                              Expected Return:
-                            </span>
-                            <span className="font-semibold text-green-600">
-                              15-25% annually
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex space-x-3 px-6 pb-6">
-                    <CustomButton
-                      type="button"
-                      variant="solid"
-                      fullWidth
-                      onClick={handleInvestment}
-                    >
-                      <DollarSign className="mr-2 h-4 w-4" />
-                      Confirm Investment
-                    </CustomButton>
-                    <CustomButton
-                      type="button"
-                      variant="outlined"
-                      fullWidth
-                      onClick={() => setIsInvestmentModalOpen(false)}
-                    >
-                      Cancel
-                    </CustomButton>
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
+      {/* All modals */}
+      {/* Buy Stock Modal */}
+      <BuyStockModal
+        isOpen={isInvestmentModalOpen}
+        onClose={() => setIsInvestmentModalOpen(false)}
+        companyId={companyId}
+        companyName={companySummary?.company_details?.company_name || "Company"}
+        nationalId={user?.national_id || ""}
+      />
 
       {/* Document Modal */}
       <Transition appear show={isDocumentModalOpen} as={Fragment}>
