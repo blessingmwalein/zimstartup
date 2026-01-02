@@ -106,6 +106,7 @@ const menuGroups = [
           { label: "Sell Stock", route: "/wallet/sell-stock" },
           { label: "Transactions", route: "/wallet/transactions" },
           { label: "Exchange Cash", route: "/wallet/exchange-cash" },
+          { label: "Portfolio", route: "/portfolio" },
         ],
       },
       // {

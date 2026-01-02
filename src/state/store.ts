@@ -10,6 +10,7 @@ import companyReviewsReducer from "./slices/companyReviewsSlice";
 import employeeReducer from "./slices/employeeSlice";
 import vccReducer from "./slices/vccSlice";
 import fundingOpportunitiesReducer from "./slices/fundingOpportunitiesSlice";
+import portfolioReducer from "./slices/portfolioSlice";
 
 const store = configureStore({
   reducer: {
@@ -22,6 +23,7 @@ const store = configureStore({
     employee: employeeReducer,
     vcc: vccReducer,
     fundingOpportunities: fundingOpportunitiesReducer,
+    portfolio: portfolioReducer,
     // Add your auth slice reducer here
   },
 });
