@@ -116,13 +116,13 @@ const CompetitionSearchInput: React.FC<CompetitionSearchInputProps> = ({
           {(query || location) &&
             suggestions.map((competition) => (
               <div
-                key={competition.competition_id}
+                key={competition.vcc_id}
                 onClick={() => onCompetitionSelect(competition)}
                 className="flex w-full cursor-pointer py-[10px] pl-[23px] pr-[15px] text-left text-[15px] hover:bg-[#0000000F]"
               >
                 <div className="ml-2 w-full">
-                  <div className="ml-2 font-bold">{competition.name}</div>
-                  <div className="ml-2">{competition.target_location}</div>
+                  <div className="ml-2 font-bold">{competition.competition_name || competition.name}</div>
+                  <div className="ml-2">{competition.target_location || "Global"}</div>
                 </div>
               </div>
             ))}

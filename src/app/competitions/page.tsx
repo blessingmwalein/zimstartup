@@ -7,8 +7,8 @@ import { useCompetitions } from "../../hooks/useCompetitions";
 import CompetitionCard from "../../components/Competitions/CompetitionCard";
 import CompetitionDetailsModal from "../../components/Competitions/CompetitionDetailsModal";
 import { Competition } from "@/state/models/competitions";
-import { Loader2 } from "lucide-react";
 import CompetitionSearchInput from "@/components/FormElements/SearchInput/CompetitionSearchInput";
+import SkeletonLoader from "@/components/common/SkeletonLoader";
 
 export default function CompetitionsPage() {
   const [query, setQuery] = useState("");
@@ -45,7 +45,7 @@ export default function CompetitionsPage() {
   };
 
   const handleJoinCompetition = (competition: Competition) => {
-    router.push(`/competitions/join/${competition.competition_id}`);
+    router.push(`/competitions/join/${competition.vcc_id}`);
   };
 
   return (
@@ -76,8 +76,8 @@ export default function CompetitionsPage() {
           {/* </div> */}
 
           {loading && (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-12 w-12 animate-spin text-secondary" />
+            <div className="mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+              <SkeletonLoader variant="competition-card" count={6} />
             </div>
           )}
 
@@ -87,9 +87,9 @@ export default function CompetitionsPage() {
 
           {!loading && !error && (
             <div className=" mt-16 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {competitions.map((competition) => (
+              {competitions?.map((competition) => (
                 <CompetitionCard
-                  key={competition.competition_id}
+                  key={competition.vcc_id}
                   competition={competition}
                   onViewDetails={handleViewDetails}
                   onJoin={handleJoinCompetition}

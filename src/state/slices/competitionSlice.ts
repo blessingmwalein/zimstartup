@@ -16,12 +16,12 @@ const initialState: CompetitionsState = {
 
 export const fetchCompetitions = createAsyncThunk("competitions/fetchCompetitions", async () => {
     const response = await getAllCompetitions()
-    return response.data
+    return response.results || response
 })
 
 export const findCompetitions = createAsyncThunk("competitions/findCompetitions", async (params: { query: string, location: string }) => {
     const response = await searchCompetitions(params)
-    return response.data
+    return response.results || response
 })
 
 const competitionsSlice = createSlice({
@@ -36,7 +36,7 @@ const competitionsSlice = createSlice({
             })
             .addCase(fetchCompetitions.fulfilled, (state, action) => {
                 state.loading = false
-                state.competitions = action.payload
+                state.competitions = action.payload || []
             })
             .addCase(fetchCompetitions.rejected, (state, action) => {
                 state.loading = false
@@ -48,7 +48,7 @@ const competitionsSlice = createSlice({
             })
             .addCase(findCompetitions.fulfilled, (state, action) => {
                 state.loading = false
-                state.competitions = action.payload
+                state.competitions = action.payload || []
             })
             .addCase(findCompetitions.rejected, (state, action) => {
                 state.loading = false

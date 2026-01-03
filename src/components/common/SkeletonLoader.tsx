@@ -1,7 +1,7 @@
 import React from "react";
 
 interface SkeletonLoaderProps {
-  variant?: "card" | "sector-card" | "company-card" | "text";
+  variant?: "card" | "sector-card" | "company-card" | "competition-card" | "text";
   count?: number;
   className?: string;
 }
@@ -47,6 +47,39 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
                   <div className="h-8 w-24 rounded bg-gray-200"></div>
                   <div className="h-10 w-32 rounded bg-gray-200"></div>
                 </div>
+              </div>
+            </div>
+          </div>
+        );
+
+      case "competition-card":
+        return (
+          <div className="overflow-hidden rounded-lg bg-white shadow-lg">
+            <div className="relative h-48 w-full animate-pulse">
+              <div className="h-full w-full bg-gray-200"></div>
+              <div className="absolute right-4 top-4 h-6 w-16 rounded-full bg-gray-300"></div>
+              <div className="absolute bottom-4 left-4 space-y-2">
+                <div className="h-6 w-48 rounded bg-gray-300"></div>
+                <div className="h-4 w-32 rounded bg-gray-300"></div>
+              </div>
+            </div>
+            <div className="p-6 animate-pulse">
+              <div className="mb-4 space-y-2">
+                <div className="h-4 w-full rounded bg-gray-200"></div>
+                <div className="h-4 w-full rounded bg-gray-200"></div>
+                <div className="h-4 w-3/4 rounded bg-gray-200"></div>
+              </div>
+              <div className="mb-2 flex items-center">
+                <div className="mr-2 h-4 w-4 rounded bg-gray-200"></div>
+                <div className="h-4 w-48 rounded bg-gray-200"></div>
+              </div>
+              <div className="mb-4 flex items-center">
+                <div className="mr-2 h-4 w-4 rounded bg-gray-200"></div>
+                <div className="h-4 w-32 rounded bg-gray-200"></div>
+              </div>
+              <div className="mt-6 flex items-center justify-between">
+                <div className="h-4 w-24 rounded bg-gray-200"></div>
+                <div className="h-10 w-32 rounded bg-gray-200"></div>
               </div>
             </div>
           </div>

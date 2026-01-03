@@ -1,16 +1,22 @@
 export interface Competition {
-    competition_id: number
-    vcc_name: string
+    vcc_id: number
+    competition_name: string
     competition_category: string
-    status: string | null
-    featured_image_url: string
-    name: string
-    short_description: string
+    competition_description: string
     start_date: string
     end_date: string
-    vcc_logo: string
-    is_active: boolean
-    target_location: string | null
+    max_participants: number
+    min_participants: number
+    // Legacy fields for backward compatibility
+    competition_id?: number
+    vcc_name?: string
+    status?: string | null
+    featured_image_url?: string
+    name?: string
+    short_description?: string
+    vcc_logo?: string
+    is_active?: boolean
+    target_location?: string | null
 }
 
 export interface CompetitionQuestion {

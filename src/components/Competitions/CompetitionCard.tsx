@@ -16,16 +16,15 @@ const CompetitionCard: React.FC<CompetitionCardProps> = ({
   onViewDetails,
   onJoin,
 }) => {
-  const {
-    name,
-    short_description,
-    featured_image_url,
-    start_date,
-    end_date,
-    status,
-    target_location,
-    vcc_name,
-  } = competition;
+  // Map new API fields to old field names for backward compatibility
+  const name = competition.competition_name || competition.name || "Untitled Competition";
+  const short_description = competition.competition_description || competition.short_description || "";
+  const featured_image_url = competition.featured_image_url || "/images/cards/cards-01.png";
+  const start_date = competition.start_date;
+  const end_date = competition.end_date;
+  const status = competition.status || "OPEN";
+  const target_location = competition.target_location || "Global";
+  const vcc_name = competition.vcc_name || competition.competition_category || "";
 
   const getStatusChip = (status: string) => {
     if (!status) {

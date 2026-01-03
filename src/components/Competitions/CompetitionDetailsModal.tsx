@@ -17,6 +17,15 @@ const CompetitionDetailsModal: React.FC<CompetitionDetailsModalProps> = ({
 }) => {
   if (!competition) return null;
 
+  // Map new API fields to old field names for backward compatibility
+  const name = competition.competition_name || competition.name || "Untitled Competition";
+  const short_description = competition.competition_description || competition.short_description || "";
+  const featured_image_url = competition.featured_image_url || "/images/cards/cards-01.png";
+  const vcc_logo = competition.vcc_logo || "/images/logo/logo.svg";
+  const vcc_name = competition.vcc_name || competition.competition_category || "";
+  const status = competition.status || "OPEN";
+  const target_location = competition.target_location || "Global";
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 p-4">
       <div className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl bg-white shadow-2xl">
@@ -29,15 +38,15 @@ const CompetitionDetailsModal: React.FC<CompetitionDetailsModalProps> = ({
 
         <div className="relative h-64 w-full overflow-hidden rounded-t-xl">
           <Image
-            src={`/${competition.featured_image_url} `}
-            alt={competition.name}
+            src={`/${featured_image_url}`}
+            alt={name}
             layout="fill"
             objectFit="cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
           <div className="absolute bottom-6 left-6">
             <h2 className="text-3xl font-bold text-white">
-              {competition.name}
+              {name}
             </h2>
           </div>
         </div>
@@ -45,18 +54,18 @@ const CompetitionDetailsModal: React.FC<CompetitionDetailsModalProps> = ({
         <div className="p-8">
           <div className="mb-6 flex items-center">
             <Image
-              src={`/${competition.vcc_logo}`}
-              alt={`${competition.vcc_name} logo`}
+              src={`/${vcc_logo}`}
+              alt={`${vcc_name} logo`}
               width={40}
               height={40}
               className="mr-4 rounded-full"
             />
             <span className="text-lg font-semibold text-gray-700">
-              {competition.vcc_name}
+              {vcc_name}
             </span>
           </div>
 
-          <p className="mb-6 text-gray-600">{competition.short_description}</p>
+          <p className="mb-6 text-gray-600">{short_description}</p>
 
           <div className="grid grid-cols-1 gap-6 text-sm md:grid-cols-2">
             <div className="flex items-start">
@@ -87,7 +96,7 @@ const CompetitionDetailsModal: React.FC<CompetitionDetailsModalProps> = ({
               <MapPin className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-secondary" />
               <div>
                 <h4 className="font-semibold text-gray-800">Location</h4>
-                <p className="text-gray-500">{competition.target_location}</p>
+                <p className="text-gray-500">{target_location}</p>
               </div>
             </div>
             <div className="flex items-start">
@@ -110,7 +119,7 @@ const CompetitionDetailsModal: React.FC<CompetitionDetailsModalProps> = ({
               <Building className="mr-3 mt-1 h-5 w-5 flex-shrink-0 text-secondary" />
               <div>
                 <h4 className="font-semibold text-gray-800">Status</h4>
-                <p className="text-gray-500">{competition.status}</p>
+                <p className="text-gray-500">{status}</p>
               </div>
             </div>
           </div>
@@ -126,7 +135,7 @@ const CompetitionDetailsModal: React.FC<CompetitionDetailsModalProps> = ({
               variant="solid"
               onClick={() => onJoin(competition)}
               //   isLoading={status === "loading"}
-              isDisabled={competition.status.toUpperCase() !== "OPEN"}
+              isDisabled={status?.toUpperCase() !== "OPEN"}
             >
               Join Competition
             </CustomButton>
