@@ -36,6 +36,7 @@ import AddCompanyRequestDialog from "@/components/Companies/dialogs/add-company-
 
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import CompanyDirectors from "@/components/Companies/company-directors";
+import CompanyViewSkeleton from "@/components/Companies/CompanyViewSkeleton";
 import type { CreateCompanyRequest } from "../../../../../../state/models/company";
 import { useSelector } from "react-redux";
 import type { UpdateContactInforRequest } from "../../../../../../state/models/employement";
@@ -265,8 +266,10 @@ export default function CompanyView() {
   }
 
   return (
-    <DefaultLayout loading={loading}>
-      {error ? (
+    <DefaultLayout>
+      {loading ? (
+        <CompanyViewSkeleton />
+      ) : error ? (
         <div className="flex h-screen items-center justify-center">
           <div className="text-center">
             <p className="text-red-500">Error: {error}</p>
@@ -287,116 +290,58 @@ export default function CompanyView() {
       ) : (
         <div className="mx-auto max-w-full p-4">
           {/* Page Header with Gradient */}
-          <div className="mb-6 rounded-lg bg-gradient-to-r from-primary to-blue-600 p-6 text-white shadow-lg">
-            <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
-              <div className="flex gap-4">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20 text-xl font-bold text-white backdrop-blur-sm">
-                  {companyData.company_data.company_abbreviations}
-                </div>
-                <div>
-                  <h1 className="text-2xl font-bold md:text-3xl">
-                    {companyData.company_data.company_name}
-                  </h1>
-                  <p className="mt-1 text-sm opacity-90">
-                    {companyData.company_data.company_short_description}
-                  </p>
-                  <div className="mt-2 flex flex-wrap gap-2">
+          <div className="relative mb-6 rounded-3xl bg-gradient-to-r from-primary to-blue-600 p-6 text-white">
+            {/* Edit Button - Top Right */}
+            <button
+              onClick={() => setEditCompanyDialogOpen(true)}
+              className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white text-primary shadow-lg transition-all hover:scale-110 hover:shadow-xl"
+              title="Edit Company"
+            >
+              <Edit className="h-5 w-5" />
+            </button>
+
+            <div className="flex gap-4 pr-14">
+              <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-sm overflow-hidden">
+                {companyData.company_logo?.company_logo ? (
+                  <img 
+                    src={companyData.company_logo.company_logo} 
+                    alt={companyData.company_data.company_name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span className="text-xl font-bold text-white">
+                    {companyData.company_data.company_abbreviations}
+                  </span>
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-2xl font-bold md:text-3xl">
+                  {companyData.company_data.company_name}
+                </h1>
+                <p className="mt-1 text-sm opacity-90 line-clamp-2">
+                  {companyData.company_data.company_short_description}
+                </p>
+                {companyData.company_data.company_short_description && companyData.company_data.company_short_description.length > 100 && (
+                  <button className="mt-1 text-xs font-medium underline opacity-90 hover:opacity-100">
+                    View more
+                  </button>
+                )}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {companyData.company_data.status && (
                     <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-sm">
                       {companyData.company_data.status}
                     </span>
-                    <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-sm">
-                      {companyData.company_data.sector}
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => console.log("Export")}
-                  className="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur-sm transition-all hover:bg-white/20"
-                >
-                  <FileText className="h-4 w-4" />
-                  Export
-                </button>
-                <button
-                  onClick={() => setEditCompanyDialogOpen(true)}
-                  className="flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-primary shadow-lg transition-all hover:shadow-xl"
-                >
-                  <Edit className="h-4 w-4" />
-                  Edit Company
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Summary Stats Cards */}
-          <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-4 2xl:gap-7.5">
-            {/* Employees Card */}
-            <div className="group rounded-lg border border-stroke bg-white p-6 shadow-default transition-all hover:shadow-xl dark:border-strokedark dark:bg-boxdark">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-title-md font-bold text-black dark:text-white">
-                    {companyData.company_data.employees}
-                  </h4>
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Employees</span>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-blue-500 shadow-lg group-hover:scale-110 transition-transform">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </div>
-
-            {/* Directors Card */}
-            <div className="group rounded-lg border border-stroke bg-white p-6 shadow-default transition-all hover:shadow-xl dark:border-strokedark dark:bg-boxdark">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-title-md font-bold text-black dark:text-white">
-                    {directors?.length || 0}
-                  </h4>
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Directors</span>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-success to-green-500 shadow-lg group-hover:scale-110 transition-transform">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </div>
-
-            {/* Documents Card */}
-            <div className="group rounded-lg border border-stroke bg-white p-6 shadow-default transition-all hover:shadow-xl dark:border-strokedark dark:bg-boxdark">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-title-md font-bold text-black dark:text-white">
-                    {companyDocuments?.documents?.length || 0}
-                  </h4>
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Documents</span>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-amber-500 shadow-lg group-hover:scale-110 transition-transform">
-                  <FileText className="h-6 w-6 text-white" />
-                </div>
-              </div>
-            </div>
-
-            {/* Location Card */}
-            <div className="group rounded-lg border border-stroke bg-white p-6 shadow-default transition-all hover:shadow-xl dark:border-strokedark dark:bg-boxdark">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h4 className="text-title-md font-bold text-black dark:text-white line-clamp-1">
+                  )}
+                  <span className="rounded-full bg-white/20 px-3 py-1 text-xs font-medium backdrop-blur-sm">
                     {companyData.company_data.location}
-                  </h4>
-                  <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Location</span>
-                  <p className="mt-1 text-xs text-gray-500">
-                    {new Date(companyData.company_data.company_start_date).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 shadow-lg group-hover:scale-110 transition-transform">
-                  <MapPin className="h-6 w-6 text-white" />
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Tabs Navigation */}
-          <div className="rounded-lg border border-stroke bg-white shadow-lg dark:border-strokedark dark:bg-boxdark">
+          <div className="rounded-3xl border border-stroke bg-white dark:border-strokedark dark:bg-boxdark">
             <Tab.Group
               selectedIndex={selectedTabIndex}
               onChange={setSelectedTabIndex}
@@ -407,9 +352,9 @@ export default function CompanyView() {
                     <Tab
                       key={index}
                       className={({ selected }) =>
-                        `flex flex-col items-center gap-2 rounded-lg px-3 py-4 font-medium transition-all ${
+                        `flex flex-col items-center gap-2 rounded-2xl px-3 py-4 font-medium transition-all ${
                           selected
-                            ? "bg-primary text-white shadow-md"
+                            ? "bg-primary text-white"
                             : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-meta-4 dark:text-gray-400 dark:hover:bg-opacity-80"
                         }`
                       }
@@ -833,7 +778,7 @@ export default function CompanyView() {
 
               <Tab.Panel>
                 <CompanyDocumentsSection
-                  documents={companyDocuments?.documents || []}
+                  documents={companyData?.company_documents || []}
                   onUpload={handleDocumentUpload}
                 />
               </Tab.Panel>

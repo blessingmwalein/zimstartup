@@ -6,7 +6,8 @@ import "@/css/style.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
 import { Provider } from "react-redux";
-import store from "@/state/store";
+import { PersistGate } from "redux-persist/integration/react";
+import store, { persistor } from "@/state/store";
 import { useAutoLogout } from "@/hooks/useAutoLogout";
 
 // Wrapper component to use the hook within the Provider context
@@ -33,10 +34,12 @@ export default function RootLayout({
     <html lang="en">
       <body suppressHydrationWarning={true}>
         <Provider store={store}>
-          <AutoLogoutCallback />
-          <div className="dark:bg-boxdark-2 dark:text-bodydark">
-            {loading ? <Loader /> : children}
-          </div>
+          <PersistGate loading={<Loader />} persistor={persistor}>
+            <AutoLogoutCallback />
+            <div className="dark:bg-boxdark-2 dark:text-bodydark">
+              {loading ? <Loader /> : children}
+            </div>
+          </PersistGate>
         </Provider>
       </body>
     </html>

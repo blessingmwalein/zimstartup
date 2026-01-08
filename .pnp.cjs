@@ -68,6 +68,7 @@ const RAW_RUNTIME_STATE =
           ["react-toastify", "virtual:bc3c9427d367200defdb471879f3e8e1b1419f4ea172188f365103908706b19a4db3343d1cc40a9bf7e896734dfac6a12c881012620fa778e8d00ae3ddf928cd#npm:10.0.6"],\
           ["recharts", "virtual:bc3c9427d367200defdb471879f3e8e1b1419f4ea172188f365103908706b19a4db3343d1cc40a9bf7e896734dfac6a12c881012620fa778e8d00ae3ddf928cd#npm:2.15.4"],\
           ["redux", "npm:5.0.1"],\
+          ["redux-persist", "virtual:bc3c9427d367200defdb471879f3e8e1b1419f4ea172188f365103908706b19a4db3343d1cc40a9bf7e896734dfac6a12c881012620fa778e8d00ae3ddf928cd#npm:6.0.0"],\
           ["tailwindcss", "npm:3.4.19"],\
           ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"],\
           ["yup", "npm:1.7.1"]\
@@ -1490,6 +1491,7 @@ const RAW_RUNTIME_STATE =
           ["react-toastify", "virtual:bc3c9427d367200defdb471879f3e8e1b1419f4ea172188f365103908706b19a4db3343d1cc40a9bf7e896734dfac6a12c881012620fa778e8d00ae3ddf928cd#npm:10.0.6"],\
           ["recharts", "virtual:bc3c9427d367200defdb471879f3e8e1b1419f4ea172188f365103908706b19a4db3343d1cc40a9bf7e896734dfac6a12c881012620fa778e8d00ae3ddf928cd#npm:2.15.4"],\
           ["redux", "npm:5.0.1"],\
+          ["redux-persist", "virtual:bc3c9427d367200defdb471879f3e8e1b1419f4ea172188f365103908706b19a4db3343d1cc40a9bf7e896734dfac6a12c881012620fa778e8d00ae3ddf928cd#npm:6.0.0"],\
           ["tailwindcss", "npm:3.4.19"],\
           ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"],\
           ["yup", "npm:1.7.1"]\
@@ -5815,6 +5817,32 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../AppData/Local/Yarn/Berry/cache/redux-npm-5.0.1-f8e6b1cb23-10c0.zip/node_modules/redux/",\
         "packageDependencies": [\
           ["redux", "npm:5.0.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["redux-persist", [\
+      ["npm:6.0.0", {\
+        "packageLocation": "../../../../AppData/Local/Yarn/Berry/cache/redux-persist-npm-6.0.0-56dad69feb-10c0.zip/node_modules/redux-persist/",\
+        "packageDependencies": [\
+          ["redux-persist", "npm:6.0.0"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:bc3c9427d367200defdb471879f3e8e1b1419f4ea172188f365103908706b19a4db3343d1cc40a9bf7e896734dfac6a12c881012620fa778e8d00ae3ddf928cd#npm:6.0.0", {\
+        "packageLocation": "./.yarn/__virtual__/redux-persist-virtual-50a35f9524/5/AppData/Local/Yarn/Berry/cache/redux-persist-npm-6.0.0-56dad69feb-10c0.zip/node_modules/redux-persist/",\
+        "packageDependencies": [\
+          ["@types/react", "npm:18.3.27"],\
+          ["@types/redux", null],\
+          ["react", "npm:18.3.1"],\
+          ["redux", "npm:5.0.1"],\
+          ["redux-persist", "virtual:bc3c9427d367200defdb471879f3e8e1b1419f4ea172188f365103908706b19a4db3343d1cc40a9bf7e896734dfac6a12c881012620fa778e8d00ae3ddf928cd#npm:6.0.0"]\
+        ],\
+        "packagePeers": [\
+          "@types/react",\
+          "@types/redux",\
+          "react",\
+          "redux"\
         ],\
         "linkType": "HARD"\
       }]\

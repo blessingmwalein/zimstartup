@@ -121,12 +121,6 @@ export const createNewCompanyUpdate = async (
   return response.data;
 };
 
-//get-company-updates
-export const getCompanyUpdates = async (companyId: any): Promise<any> => {
-  const response = await api.get(`/companies/${companyId}/update`);
-  return response.data;
-};
-
 //create-new-shareholder
 export const createNewShareholder = async (
   data: CreateCompanyShareholderRequest,
@@ -433,14 +427,19 @@ export const createAward = async (data: any) => {
   return response.data
 };
 
+// Company APIs - Updated to use new endpoints
+export const getCompanyData = async (companyId: number) => {
+  const response = await api.get(`/get-company/${companyId}`)
+  return response.data[0] // API returns array with single object
+};
+
 export const getCompanyDirectors = async (companyId: number) => {
   const response = await api.get(`/company-directors/${companyId}`)
   return response.data
 };
 
-// Company APIs
-export const getCompanyData = async (companyId: number) => {
-  const response = await api.get(`/get-all-company-data-combined/${companyId}`)
+export const getCompanyValuations = async (companyId: number) => {
+  const response = await api.get(`/company-valuations/${companyId}`)
   return response.data
 };
 
@@ -454,7 +453,13 @@ export const createCompanyUpdate = async (data: any) => {
   return response.data
 };
 
-//get emplye combined data 
+// Get company updates
+export const getCompanyUpdates = async (companyId: number) => {
+  const response = await api.get(`/companies/${companyId}/update`)
+  return response.data
+};
+
+//get employee combined data 
 export const getEmployeeCombinedData = async (employeeId: number) => {
   const response = await api.get(`/get-employee-details/${employeeId}`)
   return response.data
@@ -495,7 +500,7 @@ export const deletePreviousFunds = async (fundId: number) => {
   return response.data
 };
 
-// Fetch company requests for a given company ID
+// Get company requests for a given company ID
 export const getCompanyRequests = async (companyId: number): Promise<any> => {
   const response = await api.get(`/company-request/${companyId}`)
   return response.data

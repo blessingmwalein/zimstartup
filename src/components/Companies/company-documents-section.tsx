@@ -1,9 +1,8 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
-import { FileText, Upload, Plus, Download, Trash2 } from "lucide-react"
+import { FileText, Upload, Plus, Download, Trash2, File, FolderOpen } from "lucide-react"
 import CustomButton from "./ui/custom-button"
 
 interface CompanyDocumentsSectionProps {
@@ -61,101 +60,137 @@ export default function CompanyDocumentsSection({ documents = [], onUpload, onDe
     }
   }
 
+  const getFileIcon = (fileName: string) => {
+    const extension = fileName.split('.').pop()?.toLowerCase()
+    const iconClass = "h-12 w-12"
+    
+    switch (extension) {
+      case 'pdf':
+        return <FileText className={`${iconClass} text-red-500`} />
+      case 'doc':
+      case 'docx':
+        return <FileText className={`${iconClass} text-blue-500`} />
+      case 'xls':
+      case 'xlsx':
+        return <FileText className={`${iconClass} text-green-500`} />
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+        return <File className={`${iconClass} text-purple-500`} />
+      default:
+        return <File className={`${iconClass} text-gray-500`} />
+    }
+  }
+
   const formatDate = (dateString: string) => {
+    if (!dateString) return "N/A"
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
-      month: "long",
+      month: "short",
       day: "numeric",
     })
   }
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-      <div className="mb-6 flex items-center justify-between">
-        <h3 className="text-xl font-semibold">Company Documents</h3>
-        <label>
-          <CustomButton type="button" variant="solid" icon={<Plus className="h-4 w-4" />} isDisabled={uploading}>
+    <div className="rounded-3xl border-none bg-white p-8">
+      {/* Header */}
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h3 className="text-2xl font-bold text-gray-900">Company Documents</h3>
+          <p className="mt-1 text-sm text-gray-500">{documents.length} document{documents.length !== 1 ? 's' : ''} available</p>
+        </div>
+        <label className="cursor-pointer">
+          <CustomButton 
+            type="button" 
+            variant="solid" 
+            icon={<Plus className="h-4 w-4" />} 
+            isDisabled={uploading}
+          >
             {uploading ? "Uploading..." : "Upload Document"}
           </CustomButton>
-          <input type="file" className="hidden" onChange={handleFileChange} disabled={uploading} />
+          <input 
+            type="file" 
+            className="hidden" 
+            onChange={handleFileChange} 
+            disabled={uploading} 
+          />
         </label>
       </div>
 
+      {/* Upload Zone */}
       <div
-        className={`flex h-60 flex-col items-center justify-center rounded-lg border-2 ${
-          isDragging ? "border-blue-500 bg-blue-50" : "border-dashed"
+        className={`mb-8 flex h-48 flex-col items-center justify-center rounded-2xl border-2 transition-all ${
+          isDragging 
+            ? "border-primary bg-primary/5" 
+            : "border-dashed border-gray-300 bg-gray-50"
         }`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <div className="text-center text-gray-500">
-          <Upload className="mx-auto h-10 w-10" />
-          <p className="mt-2">Drag and drop files here, or click to browse</p>
-          <p className="mt-1 text-sm">Supported formats: PDF, DOCX, XLSX, JPG, PNG</p>
-          <label>
-            <CustomButton
-              type="button"
-              variant="outlined"
-              icon={<FileText className="h-4 w-4" />}
-              borderRadius="rounded-md"
-              fullWidth={false}
-              isDisabled={uploading}
-            >
-              Browse Files
-            </CustomButton>
-            <input type="file" className="hidden" onChange={handleFileChange} disabled={uploading} />
-          </label>
-        </div>
+        <Upload className={`mx-auto h-12 w-12 ${isDragging ? 'text-primary' : 'text-gray-400'}`} />
+        <p className="mt-3 text-base font-medium text-gray-700">Drag and drop files here</p>
+        <p className="mt-1 text-sm text-gray-500">or click the button above to browse</p>
+        <p className="mt-2 text-xs text-gray-400">Supported: PDF, DOCX, XLSX, JPG, PNG</p>
       </div>
 
-      <div className="mt-6">
-        <h4 className="mb-4 font-medium">Recent Documents</h4>
-        {documents.length === 0 ? (
-          <div className="rounded-lg border border-gray-200 p-8 text-center text-gray-500">
-            <p>No documents uploaded yet</p>
-          </div>
-        ) : (
-          <div className="rounded-lg border border-gray-200">
-            {documents.map((document, index) => (
-              <div
-                key={document.document_id || index}
-                className={`flex items-center justify-between ${
-                  index !== documents.length - 1 ? "border-b border-gray-200" : ""
-                } p-4`}
-              >
-                <div className="flex items-center gap-3">
-                  <FileText className="h-5 w-5 text-gray-500" />
-                  <div>
-                    <p className="font-medium">{document.document_name || `Document ${index + 1}`}</p>
-                    <p className="text-sm text-gray-500">
-                      Uploaded on {document.upload_date ? formatDate(document.upload_date) : "Unknown date"}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <a
-                    href={document.document_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-full p-2 text-[#001f3f] hover:bg-gray-100"
-                  >
-                    <Download className="h-5 w-5" />
-                  </a>
-                  {onDelete && (
-                    <button
-                      onClick={() => handleDeleteDocument(document.document_id)}
-                      className="rounded-full p-2 text-red-500 hover:bg-gray-100"
-                    >
-                      <Trash2 className="h-5 w-5" />
-                    </button>
-                  )}
+      {/* Documents Grid */}
+      {documents.length > 0 ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {documents.map((doc) => (
+            <div
+              key={doc.id}
+              className="group relative rounded-2xl border border-gray-200 bg-white p-5 transition-all hover:border-primary hover:shadow-lg"
+            >
+              {/* File Icon */}
+              <div className="mb-4 flex items-center justify-center">
+                <div className="flex h-20 w-20 items-center justify-center rounded-xl bg-gray-50 group-hover:bg-primary/5 transition-colors">
+                  {getFileIcon(doc.document_name)}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+
+              {/* File Name */}
+              <h4 className="mb-2 line-clamp-2 text-center text-sm font-semibold text-gray-900">
+                {doc.document_name}
+              </h4>
+
+              {/* File Date */}
+              {doc.created_at && (
+                <p className="mb-4 text-center text-xs text-gray-500">
+                  {formatDate(doc.created_at)}
+                </p>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center justify-center gap-2">
+                <a
+                  href={doc.company_doc}
+                  download
+                  className="flex items-center justify-center rounded-lg bg-primary/10 p-2 text-primary transition-colors hover:bg-primary hover:text-white"
+                  title="Download"
+                >
+                  <Download className="h-4 w-4" />
+                </a>
+                {onDelete && (
+                  <button
+                    onClick={() => handleDeleteDocument(doc.id)}
+                    className="flex items-center justify-center rounded-lg bg-red-50 p-2 text-red-600 transition-colors hover:bg-red-600 hover:text-white"
+                    title="Delete"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 p-12">
+          <FolderOpen className="h-16 w-16 text-gray-400" />
+          <p className="mt-4 text-lg font-medium text-gray-700">No documents yet</p>
+          <p className="mt-2 text-sm text-gray-500">Upload your first document to get started</p>
+        </div>
+      )}
     </div>
   )
 }
