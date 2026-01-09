@@ -20,16 +20,15 @@ const DropdownMessage = () => {
           href="#"
         >
           <span
-            className={`absolute -right-0.5 -top-0.5 z-1 h-2 w-2 rounded-full bg-meta-1 ${
-              notifying === false ? "hidden" : "inline"
-            }`}
+            className={`absolute -right-0.5 -top-0.5 z-1 h-2 w-2 rounded-full bg-meta-1 ${notifying === false ? "hidden" : "inline"
+              }`}
           >
             <span className="absolute -z-1 inline-flex h-full w-full animate-ping rounded-full bg-meta-1 opacity-75"></span>
           </span>
 
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3" />
-</svg>
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="size-6">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3" />
+          </svg>
 
         </Link>
 
@@ -63,7 +62,7 @@ const DropdownMessage = () => {
 
                   <div>
                     <h6 className="text-sm font-medium text-black dark:text-white">
-                     Econet Wireless Zw
+                      Econet Wireless Zw
                     </h6>
                     <p className="text-sm">Stock purchase successful : <strong>$1.000  </strong> USD</p>
                     <p className="text-xs">2min ago</p>
@@ -90,14 +89,14 @@ const DropdownMessage = () => {
 
                   <div>
                     <h6 className="text-sm font-medium text-black dark:text-white">
-                     Cabs Bank Zw
+                      Cabs Bank Zw
                     </h6>
                     <p className="text-sm">Sold stock : <strong>$300 </strong> USD</p>
                     <p className="text-xs">2min ago</p>
                   </div>
                 </Link>
               </li>
-             
+
             </ul>
           </div>
         )}

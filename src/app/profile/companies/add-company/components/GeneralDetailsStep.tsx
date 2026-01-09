@@ -23,13 +23,14 @@ import CustomButton from "@/components/Buttons/CustomButton";
 import CustomAlert from "@/components/common/notification/Alert";
 
 import { useAppDispatch, useAppSelector } from "@/state/store";
-import { createNewCompany } from "@/state/slices/companySlice";
-import { fetchAllConfigs } from "@/state/slices/configSlice";
 import {
     setCompanyId,
     setStep,
     setCompanyName as updateStoredCompanyName,
+    updateStepData,
 } from "@/state/slices/companyCreationSlice";
+import { createNewCompany, submitUpdateCompanyDetails } from "@/state/slices/companySlice";
+import { fetchAllConfigs } from "@/state/slices/configSlice";
 import type {
     BusinessState,
     CompanyIndustry,
@@ -60,7 +61,7 @@ const GeneralDetailsStep: React.FC = () => {
     const { industryList, businessStatesList, stockExchangeList } = useAppSelector(
         (state) => state.companyConfig
     );
-    const { companyName } = useAppSelector((state) => state.companyCreation);
+    const { companyName, stepsData, companyId } = useAppSelector((state) => state.companyCreation);
 
     const {
         register,
@@ -70,7 +71,7 @@ const GeneralDetailsStep: React.FC = () => {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(schema),
-        defaultValues: {
+        defaultValues: stepsData.general || {
             company_name: companyName || "",
         },
     });
@@ -101,11 +102,19 @@ const GeneralDetailsStep: React.FC = () => {
         };
 
         try {
-            const response = await dispatch(createNewCompany(updatePayload)).unwrap();
+            let response;
+            if (companyId) {
+                // Update existing company
+                response = await dispatch(submitUpdateCompanyDetails({ data: updatePayload as any, companyId })).unwrap();
+            } else {
+                // Create new company
+                response = await dispatch(createNewCompany(updatePayload as any)).unwrap();
+            }
 
             if (response.data) {
-                toast.success("Company details added successfully");
-                dispatch(setCompanyId(response.data.company_id));
+                toast.success(companyId ? "Company details updated successfully" : "Company details added successfully");
+                dispatch(updateStepData({ step: "general", data }));
+                dispatch(setCompanyId(response.data.company_id || companyId));
                 dispatch(updateStoredCompanyName(response.data.company_name));
                 dispatch(setStep(2));
             } else {
@@ -233,12 +242,13 @@ const GeneralDetailsStep: React.FC = () => {
                                     render={({ field: { value, onChange } }) => (
                                         <Select
                                             label="Stock Market"
-                                            options={
-                                                stockExchangeList?.map((stock: StockExchangeEntity) => ({
+                                            options={[
+                                                { value: "None", label: "None" },
+                                                ...(stockExchangeList?.map((stock: StockExchangeEntity) => ({
                                                     value: stock.name,
                                                     label: stock.name,
-                                                })) || []
-                                            }
+                                                })) || [])
+                                            ]}
                                             value={value}
                                             onChange={onChange}
                                             placeholder="Select Stock Market"
@@ -291,7 +301,7 @@ const GeneralDetailsStep: React.FC = () => {
                                             label="Business State"
                                             options={
                                                 businessStatesList?.map((state: BusinessState) => ({
-                                                    value: state.id.toString(),
+                                                    value: state.state_name,
                                                     label: state.state_name,
                                                 })) || []
                                             }

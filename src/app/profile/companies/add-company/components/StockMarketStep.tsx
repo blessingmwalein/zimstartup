@@ -15,7 +15,7 @@ import CustomAlert from "@/components/common/notification/Alert";
 import { useAppDispatch, useAppSelector } from "@/state/store";
 import { createStockMarketDetails } from "@/state/slices/companySlice";
 import { fetchAllConfigs } from "@/state/slices/configSlice";
-import { setStep } from "@/state/slices/companyCreationSlice";
+import { setStep, updateStepData } from "@/state/slices/companyCreationSlice";
 import type { MarketType, StockExchangeEntity } from "@/state/models/config";
 
 // Yup validation schema
@@ -24,7 +24,7 @@ const schema = Yup.object({
     listed_date: Yup.date().required("Listed Date is required"),
     listing_capital: Yup.number().required("Listing Capital is required"),
     listing_currency: Yup.string().required("Listing Currency is required"),
-    delisted_date: Yup.date().required("Delisted Date is required"),
+    delisted_date: Yup.date().nullable().notRequired(),
     current_market_cap: Yup.number().required("Current Market Capital is required"),
     stock_id: Yup.string().required("Stock Market is required"),
     financial_year_end: Yup.date().required("Financial Year End is required"),
@@ -33,12 +33,22 @@ const schema = Yup.object({
     ISIN: Yup.string().required("ISIN is required"),
 }).required();
 
+const currencies = [
+    { value: "USD", label: "USD - US Dollar" },
+    { value: "ZAR", label: "ZAR - South African Rand" },
+    { value: "ZiG", label: "ZiG - Zimbabwe Gold" },
+    { value: "RTGS", label: "RTGS - Real Time Gross Settlement" },
+    { value: "GBP", label: "GBP - British Pound" },
+    { value: "EUR", label: "EUR - Euro" },
+    { value: "BWP", label: "BWP - Botswana Pula" },
+];
+
 const StockMarketStep: React.FC = () => {
     const dispatch = useAppDispatch();
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { companyId, companyName } = useAppSelector((state) => state.companyCreation);
+    const { companyId, companyName, stepsData } = useAppSelector((state) => state.companyCreation);
     const { marketTypesList, stockExchangeList } = useAppSelector((state) => state.companyConfig);
 
     const {
@@ -48,6 +58,7 @@ const StockMarketStep: React.FC = () => {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(schema),
+        defaultValues: stepsData.stock || {},
     });
 
     const isFetched = useRef(false);
@@ -72,7 +83,7 @@ const StockMarketStep: React.FC = () => {
         const stockMarketPayload = {
             ...data,
             listed_date: format(new Date(data.listed_date), "yyyy-MM-dd"),
-            delisted_date: format(new Date(data.delisted_date), "yyyy-MM-dd"),
+            delisted_date: data.delisted_date ? format(new Date(data.delisted_date), "yyyy-MM-dd") : null,
             financial_year_end: format(new Date(data.financial_year_end), "yyyy-MM-dd"),
             company_id: companyId,
         };
@@ -82,6 +93,7 @@ const StockMarketStep: React.FC = () => {
 
             if (response.data) {
                 toast.success("Company stock market details added successfully");
+                dispatch(updateStepData({ step: "stock", data }));
                 dispatch(setStep(4)); // Move to Funds Details
             } else {
                 toast.error("Something went wrong");
@@ -131,7 +143,7 @@ const StockMarketStep: React.FC = () => {
                                 <Controller
                                     control={control}
                                     name="market_type_id"
-                                    render={({ field }) => (
+                                    render={({ field }: { field: any }) => (
                                         <Select
                                             label="Type of Market"
                                             options={
@@ -152,7 +164,7 @@ const StockMarketStep: React.FC = () => {
                                 <Controller
                                     control={control}
                                     name="stock_id"
-                                    render={({ field }) => (
+                                    render={({ field }: { field: any }) => (
                                         <Select
                                             label="Stock Market"
                                             options={
@@ -197,12 +209,20 @@ const StockMarketStep: React.FC = () => {
                                     icon={<DollarSign className="h-5 w-5" />}
                                 />
 
-                                <TextField
-                                    label="Listing Currency"
-                                    placeholder="Enter currency (e.g. USD)"
-                                    {...register("listing_currency")}
-                                    error={errors.listing_currency?.message}
-                                    icon={<DollarSign className="h-5 w-5" />}
+                                <Controller
+                                    control={control}
+                                    name="listing_currency"
+                                    render={({ field }: { field: any }) => (
+                                        <Select
+                                            label="Listing Currency"
+                                            options={currencies}
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            placeholder="Select currency"
+                                            error={errors.listing_currency?.message}
+                                            icon={<DollarSign className="h-5 w-5" />}
+                                        />
+                                    )}
                                 />
 
                                 <TextField
@@ -230,12 +250,20 @@ const StockMarketStep: React.FC = () => {
                                     error={errors.financial_year_end?.message}
                                 />
 
-                                <TextField
-                                    label="Reporting Currency"
-                                    placeholder="Enter reporting currency"
-                                    {...register("reporting_currency")}
-                                    error={errors.reporting_currency?.message}
-                                    icon={<DollarSign className="h-5 w-5" />}
+                                <Controller
+                                    control={control}
+                                    name="reporting_currency"
+                                    render={({ field }: { field: any }) => (
+                                        <Select
+                                            label="Reporting Currency"
+                                            options={currencies}
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            placeholder="Select currency"
+                                            error={errors.reporting_currency?.message}
+                                            icon={<DollarSign className="h-5 w-5" />}
+                                        />
+                                    )}
                                 />
                             </div>
                         </div>

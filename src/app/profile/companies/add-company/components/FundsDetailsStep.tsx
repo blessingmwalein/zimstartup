@@ -15,7 +15,7 @@ import CustomAlert from "@/components/common/notification/Alert";
 
 import { useAppDispatch, useAppSelector } from "@/state/store";
 import { createCompanyPreviousFunds } from "@/state/slices/companySlice";
-import { resetCompanyCreation } from "@/state/slices/companyCreationSlice";
+import { resetCompanyCreation, updateStepData } from "@/state/slices/companyCreationSlice";
 
 // Yup validation schema
 const schema = Yup.object({
@@ -30,13 +30,23 @@ const schema = Yup.object({
     valuation_date: Yup.date().required("Valuation Date is required"),
 }).required();
 
+const currencies = [
+    { value: "USD", label: "USD - US Dollar" },
+    { value: "ZAR", label: "ZAR - South African Rand" },
+    { value: "ZiG", label: "ZiG - Zimbabwe Gold" },
+    { value: "RTGS", label: "RTGS - Real Time Gross Settlement" },
+    { value: "GBP", label: "GBP - British Pound" },
+    { value: "EUR", label: "EUR - Euro" },
+    { value: "BWP", label: "BWP - Botswana Pula" },
+];
+
 const FundsDetailsStep: React.FC = () => {
     const router = useRouter();
     const dispatch = useAppDispatch();
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { companyId, companyName } = useAppSelector((state) => state.companyCreation);
+    const { companyId, companyName, stepsData } = useAppSelector((state: any) => state.companyCreation);
 
     const {
         register,
@@ -45,6 +55,7 @@ const FundsDetailsStep: React.FC = () => {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(schema),
+        defaultValues: stepsData.funds || {},
     });
 
     const onSubmit = async (data: any) => {
@@ -69,6 +80,7 @@ const FundsDetailsStep: React.FC = () => {
 
             if (response.data) {
                 toast.success("Company funds details added successfully");
+                dispatch(updateStepData({ step: "funds", data }));
                 finish();
             } else {
                 toast.error("Something went wrong");
@@ -120,7 +132,7 @@ const FundsDetailsStep: React.FC = () => {
                                 <Controller
                                     control={control}
                                     name="investor_type"
-                                    render={({ field }) => (
+                                    render={({ field }: { field: any }) => (
                                         <Select
                                             label="Investor Type"
                                             options={[
@@ -180,12 +192,20 @@ const FundsDetailsStep: React.FC = () => {
                                     icon={<DollarSign className="h-5 w-5" />}
                                 />
 
-                                <TextField
-                                    label="Investment Currency"
-                                    placeholder="Enter currency (e.g. USD)"
-                                    {...register("investment_currency")}
-                                    error={errors.investment_currency?.message}
-                                    icon={<DollarSign className="h-5 w-5" />}
+                                <Controller
+                                    control={control}
+                                    name="investment_currency"
+                                    render={({ field }: { field: any }) => (
+                                        <Select
+                                            label="Investment Currency"
+                                            options={currencies}
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            placeholder="Select currency"
+                                            error={errors.investment_currency?.message}
+                                            icon={<DollarSign className="h-5 w-5" />}
+                                        />
+                                    )}
                                 />
                             </div>
                         </div>
@@ -207,12 +227,20 @@ const FundsDetailsStep: React.FC = () => {
                                     icon={<DollarSign className="h-5 w-5" />}
                                 />
 
-                                <TextField
-                                    label="Valuation Currency"
-                                    placeholder="Enter valuation currency"
-                                    {...register("company_valuation_currency")}
-                                    error={errors.company_valuation_currency?.message}
-                                    icon={<DollarSign className="h-5 w-5" />}
+                                <Controller
+                                    control={control}
+                                    name="company_valuation_currency"
+                                    render={({ field }: { field: any }) => (
+                                        <Select
+                                            label="Valuation Currency"
+                                            options={currencies}
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            placeholder="Select currency"
+                                            error={errors.company_valuation_currency?.message}
+                                            icon={<DollarSign className="h-5 w-5" />}
+                                        />
+                                    )}
                                 />
 
                                 <CustomDatePicker

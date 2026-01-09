@@ -20,8 +20,8 @@ import CustomButton from "@/components/Buttons/CustomButton";
 import CustomAlert from "@/components/common/notification/Alert";
 
 import { useAppDispatch, useAppSelector } from "@/state/store";
-import { createCompanyContact } from "@/state/slices/companySlice";
-import { setStep, resetCompanyCreation } from "@/state/slices/companyCreationSlice";
+import { createCompanyContact, submitUpdateContactDetails } from "@/state/slices/companySlice";
+import { setStep, resetCompanyCreation, updateStepData } from "@/state/slices/companyCreationSlice";
 
 // Yup validation schema
 const schema = Yup.object({
@@ -31,8 +31,8 @@ const schema = Yup.object({
     email: Yup.string().email("Invalid email address").required("Email is required"),
     work_email: Yup.string().email("Invalid email address").required("Work email is required"),
     phone1: Yup.number().required("Phone number 1 is required"),
-    phone2: Yup.number().nullable(),
-    phone3: Yup.number().nullable(),
+    phone2: Yup.number().nullable().notRequired(),
+    phone3: Yup.number().nullable().notRequired(),
     address: Yup.string().required("Address is required"),
     address_city: Yup.string().required("City is required"),
     state_code: Yup.number().required("State code is required"),
@@ -45,7 +45,7 @@ const ContactDetailsStep: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { companyId, companyName } = useAppSelector((state: any) => state.companyCreation);
+    const { companyId, companyName, stepsData } = useAppSelector((state: any) => state.companyCreation);
     const { marketTypesList, stockExchangeList } = useAppSelector((state: any) => state.companyConfig);
     const {
         register,
@@ -53,6 +53,7 @@ const ContactDetailsStep: React.FC = () => {
         formState: { errors },
     } = useForm({
         resolver: yupResolver(schema),
+        defaultValues: stepsData.contact || {},
     });
 
     const onSubmit = async (data: Record<string, any>) => {
@@ -71,10 +72,18 @@ const ContactDetailsStep: React.FC = () => {
         };
 
         try {
-            const response = await dispatch(createCompanyContact(contactDetailsPayload)).unwrap();
+            let response;
+            if (stepsData.contact) {
+                // Update existing contact details
+                response = await dispatch(submitUpdateContactDetails({ data: contactDetailsPayload as any, companyId })).unwrap();
+            } else {
+                // Create new contact details
+                response = await dispatch(createCompanyContact(contactDetailsPayload)).unwrap();
+            }
 
             if (response.data) {
-                toast.success("Company contact details added successfully");
+                toast.success(stepsData.contact ? "Company contact details updated successfully" : "Company contact details added successfully");
+                dispatch(updateStepData({ step: "contact", data }));
                 dispatch(setStep(3)); // Move to Stock Market Details
             } else {
                 toast.error("Something went wrong");
